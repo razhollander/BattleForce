@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<TalentChickenEggStateS2C> ChickenEggs;
         public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
         public FixedUnorderedList<MoleStateS2C> Moles;
+        public FixedUnorderedList<ScoreGateStateS2C> ScoreGates;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public Dictionary<ushort, int> MolesHitPerTeamId;
@@ -40,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public float MapSizeMultiplier;
         
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks,
-            int maxMoles)
+            int maxMoles, int maxScoreGates)
         {
             // The lock on capacity must stay in sync with MaxCap.ConcurrentLockOnTargets, a caster can lock on every enemy, power up ball and mole at once
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls + maxMoles));
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             ChickenEggs = new FixedUnorderedList<TalentChickenEggStateS2C>(maxChickenEggs);
             GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
             Moles = new FixedUnorderedList<MoleStateS2C>(maxMoles);
+            ScoreGates = new FixedUnorderedList<ScoreGateStateS2C>(maxScoreGates);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
             MolesHitPerTeamId = new Dictionary<ushort, int>(maxTeams);
@@ -100,6 +102,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var mole in Moles.AsSpan())
             {
                 mole.Serialize(writer);
+            }
+
+            var scoreGatesCount = ScoreGates.Count;
+            writer.Put((byte)scoreGatesCount);
+            foreach (var scoreGate in ScoreGates.AsSpan())
+            {
+                scoreGate.Serialize(writer);
             }
 
             foreach (var kvp in GemsPerTeamId)
@@ -234,6 +243,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var mole = ref Moles.AddAndGet();
                 mole.Deserialize(reader);
+            }
+
+            var scoreGatesCount = reader.GetByte();
+            ScoreGates.Clear();
+            for (var i = 0; i < scoreGatesCount; i++)
+            {
+                ref var scoreGate = ref ScoreGates.AddAndGet();
+                scoreGate.Deserialize(reader);
             }
 
             GemsPerTeamId.Clear();
@@ -1125,6 +1142,34 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No mole for id {moleId}!");
         }
 
+        public bool TryGetScoreGateIndexById(ushort scoreGateId, out int scoreGateIndex)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == scoreGateId)
+                {
+                    scoreGateIndex = i;
+                    return true;
+                }
+            }
+
+            scoreGateIndex = -1;
+            return false;
+        }
+
+        public ref ScoreGateStateS2C GetScoreGateById(ushort scoreGateId)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == scoreGateId)
+                {
+                    return ref ScoreGates.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No score gate for id {scoreGateId}!");
+        }
+
         public void AddMolesHitForTeam(ushort teamId, int molesHitDelta)
         {
             MolesHitPerTeamId[teamId] += molesHitDelta;
@@ -1167,6 +1212,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             ChickenEggs.Clear();
             GalacticForceFields.Clear();
             Moles.Clear();
+            ScoreGates.Clear();
             FieldBarriersOrderedByTeamId.Clear();
         }
     }

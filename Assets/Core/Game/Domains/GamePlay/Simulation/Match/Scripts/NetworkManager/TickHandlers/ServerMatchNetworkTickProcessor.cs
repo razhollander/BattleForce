@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TrySpawnMolesCommand _trySpawnMolesCommand;
         private TryBreakChickenEggsOnMolesCommand _tryBreakChickenEggsOnMolesCommand;
         private TryEndWhacAMoleStageCommand _tryEndWhacAMoleStageCommand;
+        private TryScoreGatePassesCommand _tryScoreGatePassesCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
@@ -95,6 +96,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
             _tryBreakChickenEggsOnMolesCommand = _commandFactory.CreateCommandVoid<TryBreakChickenEggsOnMolesCommand>();
             _tryEndWhacAMoleStageCommand = _commandFactory.CreateCommandVoid<TryEndWhacAMoleStageCommand>();
+            _tryScoreGatePassesCommand = _commandFactory.CreateCommandVoid<TryScoreGatePassesCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
             _stepFrigidBlocksCommand = _commandFactory.CreateCommandVoid<StepFrigidBlocksCommand>();
@@ -138,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
+                _tryScoreGatePassesCommand.SetProcessedTick(currentTick).Execute(); // after the physics step, so gate and player positions are post-step
                 _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _tryDamagePlayersTouchingSpikesCommand.SetProcessedTick(currentTick).Execute();
@@ -331,6 +334,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.MoleHitNetEvents = _netEventsDataService.MoleHitNetEventsPerClient[clientId];
                 _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
                 _fullTickPacket.GoldenMoleDamagedNetEvents = _netEventsDataService.GoldenMoleDamagedNetEventsPerClient[clientId];
+                _fullTickPacket.ScoreGatePassedNetEvents = _netEventsDataService.ScoreGatePassedNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

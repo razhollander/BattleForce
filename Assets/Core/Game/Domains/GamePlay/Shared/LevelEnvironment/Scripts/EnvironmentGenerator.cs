@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
         [SerializeField] private List<LavaWall> _lavaWalls;
         [SerializeField] private List<PowerUpSpawnPoint> _powerUpSpawnPoints;
         [SerializeField] private List<MoleSpawnPoint> _moleSpawnPoints;
+        [SerializeField] private List<ScoreGateSpawnPoint> _scoreGates;
         [SerializeField] private Transform _cameraTopLeftBoundary;
         [SerializeField] private Transform _cameraBottomRightBoundary;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -45,6 +46,22 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             }
 
             _environmentConfig.SetMoleSpawnPoints(moleSpawnPointConfigs, index);
+        }
+
+        [Button]
+        public void RefreshScoreGates(int index)
+        {
+            var scoreGateConfigs = new ScoreGateConfig[_scoreGates.Count];
+
+            for (int i = 0; i < _scoreGates.Count; i++)
+            {
+                scoreGateConfigs[i] = new ScoreGateConfig(
+                    _scoreGates[i].Id,
+                    _scoreGates[i].transform.position.ToVector2XY().ToNumericsVector2(),
+                    _scoreGates[i].transform.eulerAngles.z);
+            }
+
+            _environmentConfig.SetScoreGates(scoreGateConfigs, index);
         }
 
         [Button]

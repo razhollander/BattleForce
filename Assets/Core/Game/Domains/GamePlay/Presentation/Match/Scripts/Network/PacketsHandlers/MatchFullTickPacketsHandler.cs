@@ -55,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<MoleHitNetEventS2C> _cachedUnprocessedMoleHitEvents;
         private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
         private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
+        private readonly CapacityList<ScoreGatePassedNetEventS2C> _cachedUnprocessedScoreGatePassedEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
         private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
@@ -157,6 +158,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedMoleHitEvents = new CapacityList<MoleHitNetEventS2C>(networkConfig.MaxCap.MoleHitNetEvents);
             _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
             _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
+            _cachedUnprocessedScoreGatePassedEvents = new CapacityList<ScoreGatePassedNetEventS2C>(networkConfig.MaxCap.ScoreGatePassedNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
@@ -284,6 +286,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessMoleHitEvents(latestFullTickPacket.MoleHitNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
             ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
+            ProcessScoreGatePassedEvents(latestFullTickPacket.ScoreGatePassedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents, ignoreEventsNotAboveTick);
@@ -353,6 +356,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateFishingRodTipsTransform(simulationState);
             UpdateSoulGhostsTransform(simulationState);
             UpdateFrigidBlocksTransform(simulationState);
+            ReconcileScoreGatesFromState(simulationState);
         }
 
         /// <summary>
@@ -1387,6 +1391,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        private void ProcessScoreGatePassedEvents(FixedUnorderedList<ScoreGatePassedNetEventS2C> scoreGatePassedNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedScoreGatePassedEvents.Clear();
+
+            foreach (var netEvent in scoreGatePassedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedScoreGatePassedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedScoreGatePassedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedScoreGatePassedEvents.Sort();
+                _presentationNetEventsHandler.ProcessScoreGatePassedEvents(_cachedUnprocessedScoreGatePassedEvents);
+            }
+        }
+
         private void ProcessMoleExpiredEvents(FixedUnorderedList<MoleExpiredNetEventS2C> moleExpiredNetEvents, int ignoreEventsNotAboveTick)
         {
             _cachedUnprocessedMoleExpiredEvents.Clear();
@@ -1726,6 +1749,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 {
                     frigidBlock.Position = state.Position.ToUnityVector2();
                     frigidBlock.Rotation = state.Rotation.ToUnityVector2();
+                }
+            }
+        }
+
+        // Score gates come from the layout (no spawn event), so the client mirrors them straight from the tick state:
+        // create the model on first sight, then keep its transform in sync as the gate is shoved around.
+        private void ReconcileScoreGatesFromState(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var scoreGateState in simulationState.ScoreGates.AsSpan())
+            {
+                if (_matchDataService.TryGetScoreGate(scoreGateState.Id, out var scoreGateModel))
+                {
+                    scoreGateModel.Position = scoreGateState.Position.ToUnityVector2();
+                    scoreGateModel.Rotation = scoreGateState.Rotation.ToUnityVector2();
+                }
+                else
+                {
+                    _matchDataService.AddScoreGate(scoreGateState.Id, scoreGateState.Position, scoreGateState.Rotation, scoreGateState.LastScoredTeamId);
                 }
             }
         }

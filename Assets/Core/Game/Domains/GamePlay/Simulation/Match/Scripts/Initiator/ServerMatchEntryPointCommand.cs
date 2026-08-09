@@ -36,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
         private IStageDataService _stageDataService;
+        private IBonusStageRotationService _bonusStageRotationService;
         private ISimulationInputService _simulationInputService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
@@ -63,6 +64,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
@@ -79,6 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             InitPlayers(_simulationMatchEnterData);
             _playerInputsPacketsHandler.InitEntryPoint();
             _stageDataService.InitEntryPoint();
+            _bonusStageRotationService.ResetData(); // the bonus-stage rotation restarts fresh for each match
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();
         }

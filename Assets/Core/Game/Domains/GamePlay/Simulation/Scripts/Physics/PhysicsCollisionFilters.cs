@@ -23,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.PlayerHeart:
@@ -36,6 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.StartMatchWall);
                     break;
                 case PhysicsBodyType.Wall:
@@ -57,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.SoulGhost)
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.TalentCard:
@@ -68,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.PowerUpBall:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.TeamFloor:
@@ -89,6 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
@@ -99,21 +104,38 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.GrapplingHookProjectile:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.FishingRodTip:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.SoulGhost:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.ChickenEgg:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
+                    break;
+                // The gate is a heavy free body: everything that can shove a wall-like object should be able to shove it,
+                // and bullets must stop on it instead of flying through the posts.
+                case PhysicsBodyType.ScoreGate:
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
+                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost)
+                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
                     break;
                 // A mole is a sensor that only needs to notice the things that can whack it: bullets, spaceships carrying a talent that spins whatever it touches, and the projectiles of such talents.
                 // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnMolesCommand resolves that overlap instead.

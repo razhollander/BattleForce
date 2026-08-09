@@ -31,7 +31,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         public void Execute()
         {
             // The preparation phase has its own centered countdown, so this one only takes over once the stage is live.
-            var shouldShowCountdown = _matchDataService.StageType == StageType.WhacAMole && !_matchDataService.IsInPreparationPhase;
+            // Shown for every bonus stage (Whac-A-Mole + GatePass).
+            var shouldShowCountdown = _matchDataService.StageType.IsBonusStage() && !_matchDataService.IsInPreparationPhase;
 
             if (!shouldShowCountdown)
             {

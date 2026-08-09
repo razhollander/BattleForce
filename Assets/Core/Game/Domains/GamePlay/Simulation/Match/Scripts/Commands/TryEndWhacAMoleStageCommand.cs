@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var simulationState = _matchDataService.SimulationState;
-            var isCountdownOver = simulationState.StageType == StageType.WhacAMole
+            var isCountdownOver = simulationState.StageType.IsBonusStage()
                                   && !simulationState.IsInPreparationPhase
                                   && !_stageDataService.IsStageEnded
                                   && _processedTick >= simulationState.WhacAMoleEndTick;

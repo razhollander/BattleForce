@@ -181,6 +181,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 frigidBlock.Velocity = body.GetLinearVelocity();
                 frigidBlock.AngularVelocity = body.GetAngularVelocity();
             }
+
+            for (int i = 0; i < _matchDataService.SimulationState.ScoreGates.Count; i++)
+            {
+                ref var scoreGate = ref _matchDataService.SimulationState.ScoreGates.GetByIndex(i);
+                var body = _physicsSimulator.GetScoreGate(scoreGate.Id);
+                scoreGate.Position = body.Position;
+                scoreGate.Rotation = body.GetAngle().FromAngleRadians();
+            }
         }
     }
 }

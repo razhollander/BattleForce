@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleHitNetEventS2C>> MoleHitNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<ScoreGatePassedNetEventS2C>> ScoreGatePassedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> GoldenMoleDamagedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
@@ -154,6 +155,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position, int emergeOnTick, bool isGolden, byte maxLives);
         void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, int byPlayerMolesHitScoreTotal, bool isGolden);
+        void AddScoreGatePassedNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamBonusScoreTotal, int byPlayerBonusScoreTotal);
         void AddMoleExpiredNetEvent(int onTick, ushort moleId, int hideOnTick);
         void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, byte remainingLives, byte maxLives);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);

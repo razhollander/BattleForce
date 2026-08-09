@@ -12,6 +12,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         public bool IsStageEnded { get; set; }
         public float StageRestartTimer { get; set; }
         public bool IsWhacAMoleStage => _matchDataService.SimulationState.StageType == StageType.WhacAMole;
+        public bool IsBonusStage => _matchDataService.SimulationState.StageType.IsBonusStage();
 
         public StageDataService(IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig)
         {

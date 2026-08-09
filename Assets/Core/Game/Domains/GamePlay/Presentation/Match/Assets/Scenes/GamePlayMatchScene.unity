@@ -1271,6 +1271,7 @@ MonoBehaviour:
   _secondCastAimArrowViewPrefab: {fileID: 5122680099135389200, guid: 0aceb9039492e4b55b8e9a85bf21460f, type: 3}
   _soulGhostViewPrefab: {fileID: 7513383058881288450, guid: efd9349a85bdf4c52b914330766a5db3, type: 3}
   _frigidBlockViewPrefab: {fileID: 6600000000000000004, guid: bf83a0035cab451ba603c58f36e4b6a9, type: 3}
+  _scoreGateViewPrefab: {fileID: 7134216670489954241, guid: 2dfeba75cb906420192d3bb41f365a64, type: 3}
   _dashPulseGustEffectViewPrefab: {fileID: 2651892565007212038, guid: 26b876fb431b54fffa58daf61e4d5811, type: 3}
   _nukeShockwaveEffectViewPrefab: {fileID: 8953231488408219917, guid: a8cff7a8f0054444194ea2a25db08580, type: 3}
   _magneticPullFieldViewPrefab: {fileID: 4847719626318205942, guid: 7cd482f6bf67d433481abe04296c2986, type: 3}

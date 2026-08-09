@@ -89,7 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            if (_stageDataService.IsWhacAMoleStage) // Whac-A-Mole players have no health, so nothing can damage them
+            if (_stageDataService.IsBonusStage) // Bonus-stage players have no health, so nothing can damage them
             {
                 return;
             }

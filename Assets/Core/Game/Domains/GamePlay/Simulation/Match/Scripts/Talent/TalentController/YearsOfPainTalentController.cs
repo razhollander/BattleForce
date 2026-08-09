@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TryHitMoleCommand _tryHitMoleCommand;
+        private PushScoreGateCommand _pushScoreGateCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.YearsOfPain;
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
+            _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -128,11 +130,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
             }
 
+            // Independently of the enemy/mole hit, the rectangle shoves and spins any score gate it covers.
+            if (_physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
+                && hitGateData.PhysicsBodyType == PhysicsBodyType.ScoreGate)
+            {
+                PushScoreGate(hitGateData.Id, direction);
+            }
+
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddActivateYearsOfPainTalentNetEventS2C(tick, _casterPlayerId, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
+        }
+
+        private void PushScoreGate(ushort scoreGateId, System.Numerics.Vector2 direction)
+        {
+            var gatePosition = _matchDataService.SimulationState.GetScoreGateById(scoreGateId).Position;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(direction * gatePassConfig.YearsOfPainPushImpulse)
+                .SetWorldContactPoint(gatePosition)
+                .SetExtraSpinImpulse(gatePassConfig.YearsOfPainSpinImpulse)
+                .Execute();
         }
 
         private void ApplyEffectToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)

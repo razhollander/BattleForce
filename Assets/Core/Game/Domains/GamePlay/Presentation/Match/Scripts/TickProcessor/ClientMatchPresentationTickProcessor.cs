@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleShootFrigidBlockNetEventsCommand _handleShootFrigidBlockNetEventsCommand;
         private readonly HandleDestroyFrigidBlockNetEventsCommand _handleDestroyFrigidBlockNetEventsCommand;
         private readonly UpdateFrigidBlocksTransformCommand _updateFrigidBlocksTransformCommand;
+        private readonly UpdateScoreGatesTransformCommand _updateScoreGatesTransformCommand;
         private readonly HandleActivateSentryGunTalentNetEventsCommand _handleActivateSentryGunTalentNetEventsCommand;
         private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
         private readonly HandleActivateRockTalentNetEventsCommand _handleActivateRockTalentNetEventsCommand;
@@ -110,6 +111,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
         private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
         private readonly HandleGoldenMoleDamagedNetEventsCommand _handleGoldenMoleDamagedNetEventsCommand;
+        private readonly HandleScoreGatePassedNetEventsCommand _handleScoreGatePassedNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
             IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
@@ -163,6 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleShootFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleShootFrigidBlockNetEventsCommand>();
             _handleDestroyFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleDestroyFrigidBlockNetEventsCommand>();
             _updateFrigidBlocksTransformCommand = commandFactory.CreateCommandVoid<UpdateFrigidBlocksTransformCommand>();
+            _updateScoreGatesTransformCommand = commandFactory.CreateCommandVoid<UpdateScoreGatesTransformCommand>();
             _handleActivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSentryGunTalentNetEventsCommand>();
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateRockTalentNetEventsCommand>();
@@ -205,6 +208,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
             _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
             _handleGoldenMoleDamagedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGoldenMoleDamagedNetEventsCommand>();
+            _handleScoreGatePassedNetEventsCommand = commandFactory.CreateCommandVoid<HandleScoreGatePassedNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -254,6 +258,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleGoldenMoleDamagedNetEventsCommand.Execute();
             _handleMoleHitNetEventsCommand.Execute();
+            _handleScoreGatePassedNetEventsCommand.Execute();
             _handleMoleExpiredNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
@@ -294,6 +299,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateFishingRodTipsTransformCommand.Execute();
             _updateSoulGhostsTransformCommand.Execute();
             _updateFrigidBlocksTransformCommand.Execute();
+            _updateScoreGatesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();

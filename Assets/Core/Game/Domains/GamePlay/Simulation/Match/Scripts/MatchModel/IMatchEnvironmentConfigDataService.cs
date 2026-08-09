@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; }
         PowerUpSpawnPointConfig[] PowerUpSpawnPoints { get; }
         MoleSpawnPointConfig[] MoleSpawnPoints { get; }
+        ScoreGateConfig[] ScoreGates { get; }
         void InitEnvironmentLayout(int environmentLayoutId);
     }
 }

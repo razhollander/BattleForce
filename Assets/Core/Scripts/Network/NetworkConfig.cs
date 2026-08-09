@@ -146,6 +146,8 @@ namespace Core.Scripts.Network
         public int MoleHitNetEvents = 64;
         public int MoleExpiredNetEvents = 64;
         public int GoldenMoleDamagedNetEvents = 64;
+        public int ConcurrentScoreGates = 4;
+        public int ScoreGatePassedNetEvents = 64;
 
         [Serializable]
         public class EnvironmentRotatingWheel

@@ -33,6 +33,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
@@ -86,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private SecondCastAimArrowView _secondCastAimArrowViewPrefab;
         [SerializeField] private SoulGhostView _soulGhostViewPrefab;
         [SerializeField] private FrigidBlockView _frigidBlockViewPrefab;
+        [SerializeField] private ScoreGateView _scoreGateViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
         [SerializeField] private NukeShockwaveEffectView _nukeShockwaveEffectViewPrefab;
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
@@ -149,6 +151,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<SecondCastAimArrowControllers>().AsSingle().WithArguments(_secondCastAimArrowViewPrefab).NonLazy();
             Container.BindInterfacesTo<SoulGhostControllers>().AsSingle().WithArguments(_soulGhostViewPrefab).NonLazy();
             Container.BindInterfacesTo<FrigidBlocksControllers>().AsSingle().WithArguments(_frigidBlockViewPrefab).NonLazy();
+            Container.BindInterfacesTo<ScoreGatesControllers>().AsSingle().WithArguments(_scoreGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<NukeShockwaveEffectController>().AsSingle().WithArguments(_nukeShockwaveEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();

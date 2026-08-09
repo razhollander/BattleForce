@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TryHitMoleCommand _tryHitMoleCommand;
+        private PushScoreGateCommand _pushScoreGateCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.MagneticPull;
@@ -59,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
+            _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -127,11 +129,32 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
             }
             
+            // Independently of the enemy/mole hit, the field drags any score gate in range toward the caster.
+            if (_physicsSimulator.ArcCastByPriority(center, fieldRadius, direction, fieldArcAngle, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
+                && hitGateData.PhysicsBodyType == PhysicsBodyType.ScoreGate)
+            {
+                PullScoreGateToCaster(hitGateData.Id, casterPlayerState);
+            }
+
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddCreateMagneticPullFieldNetEventS2C(tick, _casterPlayerId, center, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
+        }
+
+        private void PullScoreGateToCaster(ushort scoreGateId, PlayerStateS2C casterPlayerState)
+        {
+            var gatePosition = _matchDataService.SimulationState.GetScoreGateById(scoreGateId).Position;
+            var directionToCaster = (casterPlayerState.Spaceship.Transform.Position - gatePosition).NormalizeSafe();
+            var impulse = directionToCaster * _gamePlayConfigService.GamePlayConfig.GatePass.MagneticPullImpulse;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(impulse)
+                .SetWorldContactPoint(gatePosition)
+                .SetExtraSpinImpulse(0f)
+                .Execute();
         }
 
         private void ApplyPullToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)

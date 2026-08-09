@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Vector2 = System.Numerics.Vector2;
 
@@ -27,6 +28,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         {
             { StageType.DeathMatch, new List<int>() },
             { StageType.WhacAMole, new List<int>() },
+            { StageType.GatePass, new List<int>() },
         };
 
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
@@ -47,7 +49,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentChickenEggs,
                 maxCap.ConcurrentGalacticForceFields,
                 maxCap.ConcurrentFrigidBlocks,
-                maxCap.ConcurrentMoles);
+                maxCap.ConcurrentMoles,
+                maxCap.ConcurrentScoreGates);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -129,6 +132,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             mole.RemainingLives = lives;
             mole.MaxLives = lives;
             return mole;
+        }
+
+        // A score gate uses its authored layout id (not an auto-incremented one), so the same gate keeps its id across rejoins.
+        public ScoreGateStateS2C AddScoreGate(ushort id, Vector2 position, float rotationDegrees)
+        {
+            ref var scoreGate = ref _simulationState.ScoreGates.AddAndGet();
+            scoreGate.Id = id;
+            scoreGate.Position = position;
+            scoreGate.Rotation = rotationDegrees.ToRadians().AngleToVector();
+            scoreGate.LastScoredTeamId = 0;
+            return scoreGate;
         }
 
         public TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick)

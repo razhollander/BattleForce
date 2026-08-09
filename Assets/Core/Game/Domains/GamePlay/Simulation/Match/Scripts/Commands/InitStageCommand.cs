@@ -18,6 +18,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
@@ -34,6 +35,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private IStageDataService _stageDataService;
+        private IBonusStageRotationService _bonusStageRotationService;
+        private IScoreGatePassTrackerService _scoreGatePassTrackerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -59,6 +62,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
+            _scoreGatePassTrackerService = _diContainer.Resolve<IScoreGatePassTrackerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
@@ -85,7 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             RestartStageData();
             var stageType = ResolveStageTypeForCurrentStage();
             _matchDataService.SimulationState.StageType = stageType;
-            SetupWhacAMoleStageData(stageType);
+            SetupBonusStageData(stageType);
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(stageType, mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
@@ -95,27 +100,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private StageType ResolveStageTypeForCurrentStage()
         {
             var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
-            var isRotationConfigured = gamePlayConfig.IsWhacAMoleModeEnabled && gamePlayConfig.WhacAMoleEveryXStages > 0;
-            var didReachWhacAMoleStage = isRotationConfigured && _stageNumber % gamePlayConfig.WhacAMoleEveryXStages == 0;
+            var isRotationConfigured = gamePlayConfig.AreBonusStagesEnabled && gamePlayConfig.WhacAMoleEveryXStages > 0;
+            var didReachBonusStage = isRotationConfigured && _stageNumber % gamePlayConfig.WhacAMoleEveryXStages == 0;
 
-            return didReachWhacAMoleStage ? StageType.WhacAMole : StageType.DeathMatch;
+            return didReachBonusStage ? _bonusStageRotationService.ResolveNextBonusStageType() : StageType.DeathMatch;
         }
 
+        // The bonus score fields (per team + per player) and the countdown end tick are shared by every bonus stage.
         // The end tick already covers the preparation phase, so a rejoining client can always derive the countdown from it.
-        private void SetupWhacAMoleStageData(StageType stageType)
+        private void SetupBonusStageData(StageType stageType)
         {
             var simulationState = _matchDataService.SimulationState;
             simulationState.ResetMolesHitPerTeam(_matchDataService.TeamIds);
             simulationState.ResetMolesHitScoreForAllPlayers();
 
-            if (stageType != StageType.WhacAMole)
+            if (!stageType.IsBonusStage())
             {
                 simulationState.WhacAMoleEndTick = 0;
                 return;
             }
 
             var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
-            var stageDurationSeconds = gamePlayConfig.PreparationPhaseDuration + gamePlayConfig.WhacAMole.StageDurationSeconds;
+            var bonusStageDurationSeconds = stageType == StageType.WhacAMole
+                ? gamePlayConfig.WhacAMole.StageDurationSeconds
+                : gamePlayConfig.GatePass.StageDurationSeconds;
+            var stageDurationSeconds = gamePlayConfig.PreparationPhaseDuration + bonusStageDurationSeconds;
             var stageDurationTicks = (int)System.MathF.Ceiling(stageDurationSeconds * _networkConfig.TicksPerSeconds);
             simulationState.WhacAMoleEndTick = _tickService.CurrentTick + stageDurationTicks;
         }
@@ -127,6 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
             
             CreateWalls(mapSizeMultiplier);
+            CreateScoreGates(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);
             CreateStageBoundaries(mapSizeMultiplier);
             CreateTalentCards(mapSizeMultiplier);
@@ -154,7 +164,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
 
-            return stageType == StageType.WhacAMole ? gamePlayConfig.DefaultWhacAMoleEnvironmentId : gamePlayConfig.DeafultEnvironmentId;
+            switch (stageType)
+            {
+                case StageType.WhacAMole: return gamePlayConfig.DefaultWhacAMoleEnvironmentId;
+                case StageType.GatePass: return gamePlayConfig.DefaultGatePassEnvironmentId;
+                default: return gamePlayConfig.DeafultEnvironmentId;
+            }
         }
 
         // Each stage type draws from its own pool and never repeats a layout until that pool is exhausted.
@@ -204,6 +219,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTouchingWallDataService.ClearAllData();
             _playersTouchingSpikesTrackerService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();
+            _scoreGatePassTrackerService.ClearAllData(); // stale previous positions across a stage boundary would score phantom passes
             _stageDataService.ClearData();
         }
 
@@ -356,6 +372,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService.EnvironmentData.AddWall(wallId, wallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
             _physicsSimulator.AddWall(wallId, wallPoints, lavaWallWorldPosition);
+        }
+
+        // Only GatePass layouts author score gates, so this is a no-op for every other stage type.
+        private void CreateScoreGates(float mapSizeMultiplier)
+        {
+            var scoreGateConfigs = _matchEnvironmentConfigDataService.ScoreGates;
+            if (scoreGateConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var postSize = _sharedGamePlayConfig.ScoreGatePostSize.ToNumericsVector2() * mapSizeMultiplier;
+            var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * mapSizeMultiplier;
+
+            foreach (var scoreGateConfig in scoreGateConfigs)
+            {
+                var position = scoreGateConfig.Position * mapSizeMultiplier;
+                _matchDataService.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees);
+                _physicsSimulator.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees, postSize, gapWidth,
+                    _sharedGamePlayConfig.ScoreGateDensity, _sharedGamePlayConfig.ScoreGateRestitution,
+                    _sharedGamePlayConfig.ScoreGateLinearDamping, _sharedGamePlayConfig.ScoreGateAngularDamping);
+            }
         }
 
         private void CreateLavaWalls(float mapSizeMultiplier)

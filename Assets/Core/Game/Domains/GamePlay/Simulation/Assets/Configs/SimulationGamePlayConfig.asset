@@ -218,7 +218,9 @@ MonoBehaviour:
     EveryXStages: 2
     IsWhacAMoleModeEnabled: 1
     WhacAMoleEveryXStages: 1
+    EnabledBonusStageTypes: 0200000003000000
     DefaultWhacAMoleEnvironmentId: 22
+    DefaultGatePassEnvironmentId: 23
     WhacAMole:
       StageDurationSeconds: 15
       MinMoleSpawnIntervalSeconds: 1
@@ -232,6 +234,21 @@ MonoBehaviour:
       MaxMolesUntilGoldenMole: 6
       GoldenMoleLives: 3
       GoldenMoleScoreOnKill: 3
+    GatePass:
+      StageDurationSeconds: 60
+      ScorePerPass: 1
+      PassScoreCooldownSeconds: 0.4
+      TeleportDetectionSegmentLength: 8
+      KOPushImpulse: 6
+      KOSpinImpulse: 3
+      HeadbuttPushImpulse: 14
+      HeadbuttSpinImpulse: 4
+      ChickenEggSpinImpulse: 5
+      GrapplingHookReactionImpulse: 2
+      MagneticPullImpulse: 6
+      YearsOfPainPushImpulse: 8
+      YearsOfPainSpinImpulse: 3
+      WaterGunPushImpulsePerSecond: 10
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0

@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Telepor
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
@@ -78,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
+        private IScoreGatesControllers _scoreGatesControllers;
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
@@ -130,6 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
+            _scoreGatesControllers = _diContainer.Resolve<IScoreGatesControllers>();
             _chickenEggsControllers = _diContainer.Resolve<IMatchChickenEggsControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
@@ -175,6 +178,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _secondCastAimArrowControllers.DestroyAll();
             _soulGhostControllers.DestroyAll();
             _frigidBlocksControllers.DestroyAll();
+            _scoreGatesControllers.DestroyAll();
             _chickenEggsControllers.DestroyAll();
             _galacticPullStarEffectControllers.DestroyAll();
             _lockOnTargetEffectController.DestroyAll();
@@ -216,18 +220,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateFishingRodTips();
             CreateSoulGhosts();
             CreateFrigidBlocks();
+            CreateScoreGates(mapSizeMultiplier);
             CreateChickenEggs();
             CreateGalacticPullStars();
             SetupWhacAMoleHud();
         }
 
-        // Whac-A-Mole players cannot be damaged, so their health bars are meaningless and the moles-hit score takes over.
+        // Bonus-stage players cannot be damaged, so their health bars are meaningless and the bonus score takes over.
         private void SetupWhacAMoleHud()
         {
-            var isWhacAMoleStage = _simulationState.StageType == StageType.WhacAMole;
-            _teamsBoardUIController.SetIsMolesHitShown(isWhacAMoleStage);
+            var isBonusStage = _simulationState.StageType.IsBonusStage();
+            _teamsBoardUIController.SetIsMolesHitShown(isBonusStage);
 
-            if (!isWhacAMoleStage)
+            if (!isBonusStage)
             {
                 return;
             }
@@ -671,6 +676,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 _matchDataService.AddFrigidBlock(frigidBlock.Id, frigidBlock.PlayerCasterId, frigidBlock.Position, frigidBlock.Rotation);
                 _frigidBlocksControllers.CreateFrigidBlock(frigidBlock.Id, frigidBlock.Position.ToUnityVector2(), frigidBlock.Rotation.ToUnityVector2());
+            }
+        }
+
+        // Score gates come straight from the layout (no spawn event), so the full-state sync is where the client builds
+        // both the model and the view. A gate that was already scored on keeps its team tint through the rejoin.
+        private void CreateScoreGates(float mapSizeMultiplier)
+        {
+            foreach (var scoreGate in _simulationState.ScoreGates.AsSpan())
+            {
+                _matchDataService.AddScoreGate(scoreGate.Id, scoreGate.Position, scoreGate.Rotation, scoreGate.LastScoredTeamId);
+                _scoreGatesControllers.CreateScoreGate(scoreGate.Id, scoreGate.Position.ToUnityVector2(), scoreGate.Rotation.ToQuaternion(), scoreGate.LastScoredTeamId, mapSizeMultiplier);
             }
         }
 

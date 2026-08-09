@@ -9,6 +9,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage
         bool IsStageEnded { get; set; }
         float StageRestartTimer { get; set; }
         bool IsWhacAMoleStage { get; }
+        bool IsBonusStage { get; }
         void ClearData();
         Dictionary<ushort, int> GemsCollectedPerTeam { get; }
         void AddGemsForTeam(ushort teamAlive, int gemsDelta);

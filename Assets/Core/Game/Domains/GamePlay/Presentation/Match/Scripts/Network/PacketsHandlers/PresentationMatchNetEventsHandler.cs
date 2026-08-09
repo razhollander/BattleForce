@@ -300,6 +300,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        // Bonus-score storage is shared with Whac-A-Mole (SetTeamMolesHit / SetPlayerMolesHitScore), so a GatePass pass
+        // updates the same team board and per-player UI. The gate tint uses the client gate model, updated here too.
+        public void ProcessScoreGatePassedEvents(CapacityList<ScoreGatePassedNetEventS2C> scoreGatePassedNetEvents)
+        {
+            if (scoreGatePassedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var scoreGatePassedNetEvent in scoreGatePassedNetEvents)
+            {
+                _matchDataService.SetTeamMolesHit(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
+                _matchDataService.SetPlayerMolesHitScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
+                _matchDataService.SetScoreGateLastScoredTeam(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
+                _cachedPresentationEventsService.ScoreGatePassedNetEvents.Add(scoreGatePassedNetEvent);
+            }
+        }
+
         // An expired mole is not gone yet, it only starts its pre-hide shake and stays hittable until it goes into its
         // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleHitEvents, and one
         // that hides on its own leaves no event, so its stale model entry is cleared with the rest on the next full sync.

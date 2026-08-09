@@ -1244,6 +1244,58 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             RemoveBody(body);
         }
 
+        // A score gate is a single dynamic body carrying two square post fixtures, so the posts can never drift apart
+        // and the whole gate rotates as one rigid piece. The gap between them is what players score by passing through.
+        public void AddScoreGate(ushort id, Vector2 position, float rotationDegrees, Vector2 postSize, float gapWidth, float density, float restitution, float linearDamping, float angularDamping)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.angle = rotationDegrees.ToRadians();
+            bodyDef.linearDamping = linearDamping;
+            bodyDef.angularDamping = angularDamping;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.ScoreGate);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var postHalfWidth = postSize.X * 0.5f;
+            var postHalfHeight = postSize.Y * 0.5f;
+            var postOffsetX = gapWidth * 0.5f + postHalfWidth;
+
+            AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(-postOffsetX, 0f), density, restitution);
+            AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(postOffsetX, 0f), density, restitution);
+        }
+
+        private void AddScoreGatePostFixture(Body body, float postHalfWidth, float postHalfHeight, Vector2 postCenter, float density, float restitution)
+        {
+            var boxShape = GetPolygonShape();
+            boxShape.SetAsBox(postHalfWidth, postHalfHeight, postCenter, 0f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boxShape;
+            fixtureDef.density = density;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = restitution;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.ScoreGate.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.ScoreGate.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boxShape);
+        }
+
+        public Body GetScoreGate(ushort id)
+        {
+            return GetBody(PhysicsBodyType.ScoreGate, id);
+        }
+
+        public void RemoveScoreGate(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.ScoreGate, id);
+            RemoveBody(body);
+        }
+
         public void AddGrapplingHookProjectile(ushort id, ushort teamId, Vector2 position, float radius, Vector2 velocity)
         {
             var bodyDef = GetBodyDef();

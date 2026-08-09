@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         // The DeathMatch layout pool. Kept under its original name so existing assets keep working.
         public List<int> AvailableLayoutIndexes;
         public List<int> WhacAMoleLayoutIndexes;
+        public List<int> GatePassLayoutIndexes;
 
         public EnvironmentLayoutConfig GetEnvironmentLayout(int index)
         {
@@ -30,7 +31,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
         public List<int> GetLayoutIndexesForStageType(StageType stageType)
         {
-            return stageType == StageType.WhacAMole ? WhacAMoleLayoutIndexes : AvailableLayoutIndexes;
+            switch (stageType)
+            {
+                case StageType.WhacAMole: return WhacAMoleLayoutIndexes;
+                case StageType.GatePass: return GatePassLayoutIndexes;
+                default: return AvailableLayoutIndexes;
+            }
         }
         
         public void SetWalls(WallConfig[] wallConfigs, int index)
@@ -181,6 +187,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             {
                 var newLayout = new EnvironmentLayoutConfig("", "");
                 newLayout.SetMoleSpawnPointsJson(json);
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
+        public void SetScoreGates(S2CModels.ScoreGateConfig[] scoreGates, int index)
+        {
+            var json = JsonConvert.SerializeObject(scoreGates);
+
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetScoreGatesJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetScoreGatesJson(json);
                 _environmentLayoutConfigs[index] = newLayout;
             }
 #if UNITY_EDITOR

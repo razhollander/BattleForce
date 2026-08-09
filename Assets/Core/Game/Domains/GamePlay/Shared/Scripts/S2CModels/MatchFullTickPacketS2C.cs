@@ -94,6 +94,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<MoleHitNetEventS2C> MoleHitNetEvents;
         public FixedUnorderedList<MoleExpiredNetEventS2C> MoleExpiredNetEvents;
         public FixedUnorderedList<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents;
+        public FixedUnorderedList<ScoreGatePassedNetEventS2C> ScoreGatePassedNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -104,7 +105,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
                 maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields, maxCap.ConcurrentFrigidBlocks,
-                maxCap.ConcurrentMoles);
+                maxCap.ConcurrentMoles, maxCap.ConcurrentScoreGates);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -193,6 +194,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             MoleHitNetEvents = new FixedUnorderedList<MoleHitNetEventS2C>(maxCap.MoleHitNetEvents);
             MoleExpiredNetEvents = new FixedUnorderedList<MoleExpiredNetEventS2C>(maxCap.MoleExpiredNetEvents);
             GoldenMoleDamagedNetEvents = new FixedUnorderedList<GoldenMoleDamagedNetEventS2C>(maxCap.GoldenMoleDamagedNetEvents);
+            ScoreGatePassedNetEvents = new FixedUnorderedList<ScoreGatePassedNetEventS2C>(maxCap.ScoreGatePassedNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -284,6 +286,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 9)) != 0) SerializedMoleHitNetEvents(writer);
             if ((eventMask2 & (1UL << 10)) != 0) SerializedMoleExpiredNetEvents(writer);
             if ((eventMask2 & (1UL << 11)) != 0) SerializedGoldenMoleDamagedNetEvents(writer);
+            if ((eventMask2 & (1UL << 12)) != 0) SerializedScoreGatePassedNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -301,6 +304,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (MoleHitNetEvents.Count > 0) eventMask2 |= 1UL << 9;
             if (MoleExpiredNetEvents.Count > 0) eventMask2 |= 1UL << 10;
             if (GoldenMoleDamagedNetEvents.Count > 0) eventMask2 |= 1UL << 11;
+            if (ScoreGatePassedNetEvents.Count > 0) eventMask2 |= 1UL << 12;
             return eventMask2;
         }
 
@@ -622,6 +626,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 11)) != 0) DeserializedGoldenMoleDamagedNetEvents(reader);
             else GoldenMoleDamagedNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 12)) != 0) DeserializedScoreGatePassedNetEvents(reader);
+            else ScoreGatePassedNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -2090,6 +2097,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref GoldenMoleDamagedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedScoreGatePassedNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)ScoreGatePassedNetEvents.Count);
+            foreach (var netEvent in ScoreGatePassedNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedScoreGatePassedNetEvents(NetDataReader reader)
+        {
+            ScoreGatePassedNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref ScoreGatePassedNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

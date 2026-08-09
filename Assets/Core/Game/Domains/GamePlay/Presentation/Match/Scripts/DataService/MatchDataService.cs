@@ -31,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchFishingRodTipModel> FishingRodTips { get; private set; }
         public List<MatchSoulGhostModel> SoulGhosts { get; private set; }
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
+        public List<MatchScoreGateModel> ScoreGates { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchMoleModel> Moles { get; private set; }
@@ -71,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FishingRodTips = new List<MatchFishingRodTipModel>(networkConfig.MaxCap.ConcurrentPlayers);
             SoulGhosts = new List<MatchSoulGhostModel>(networkConfig.MaxCap.ConcurrentPlayers);
             FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
+            ScoreGates = new List<MatchScoreGateModel>(networkConfig.MaxCap.ConcurrentScoreGates);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
         }
 
@@ -290,6 +292,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FishingRodTips.Clear();
             SoulGhosts.Clear();
             FrigidBlocks.Clear();
+            ScoreGates.Clear();
             ChickenEggs.Clear();
         }
 
@@ -507,6 +510,62 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 if (FrigidBlocks[i].Id == id)
                 {
                     FrigidBlocks.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId)
+        {
+            var model = new MatchScoreGateModel(id, position.ToUnityVector2(), rotation.ToUnityVector2(), lastScoredTeamId);
+            ScoreGates.Add(model);
+            return model;
+        }
+
+        public MatchScoreGateModel GetScoreGate(ushort id)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == id)
+                {
+                    return ScoreGates[i];
+                }
+            }
+
+            LogService.LogError($"Couldn't find score gate with id {id}");
+            return null;
+        }
+
+        public bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == id)
+                {
+                    scoreGate = ScoreGates[i];
+                    return true;
+                }
+            }
+
+            scoreGate = null;
+            return false;
+        }
+
+        public void SetScoreGateLastScoredTeam(ushort id, ushort teamId)
+        {
+            if (TryGetScoreGate(id, out var scoreGate))
+            {
+                scoreGate.LastScoredTeamId = teamId;
+            }
+        }
+
+        public void RemoveScoreGate(ushort id)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == id)
+                {
+                    ScoreGates.RemoveAt(i);
                     return;
                 }
             }

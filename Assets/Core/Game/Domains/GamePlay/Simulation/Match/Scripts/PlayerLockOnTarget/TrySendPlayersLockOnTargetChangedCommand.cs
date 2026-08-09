@@ -67,11 +67,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                         _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange,
                         _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
                     // Whac-A-Mole players cannot lock on each other, moles take the place of enemies as the shootable target.
+                    // GatePass players cannot lock on enemies either (enemies take no damage), and there are no moles, so
+                    // only power-up balls remain lockable there.
                     if (_stageDataService.IsWhacAMoleStage)
                     {
                         FindTargetedMolesOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
                     }
-                    else
+                    else if (!_stageDataService.IsBonusStage)
                     {
                         FindTargetedEnemyIdsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
                     }

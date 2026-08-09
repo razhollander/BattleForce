@@ -25,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FishingRodTip = 19,
         SoulGhost = 20,
         Mole = 21,
+        ScoreGate = 22,
     }
     
     // Each value is one bit of a fixture's categoryBits/maskBits, so the highest usable value is 31.
@@ -48,5 +49,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FishingRodTip = 13,
         SoulGhost = 14,
         Mole = 15,
+        ScoreGate = 16,
     }
 }

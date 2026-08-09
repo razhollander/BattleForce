@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
@@ -33,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             _diContainer.Bind<IMatchDataService>().To<MatchDataService>().AsSingle();
             _diContainer.Bind<IStageDataService>().To<StageDataService>().AsSingle();
+            _diContainer.Bind<IBonusStageRotationService>().To<BonusStageRotationService>().AsSingle();
+            _diContainer.Bind<IScoreGatePassTrackerService>().To<ScoreGatePassTrackerService>().AsSingle();
             _diContainer.Bind<IPreparationPhaseTimerService>().To<PreparationPhaseTimerService>().AsSingle();
             _diContainer.Bind<ITickProcessor>().To<ServerMatchNetworkTickProcessor>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();

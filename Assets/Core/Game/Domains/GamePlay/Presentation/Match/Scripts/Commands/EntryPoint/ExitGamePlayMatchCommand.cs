@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Background.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts.ObtainedEffect;
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
+        private IScoreGatesControllers _scoreGatesControllers;
         private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
 
         public override void ResolveDependencies()
@@ -34,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
+            _scoreGatesControllers = _diContainer.Resolve<IScoreGatesControllers>();
             _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
         }
 
@@ -47,6 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _talentCardObtainedEffectController.InitExitPoint();
             _galacticPullStarEffectControllers.InitExitPoint();
             _frigidBlocksControllers.InitExitPoint();
+            _scoreGatesControllers.InitExitPoint();
             _secondCastAimArrowControllers.InitExitPoint();
         }
     }

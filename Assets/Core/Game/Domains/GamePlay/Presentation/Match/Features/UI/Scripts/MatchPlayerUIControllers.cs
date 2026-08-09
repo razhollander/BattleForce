@@ -39,7 +39,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             {
                 case StageType.DeathMatch: // the health bar is shown by default
                     break;
-                case StageType.WhacAMole: // the health bar slot shows the player's moles-hit score contribution instead
+                case StageType.WhacAMole: // the health bar slot shows the player's bonus score contribution instead
+                case StageType.GatePass: // GatePass shows the player's gate-pass contribution in the same slot
                     newPlayerController.ShowMolesHitScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
                     break;
                 default:

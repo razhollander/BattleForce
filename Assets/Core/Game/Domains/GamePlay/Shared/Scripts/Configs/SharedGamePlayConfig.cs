@@ -28,4 +28,13 @@ public class SharedGamePlayConfig : ScriptableObject
     public float HeadbuttMaxChargeDurationSeconds = 2f;
     public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
     public float MoleHideShakeDurationSeconds = 1f; // once its lifetime ends the mole shakes in place before hiding, and stays hittable while it does
+
+    // GatePass ScoreGateObstacle geometry + mass. Both the server (body) and the client (view) read these, so they
+    // live in the Shared config. One gate = two square posts of ScoreGatePostSize with ScoreGateGapWidth between them.
+    public UnityEngine.Vector2 ScoreGatePostSize = new UnityEngine.Vector2(1.5f, 1.5f);
+    public float ScoreGateGapWidth = 4f;
+    public float ScoreGateDensity = 4f; // "medium mass" - heavier than a frigid block, lighter than a wall
+    public float ScoreGateRestitution = 0.2f;
+    public float ScoreGateLinearDamping = 1.5f; // a shoved gate drifts and settles instead of sliding forever
+    public float ScoreGateAngularDamping = 1.5f; // a spun gate decays after a couple of turns
 }

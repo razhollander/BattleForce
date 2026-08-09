@@ -91,6 +91,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void RemoveSoulGhost(ushort id);
         MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation);
         void RemoveFrigidBlock(ushort id);
+        List<MatchScoreGateModel> ScoreGates { get; }
+        MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId);
+        MatchScoreGateModel GetScoreGate(ushort id);
+        bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate);
+        void SetScoreGateLastScoredTeam(ushort id, ushort teamId);
+        void RemoveScoreGate(ushort id);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
         MatchChickenEggModel GetChickenEgg(ushort id);

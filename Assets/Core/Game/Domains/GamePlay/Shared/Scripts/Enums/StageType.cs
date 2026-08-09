@@ -5,5 +5,6 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Enums
         None = 0,
         DeathMatch = 1,
         WhacAMole = 2,
+        GatePass = 3,
     }
 }
