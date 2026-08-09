@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
 using Zenject;
@@ -14,14 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
     {
         private readonly MolePool _pool;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IAudioService _audioService;
         private readonly List<MoleController> _controllers = new List<MoleController>();
         private readonly Dictionary<ushort, MoleController> _controllerPerActiveMoleId = new Dictionary<ushort, MoleController>();
         private Transform _parent;
 
-        public MoleControllers(MoleView moleViewPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider)
+        public MoleControllers(MoleView moleViewPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _pool = new MolePool(moleViewPrefab, diContainer);
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
         }
 
         public void InitEntryPoint()
@@ -32,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void CreateMoleAtSpawnPoint(Vector2 spawnPointPosition)
         {
-            var controller = new MoleController(spawnPointPosition, _pool, _parent, _stageCancellationTokenProvider);
+            var controller = new MoleController(spawnPointPosition, _pool, _parent, _stageCancellationTokenProvider, _audioService);
             controller.CreateView();
             _controllers.Add(controller);
         }
@@ -105,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         {
             foreach (var controller in _controllerPerActiveMoleId.Values)
             {
-                controller.SetInHoleState();
+                controller.SetInHoleState(false);
             }
 
             _controllerPerActiveMoleId.Clear();

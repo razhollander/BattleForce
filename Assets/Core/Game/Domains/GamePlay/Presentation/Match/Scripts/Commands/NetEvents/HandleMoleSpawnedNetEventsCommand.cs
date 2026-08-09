@@ -46,7 +46,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                     remainingShakeSeconds, moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
             }
 
-            _audioService.PlayAudio(AudioClipType.MoleSpawned);
             moleSpawnedNetEvents.Clear();
         }
     }

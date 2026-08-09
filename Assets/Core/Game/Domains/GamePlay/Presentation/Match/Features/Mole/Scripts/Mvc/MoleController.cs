@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
+using Core.Scripts.Services.AudioService;
 using Core.Scripts.Utils;
 using UnityEngine;
 
@@ -12,12 +13,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
     {
         private const ushort NO_ACTIVE_MOLE_ID = ushort.MaxValue; // a mole id travels as a byte on the wire, so this can never collide with a real one
 
+        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
+        private readonly IAudioService _audioService;
+        
         private readonly MolePool _molePool;
         private readonly Transform _parent;
-        private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private MoleView _moleView;
         private MoleStateType _stateType;
-        private bool _isGolden;
         private byte _remainingLives;
         private byte _maxLives;
 
@@ -26,12 +28,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         // The mole this spawn point currently belongs to. Net events of any older mole must not touch it anymore.
         public ushort ActiveMoleId { get; private set; } = NO_ACTIVE_MOLE_ID;
 
-        public MoleController(Vector2 spawnPointPosition, MolePool molePool, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider)
+        public MoleController(Vector2 spawnPointPosition, MolePool molePool, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             SpawnPointPosition = spawnPointPosition;
             _molePool = molePool;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
+            _audioService = audioService;
         }
 
         public void CreateView()
@@ -57,10 +60,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             PlayHitAsync().Forget();
         }
 
-        public void SetInHoleState()
+        public void SetInHoleState(bool playSoundFx = true)
         {
             _stateType = MoleStateType.InHole;
             ActiveMoleId = NO_ACTIVE_MOLE_ID;
+
+            if (playSoundFx)
+            {
+                _audioService.PlayAudio(AudioClipType.MoleDespawned);
+            }
             _moleView.PlayHideInHoleAsync(_stageCancellationTokenProvider.CancellationTokenSource.Token).Forget();
         }
 
@@ -82,7 +90,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public void SetEmergingFromHoleState(ushort moleId, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives)
         {
             ActiveMoleId = moleId;
-            _isGolden = isGolden;
             _remainingLives = remainingLives;
             _maxLives = maxLives;
             _moleView.SetIsGolden(isGolden);
@@ -116,6 +123,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             }
 
             _stateType = MoleStateType.OutsideHole;
+            _audioService.PlayAudio(AudioClipType.MoleSpawned);
             await _moleView.PlayEmergeFromHoleAsync(_stageCancellationTokenProvider.CancellationTokenSource.Token);
 
             if (_stateType != MoleStateType.OutsideHole) // the mole may have been hit or expired while it was still emerging

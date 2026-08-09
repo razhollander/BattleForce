@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 3
+      StartHealth: 1
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -32,7 +32,7 @@ MonoBehaviour:
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
       CanBarrelDash: 1
-      BarrelDashForce: 30
+      BarrelDashForce: 25
       BarrelDashSpinAmount: 57
     PlayerBullet:
       MoveSpeed: 10
@@ -200,9 +200,9 @@ MonoBehaviour:
       Damage: 1
       DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 0
+    DeafultEnvironmentId: 3
     ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 0
+    ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
@@ -232,7 +232,6 @@ MonoBehaviour:
       MaxMolesUntilGoldenMole: 6
       GoldenMoleLives: 3
       GoldenMoleScoreOnKill: 3
-      GemsForWinningTeam: 1
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0
