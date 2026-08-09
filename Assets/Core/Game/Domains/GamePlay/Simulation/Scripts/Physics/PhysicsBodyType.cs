@@ -27,6 +27,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         Mole = 21,
     }
     
+    // Each value is one bit of a fixture's categoryBits/maskBits, so the highest usable value is 31.
+    // Before adding a value, check whether an existing channel already expresses the same filtering
+    // relationship - AnyObjectThatCollidesOnlyWithPlayer is shared by seven different body types.
     public enum PhysicsCollisionType
     {
         None = 0,

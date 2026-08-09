@@ -8,9 +8,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         // GetCollisionsCategory builds a fixture's categoryBits: the SET of collision bits this body
         // exposes, i.e. "which other bodies' masks are allowed to see me". It ORs several single bits
         // together, so it returns a compound mask (e.g. a Wall is seen by players, bullets, powerups...).
-        public static ushort GetCollisionsCategory(this PhysicsBodyType type)
+        public static uint GetCollisionsCategory(this PhysicsBodyType type)
         {
-            int collisionMask;
+            uint collisionMask;
 
             switch (type)
             {
@@ -124,19 +124,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip);
                     break;
                 default:
-                    collisionMask = 0xFFFF;
+                    collisionMask = 0xFFFFFFFF;
                     break;
             }
 
-            return (ushort) collisionMask;
+            return collisionMask;
         }
 
         // GetCollisionMask builds a SINGLE collision bit from one PhysicsCollisionType.
         // Used to set a fixture's maskBits ("who I collide with") and to OR individual
-        // bits into the category set above. 
-        public static ushort GetCollisionMask(this PhysicsCollisionType type)
+        // bits into the category set above.
+        public static uint GetCollisionMask(this PhysicsCollisionType type)
         {
-            return (ushort) (1 << (int) type);
+            return 1u << (int) type;
         }
     }
 }
