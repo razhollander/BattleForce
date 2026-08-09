@@ -65,6 +65,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         void AddChickenEgg(ushort eggId, ushort teamId, Vector2 position, float eggRadius);
         Body GetChickenEgg(ushort chieckEggId);
         void RemoveChickenEgg(ushort eggId);
+        bool CircleCastOnEnvironmentSpikes(Vector2 center, float radius, out PhysicsBodyData hitBodyData);
         bool RectangleCastByPriority(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, out PhysicsBodyData hitBodyData);
         bool RayCast(Vector2 originPoint, Vector2 endPoint, out PhysicsBodyData hitBodyData, PhysicsBodyType[] bodyTypesRayCastCanHit = null, PhysicsBodyData? ignoredBody = null);
         void EnablePlayerToCollideWithPlayers(ushort playerId);

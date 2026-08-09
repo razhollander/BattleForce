@@ -39,14 +39,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
-            if (!CanPlayerPerformBarrelDash(playerSpaceship))
+            if (!_gamePlayConfigService.GamePlayConfig.PlayerSpaceship.CanBarrelDash || !CanPlayerPerformBarrelDash(playerSpaceship))
             {
                 return;
             }
 
             var spaceshipConfig = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship;
-
-            // Spinning first so that an active talent is deactivated before the dash force is applied
+            
             _trySpinPlayerCommand.SetPlayer(_playerId).SetSpinAmount(spaceshipConfig.BarrelDashSpinAmount).SetTick(_processedTick).Execute();
             _tryAddForceToPlayerCommand.SetPlayerId(_playerId).SetForce(playerSpaceship.AimDirection * spaceshipConfig.BarrelDashForce).ShouldTurnOffEngine(false).Execute();
         }

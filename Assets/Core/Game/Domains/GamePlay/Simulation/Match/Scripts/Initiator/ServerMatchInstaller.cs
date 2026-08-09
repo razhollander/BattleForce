@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHan
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
@@ -40,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersInLavaTrackerService>().To<PlayersInLavaTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersOutsideStageTrackerService>().To<PlayersOutsideStageTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersTouchingWallDataService>().To<PlayersTouchingWallDataService>().AsSingle().NonLazy();
+            _diContainer.Bind<IPlayersTouchingSpikesTrackerService>().To<PlayersTouchingSpikesTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IOverrideableNetEventsService>().To<OverrideableNetEventsService>().AsSingle().NonLazy();
             _diContainer.Bind<IPowerUpsSpawnerService>().To<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
             _diContainer.Bind<IMolesSpawnerService>().To<MolesSpawnTimerService>().AsSingle().NonLazy();

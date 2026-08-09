@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 1
+      StartHealth: 3
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -31,6 +31,7 @@ MonoBehaviour:
       LockOnTargetMaxRange: 13
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
+      CanBarrelDash: 1
       BarrelDashForce: 30
       BarrelDashSpinAmount: 57
     PlayerBullet:
@@ -191,14 +192,15 @@ MonoBehaviour:
       NukeMaxSpinAmount: 300
       ShuffleSwapIntervalInSeconds: 0.25
     EnvironmentSprings:
-      Force: 40
+      Force: 55
       MaxSpin: 65
       MinSpin: 50
       Size: {x: 2, y: 1}
     EnvironmentSpikes:
       Damage: 1
+      DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 21
+    DeafultEnvironmentId: 0
     ShouldChooseRandomStage: 0
     ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3

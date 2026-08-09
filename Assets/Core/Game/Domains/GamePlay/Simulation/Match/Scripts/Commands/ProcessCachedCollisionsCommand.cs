@@ -7,6 +7,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
@@ -33,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ITeleportGateService _teleportGateService;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
+        private IPlayersTouchingSpikesTrackerService _playersTouchingSpikesTrackerService;
 
         private int _processedTick;
         private TryHitPlayerCommand _tryHitPlayerCommand;
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ObtainPowerUpBallCommand _obtainPowerUpBallCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
+        private CollidePlayerWithEnvironmentSpikeCommand _collidePlayerWithEnvironmentSpikeCommand;
         private TryHitMoleCommand _tryHitMoleCommand;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -59,11 +62,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
+            _collidePlayerWithEnvironmentSpikeCommand = _commandFactory.CreateCommandVoid<CollidePlayerWithEnvironmentSpikeCommand>();
             _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
+            _playersTouchingSpikesTrackerService = _diContainer.Resolve<IPlayersTouchingSpikesTrackerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
         }
@@ -87,6 +92,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerLavaCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerStageBoundaryCollision(objectA, objectB, collisionEvent.Type);
                 HandlePlayerWallStickTracking(objectA, objectB, collisionEvent.Type, collisionEvent.Contact);
+                HandlePlayerEnvironmentSpikeCollision(objectA, objectB, collisionEvent.Type);
 
                 if (collisionEvent.Type != PhysicsEventEventType.Begin)
                 {
@@ -101,7 +107,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerBulletTalentCardCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerBulletPowerUpCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerEnvironmentSpringCollision(objectA, objectB);
-                HandlePlayerEnvironmentSpikeCollision(objectA, objectB);
                 HandlePlayerTeleportGateCollision(objectA, objectB);
                 HandleSwapFieldPlayerCollision(objectA, objectB);
                 HandleKOProjectilePlayerCollision(objectA, objectB);
@@ -858,7 +863,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService.AddEnvironmentSpringPlayerCollisionNetEvent(_processedTick, springId, playerId, pushDirection);
         }
 
-        private void HandlePlayerEnvironmentSpikeCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        private void HandlePlayerEnvironmentSpikeCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, PhysicsEventEventType eventType)
         {
             var isPlayerToSpike = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike;
             var isSpikeToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.EnvironmentSpike && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
@@ -882,19 +887,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 spikeId = objectA.Id;
             }
 
-            if (!_matchDataService.SimulationState.GetPlayerById(playerId).Spaceship.IsAlive)
+            if (eventType == PhysicsEventEventType.End)
             {
+                _playersTouchingSpikesTrackerService.OnPlayerEndTouchSpike(playerId, spikeId);
                 return;
             }
-
-            var damage = _gamePlayConfigService.GamePlayConfig.EnvironmentSpikes.Damage;
-            _tryHitPlayerCommand
-                .SetPlayerIdGotHit(playerId)
-                .SetHitDamage(damage)
+            
+            _playersTouchingSpikesTrackerService.OnPlayerBeginTouchSpike(playerId, spikeId);
+            _collidePlayerWithEnvironmentSpikeCommand
+                .SetPlayerId(playerId)
+                .SetSpikeId(spikeId)
                 .SetProcessedTick(_processedTick)
                 .Execute();
-
-            _netEventsDataService.AddEnvironmentSpikePlayerCollisionNetEvent(_processedTick, spikeId, playerId);
         }
 
         private void HandleBulletWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)

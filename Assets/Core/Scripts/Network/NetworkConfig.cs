@@ -38,6 +38,7 @@ namespace Core.Scripts.Network
         public int PacketTypes = 256; // if one day this is changed to a bigger number, need to parse packet types as ushort instead of byte
         public int ConcurrentEnvironmentRotatingWheels = 16;
         public int ConcurrentFieldBarriers = 16;
+        public int ConcurrentSpikeCollidingWithPlayer = 4;
         public EnvironmentRotatingWheel EnvironmentRotatingWheelCap;
         
         //physics Box2D

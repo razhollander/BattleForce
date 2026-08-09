@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPlayersPowerUpsManager _playersPowerUpsManager;
 
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
+        private TryDamagePlayersTouchingSpikesCommand _tryDamagePlayersTouchingSpikesCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
         private TrySpawnMolesCommand _trySpawnMolesCommand;
         private TryBreakChickenEggsOnMolesCommand _tryBreakChickenEggsOnMolesCommand;
@@ -89,6 +90,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             _tryEndPlayersSpinIfReachedZeroAngularVecityCommand = _commandFactory.CreateCommandVoid<TryEndPlayersSpinIfReachedZeroAngularVecityCommand>();
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
+            _tryDamagePlayersTouchingSpikesCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersTouchingSpikesCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
             _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
             _tryBreakChickenEggsOnMolesCommand = _commandFactory.CreateCommandVoid<TryBreakChickenEggsOnMolesCommand>();
@@ -138,6 +140,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
                 _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
+                _tryDamagePlayersTouchingSpikesCommand.SetProcessedTick(currentTick).Execute();
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
                 RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);

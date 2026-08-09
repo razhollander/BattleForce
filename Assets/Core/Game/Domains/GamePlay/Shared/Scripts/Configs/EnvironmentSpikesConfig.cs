@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
     public class EnvironmentSpikesConfig
     {
         public ushort Damage = 1;
+        public float DamageIntervalInSeconds = 1.0f;
         [JsonConverter(typeof(Vector2Converter))]
         public Vector2 Size = new Vector2(2f, 1f);
     }

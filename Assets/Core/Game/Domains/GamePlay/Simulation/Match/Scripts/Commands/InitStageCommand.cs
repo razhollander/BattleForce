@@ -19,6 +19,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.TickService;
@@ -47,6 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TryAddARandomTalentForPlayerCommand _tryAddARandomTalentForPlayerCommand;
         private IPlayersOutsideStageTrackerService _playersOutsideStageTrackerService;
         private IPlayersTouchingWallDataService _playersTouchingWallDataService;
+        private IPlayersTouchingSpikesTrackerService _playersTouchingSpikesTrackerService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
         private List<ushort> _cachedShuffledTeamIds;
         private ITickService _tickService;
@@ -71,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryAddARandomTalentForPlayerCommand = _commandFactory.CreateCommandVoid<TryAddARandomTalentForPlayerCommand>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
             _playersTouchingWallDataService = _diContainer.Resolve<IPlayersTouchingWallDataService>();
+            _playersTouchingSpikesTrackerService = _diContainer.Resolve<IPlayersTouchingSpikesTrackerService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _tickService = _diContainer.Resolve<ITickService>();
             _cachedShuffledTeamIds = new List<ushort>(_sharedGamePlayConfig.MaxTeamsAmount);
@@ -199,6 +202,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
             _playersTouchingWallDataService.ClearAllData();
+            _playersTouchingSpikesTrackerService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();
             _stageDataService.ClearData();
         }
@@ -332,7 +336,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void CreateWalls(float mapSizeMultiplier)
         {
             var wallConfigs = _matchEnvironmentConfigDataService.WallConfigs;
-
+            if (wallConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+            
             foreach (var wallConfig in wallConfigs)
             {
                 var points = new Vector2[wallConfig.Points.Length];

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IMolesSpawnerService _molesSpawnerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
+        private IPlayersTouchingSpikesTrackerService _playersTouchingSpikesTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
@@ -38,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _molesSpawnerService = _diContainer.Resolve<IMolesSpawnerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
+            _playersTouchingSpikesTrackerService = _diContainer.Resolve<IPlayersTouchingSpikesTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
@@ -50,19 +53,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             StepPlayersShootCooldown(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
             _molesSpawnerService.StepTimer(_deltaTime);
-            StepPlayersInLavaTimer(_deltaTime);
+            StepPlayersInHazardsTimers(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);
             _lockOnTargetTimerService.StepTimers(_deltaTime);
         }
-
-        private void StepPlayersInLavaTimer(float deltaTime)
+        
+        private void StepPlayersInHazardsTimers(float deltaTime)
         {
-            var playerIdsNotToIncrementTimerInLava = GetPlayerIdsNotToIncrementTimerInLava();
-            _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(playerIdsNotToIncrementTimerInLava, deltaTime);
+            var immunePlayerIds = GetRockOrFrozenPlayerIds();
+            _playersInLavaTrackerService.StepTimePassedSinceLastDamageTaken(immunePlayerIds, deltaTime);
+            _playersTouchingSpikesTrackerService.StepTimePassedSinceLastDamageTaken(immunePlayerIds, deltaTime);
         }
 
-        private FixedUnorderedList<ushort> GetPlayerIdsNotToIncrementTimerInLava()
+        private FixedUnorderedList<ushort> GetRockOrFrozenPlayerIds()
         {
             _cachedPlayerIdsNotToIncrementTimerInLavaList.Clear();
             foreach (var playerState in _matchDataService.SimulationState.Players.AsSpan())
