@@ -739,8 +739,15 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 frigidBlock.SerializeDelta(writer);
             }
+
+            var scoreGatesCount = ScoreGates.Count;
+            writer.Put((byte)scoreGatesCount);
+            foreach (var scoreGate in ScoreGates.AsSpan())
+            {
+                scoreGate.SerializeDelta(writer);
+            }
         }
-        
+
         private void PutBulletTransformsBatched(NetDataWriter writer) // maybe one day this will be used
         {
             var bulletsCount = Bullets.Count;
@@ -862,6 +869,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var frigidBlock = ref FrigidBlocks.AddAndGet();
                 frigidBlock.DeserializeDelta(reader);
+            }
+
+            var scoreGatesCount = reader.GetByte();
+            ScoreGates.Clear();
+            for (int i = 0; i < scoreGatesCount; i++)
+            {
+                ref var scoreGate = ref ScoreGates.AddAndGet();
+                scoreGate.DeserializeDelta(reader);
             }
         }
 

@@ -33,7 +33,10 @@ public class SharedGamePlayConfig : ScriptableObject
     // live in the Shared config. One gate = two square posts of ScoreGatePostSize with ScoreGateGapWidth between them.
     public UnityEngine.Vector2 ScoreGatePostSize = new UnityEngine.Vector2(1.5f, 1.5f);
     public float ScoreGateGapWidth = 4f;
-    public float ScoreGateDensity = 4f; // "medium mass" - heavier than a frigid block, lighter than a wall
+    // Direct control over how heavy the gate feels. When > 0 it overrides the density-derived mass, so tuning this one
+    // number changes how far a ram/talent shoves the gate. When 0, the mass falls back to ScoreGateDensity * area.
+    public float ScoreGateMass = 20f;
+    public float ScoreGateDensity = 4f; // used to build the fixtures; ScoreGateMass overrides the resulting mass when > 0
     public float ScoreGateRestitution = 0.2f;
     public float ScoreGateLinearDamping = 1.5f; // a shoved gate drifts and settles instead of sliding forever
     public float ScoreGateAngularDamping = 1.5f; // a spun gate decays after a couple of turns

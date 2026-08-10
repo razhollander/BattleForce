@@ -391,7 +391,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var position = scoreGateConfig.Position * mapSizeMultiplier;
                 _matchDataService.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees);
                 _physicsSimulator.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees, postSize, gapWidth,
-                    _sharedGamePlayConfig.ScoreGateDensity, _sharedGamePlayConfig.ScoreGateRestitution,
+                    _sharedGamePlayConfig.ScoreGateMass, _sharedGamePlayConfig.ScoreGateDensity, _sharedGamePlayConfig.ScoreGateRestitution,
                     _sharedGamePlayConfig.ScoreGateLinearDamping, _sharedGamePlayConfig.ScoreGateAngularDamping);
             }
         }

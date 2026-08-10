@@ -133,11 +133,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePlayerMoleCollision(objectA, objectB);
                 HandleKOProjectileMoleCollision(objectA, objectB);
                 HandleFishingRodTipMoleCollision(objectA, objectB);
+                HandleHeadbuttScoreGateCollision(objectA, objectB); // before the player bounce, so the push reads the dash velocity, not the reflected one
                 HandlePlayerScoreGateCollision(objectA, objectB, collisionEvent.Contact);
                 HandleBulletScoreGateCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePowerUpBallScoreGateCollision(objectA, objectB, collisionEvent.Contact);
                 HandleKOProjectileScoreGateCollision(objectA, objectB);
-                HandleHeadbuttScoreGateCollision(objectA, objectB);
                 HandleChickenEggScoreGateCollision(objectA, objectB);
             }
 

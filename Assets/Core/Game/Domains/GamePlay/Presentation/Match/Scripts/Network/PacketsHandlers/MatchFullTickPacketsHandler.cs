@@ -1753,8 +1753,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        // Score gates come from the layout (no spawn event), so the client mirrors them straight from the tick state:
-        // create the model on first sight, then keep its transform in sync as the gate is shoved around.
+        // Score gates come from the layout (no spawn event). Both the model and the view are built by the full-state
+        // sync (SyncMatchSimulationStateCommand); here we only keep the transform of an already-created gate in sync as
+        // it is shoved around. A gate not found yet just hasn't been synced this session, so we skip it rather than add a
+        // viewless model - the next full sync creates both halves together.
         private void ReconcileScoreGatesFromState(MatchSimulationStateS2C simulationState)
         {
             foreach (var scoreGateState in simulationState.ScoreGates.AsSpan())
@@ -1763,10 +1765,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 {
                     scoreGateModel.Position = scoreGateState.Position.ToUnityVector2();
                     scoreGateModel.Rotation = scoreGateState.Rotation.ToUnityVector2();
-                }
-                else
-                {
-                    _matchDataService.AddScoreGate(scoreGateState.Id, scoreGateState.Position, scoreGateState.Rotation, scoreGateState.LastScoredTeamId);
                 }
             }
         }

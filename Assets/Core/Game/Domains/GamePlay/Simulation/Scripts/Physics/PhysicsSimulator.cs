@@ -1246,7 +1246,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
         // A score gate is a single dynamic body carrying two square post fixtures, so the posts can never drift apart
         // and the whole gate rotates as one rigid piece. The gap between them is what players score by passing through.
-        public void AddScoreGate(ushort id, Vector2 position, float rotationDegrees, Vector2 postSize, float gapWidth, float density, float restitution, float linearDamping, float angularDamping)
+        public void AddScoreGate(ushort id, Vector2 position, float rotationDegrees, Vector2 postSize, float gapWidth, float mass, float density, float restitution, float linearDamping, float angularDamping)
         {
             var bodyDef = GetBodyDef();
             bodyDef.type = BodyType.Dynamic;
@@ -1265,6 +1265,26 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
 
             AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(-postOffsetX, 0f), density, restitution);
             AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(postOffsetX, 0f), density, restitution);
+
+            OverrideScoreGateMass(body, mass);
+        }
+
+        // The fixtures give the body a density-derived mass; when a direct mass is configured we override it, scaling the
+        // rotational inertia by the same ratio so the spin feel stays consistent with the new mass.
+        private static void OverrideScoreGateMass(Body body, float mass)
+        {
+            if (mass <= 0f)
+            {
+                return;
+            }
+
+            body.GetMassData(out var massData);
+            if (massData.mass > 0f)
+            {
+                massData.I *= mass / massData.mass;
+            }
+            massData.mass = mass;
+            body.SetMassData(massData);
         }
 
         private void AddScoreGatePostFixture(Body body, float postHalfWidth, float postHalfHeight, Vector2 postCenter, float density, float restitution)

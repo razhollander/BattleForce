@@ -130,7 +130,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
             
             // Independently of the enemy/mole hit, the field drags any score gate in range toward the caster.
-            if (_physicsSimulator.ArcCastByPriority(center, fieldRadius, direction, fieldArcAngle, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
+            if (_matchDataService.SimulationState.ScoreGates.Count > 0
+                && _physicsSimulator.ArcCastByPriority(center, fieldRadius, direction, fieldArcAngle, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
                 && hitGateData.PhysicsBodyType == PhysicsBodyType.ScoreGate)
             {
                 PullScoreGateToCaster(hitGateData.Id, casterPlayerState);

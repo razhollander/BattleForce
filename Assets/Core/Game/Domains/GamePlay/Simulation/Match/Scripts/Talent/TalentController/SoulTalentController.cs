@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
@@ -22,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
         private readonly SharedGamePlayConfig _sharedConfig;
+        private readonly IScoreGatePassTrackerService _scoreGatePassTrackerService;
 
         public TalentType TalentType => TalentType.Soul;
 
@@ -32,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
 
         public SoulTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedConfig, IScoreGatePassTrackerService scoreGatePassTrackerService)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _sharedConfig = sharedConfig;
+            _scoreGatePassTrackerService = scoreGatePassTrackerService;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -96,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             casterPlayerState.Spaceship.Transform.Position = ghostPosition;
             casterPlayerState.Spaceship.Transform.Direction = ghostDirection;
             casterPlayerState.Spaceship.Transform.Velocity = Vector2.Zero;
+            _scoreGatePassTrackerService.InvalidatePreviousPosition(_casterPlayerId); // the jump to the ghost must not be read as a gate pass
 
             DeactivateTalent(tick, didTeleport: true, ghostPosition, ghostDirection);
         }

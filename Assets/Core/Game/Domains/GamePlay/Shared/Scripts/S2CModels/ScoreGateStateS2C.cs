@@ -32,6 +32,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             LastScoredTeamId = reader.GetByte();
         }
 
+        // Per-tick transform update (the gate is physics-driven, so only its moving transform changes each tick).
+        // LastScoredTeamId is not sent here - the tint is driven by the ScoreGatePassed net event and the rejoin snapshot.
+        public void SerializeDelta(NetDataWriter writer)
+        {
+            writer.Put((byte)Id);
+            writer.PutVector2Quantized(Position);
+            writer.PutFloat16(Rotation.X);
+            writer.PutFloat16(Rotation.Y);
+        }
+
+        public void DeserializeDelta(NetDataReader reader)
+        {
+            Id = reader.GetByte();
+            Position = reader.GetVector2Quantized();
+            var rotationX = reader.GetFloat16();
+            var rotationY = reader.GetFloat16();
+            Rotation = new Vector2(rotationX, rotationY);
+        }
+
         public bool Equals(ushort otherId)
         {
             return Id == otherId;

@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -26,7 +27,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
             INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
-            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService)
+            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService,
+            IScoreGatePassTrackerService scoreGatePassTrackerService)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -35,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
             _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(
                 () => new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService,
-                    commandFactory, sharedGamePlayConfig, playersMouseDataService, playersInLavaTrackerService), networkConfig.MaxCap.ConcurrentPlayers);
+                    commandFactory, sharedGamePlayConfig, playersMouseDataService, playersInLavaTrackerService, scoreGatePassTrackerService), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)

@@ -131,7 +131,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             }
 
             // Independently of the enemy/mole hit, the rectangle shoves and spins any score gate it covers.
-            if (_physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
+            if (_matchDataService.SimulationState.ScoreGates.Count > 0
+                && _physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
                 && hitGateData.PhysicsBodyType == PhysicsBodyType.ScoreGate)
             {
                 PushScoreGate(hitGateData.Id, direction);

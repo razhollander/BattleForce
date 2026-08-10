@@ -57,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Editor
             var shared = AssetDatabase.LoadAssetAtPath<SharedGamePlayConfig>(SHARED_CONFIG_PATH);
             shared.ScoreGatePostSize = new Vector2(1.5f, 1.5f);
             shared.ScoreGateGapWidth = 4f;
+            shared.ScoreGateMass = 20f;
             shared.ScoreGateDensity = 4f;
             shared.ScoreGateRestitution = 0.2f;
             shared.ScoreGateLinearDamping = 1.5f;
