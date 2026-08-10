@@ -335,6 +335,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
                 _fullTickPacket.GoldenMoleDamagedNetEvents = _netEventsDataService.GoldenMoleDamagedNetEventsPerClient[clientId];
                 _fullTickPacket.ScoreGatePassedNetEvents = _netEventsDataService.ScoreGatePassedNetEventsPerClient[clientId];
+                _fullTickPacket.GateTrapClosingNetEvents = _netEventsDataService.GateTrapClosingNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

@@ -122,6 +122,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-15.6,"Y":-16.7}},{"Position":{"X":-22.6,"Y":15.4}},{"Position":{"X":21.9,"Y":10.0}},{"Position":{"X":16.3,"Y":-15.5}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: 
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -151,6 +152,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: 
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: A
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -278,6 +280,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: 
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: GPU
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -897,6 +900,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-14.1,"Y":-7.1}},{"Position":{"X":-20.9,"Y":8.2}},{"Position":{"X":19.1,"Y":5.1}},{"Position":{"X":17.0,"Y":-8.8}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: '{"TopLeft":{"X":-39.45,"Y":29.23},"BottomRight":{"X":39.8,"Y":-35.4}}'
     - _environmentName: Middle Lava River
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -949,6 +953,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-30.9,"Y":-19.3}},{"Position":{"X":-22.6,"Y":15.4}},{"Position":{"X":22.3,"Y":11.0}},{"Position":{"X":33.1,"Y":-17.3}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Swiss
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -999,6 +1004,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":0.0}},{"Position":{"X":-16.1,"Y":-18.1}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":20.5,"Y":14.2}},{"Position":{"X":15.6,"Y":-15.9}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: 4 rooms
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1069,6 +1075,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-19.3,"Y":8.4}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":15.1,"Y":15.6}},{"Position":{"X":-19.9,"Y":-10.4}},{"Position":{"X":9.3,"Y":-20.1}},{"Position":{"X":9.7,"Y":8.3}},{"Position":{"X":21.3,"Y":-10.1}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Testing
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1114,6 +1121,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":-8.2,"Y":-3.3}},{"Position":{"X":30.6,"Y":1.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Big Empty
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1143,6 +1151,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":-8.2,"Y":-3.3}},{"Position":{"X":30.6,"Y":1.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Crazy Eyes
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1227,6 +1236,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":2.4,"Y":-17.3}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":-1.2,"Y":-1.6}},{"Position":{"X":30.0,"Y":-17.8}},{"Position":{"X":30.6,"Y":1.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Earphone
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1312,6 +1322,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-26.6,"Y":-24.7}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-17.8,"Y":5.7}},{"Position":{"X":-33.6,"Y":-23.5}},{"Position":{"X":-8.0,"Y":-9.3}},{"Position":{"X":21.4,"Y":-6.4}},{"Position":{"X":12.5,"Y":12.7}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Pinwheel Bounce
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1327,6 +1338,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":-13.0,"Y":-21.2}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":19.5,"Y":-14.1}},{"Position":{"X":36.6,"Y":-19.6}},{"Position":{"X":30.6,"Y":1.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Twin Rivers
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1342,6 +1354,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-30.5,"Y":15.1}},{"Position":{"X":6.0,"Y":-17.6}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":24.6,"Y":16.9}},{"Position":{"X":-32.2,"Y":-15.3}},{"Position":{"X":-6.3,"Y":-2.0}},{"Position":{"X":36.6,"Y":-19.6}},{"Position":{"X":30.6,"Y":1.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Solar Flare
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1357,6 +1370,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-35.6,"Y":2.4}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-17.8,"Y":5.7}},{"Position":{"X":-29.0,"Y":-15.9}},{"Position":{"X":19.2,"Y":-0.7}},{"Position":{"X":30.8,"Y":-13.2}},{"Position":{"X":29.5,"Y":17.8}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Convergence
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1372,6 +1386,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-31.1,"Y":0.0}},{"Position":{"X":7.7,"Y":-20.9}},{"Position":{"X":-8.9,"Y":18.2}},{"Position":{"X":-28.0,"Y":12.4}},{"Position":{"X":-29.0,"Y":-15.9}},{"Position":{"X":19.2,"Y":-0.7}},{"Position":{"X":30.8,"Y":-13.2}},{"Position":{"X":29.5,"Y":17.8}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Whac A Mole
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1387,6 +1402,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-33.0,"Y":1.5}},{"Position":{"X":-25.5,"Y":-9.0}},{"Position":{"X":-13.0,"Y":11.5}},{"Position":{"X":-4.5,"Y":-12.0}},{"Position":{"X":5.0,"Y":12.0}},{"Position":{"X":13.5,"Y":-11.0}},{"Position":{"X":25.0,"Y":8.5}},{"Position":{"X":33.5,"Y":-2.0}}]'
       _moleSpawnPointsJson: '[{"Position":{"X":37.2151,"Y":5.3026}},{"Position":{"X":-36.4066,"Y":3.1598}},{"Position":{"X":11.785,"Y":1.1957}},{"Position":{"X":-10.9674,"Y":10.2614}},{"Position":{"X":-33.0683,"Y":14.0789}},{"Position":{"X":2.6098,"Y":9.5227}},{"Position":{"X":-1.8763,"Y":-10.1348}},{"Position":{"X":-27.9025,"Y":-9.9852}},{"Position":{"X":-26.5166,"Y":4.2457}},{"Position":{"X":-4.431,"Y":8.4517}},{"Position":{"X":12.0678,"Y":-6.65}},{"Position":{"X":32.1626,"Y":-2.8808}},{"Position":{"X":-38.4654,"Y":7.7331}},{"Position":{"X":-10.7942,"Y":-4.1989}},{"Position":{"X":-27.3497,"Y":9.5563}},{"Position":{"X":-37.582,"Y":-8.8003}},{"Position":{"X":24.8377,"Y":3.5345}},{"Position":{"X":-23.6473,"Y":-1.276}},{"Position":{"X":-0.7351,"Y":14.3556}},{"Position":{"X":29.7529,"Y":13.319}},{"Position":{"X":-10.212,"Y":-9.9726}},{"Position":{"X":39.0743,"Y":10.0973}},{"Position":{"X":5.983,"Y":-6.3344}},{"Position":{"X":-1.2225,"Y":-0.9397}},{"Position":{"X":-6.6672,"Y":-14.7136}},{"Position":{"X":24.4111,"Y":-6.5003}},{"Position":{"X":4.8429,"Y":4.2912}},{"Position":{"X":-9.5124,"Y":4.991}},{"Position":{"X":28.6542,"Y":7.9914}},{"Position":{"X":-31.7177,"Y":-4.9968}},{"Position":{"X":21.0677,"Y":-0.4523}},{"Position":{"X":10.1464,"Y":10.5057}}]'
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Whac A Mole Rings
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1402,6 +1418,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-38.0,"Y":0.0}},{"Position":{"X":-24.0,"Y":0.0}},{"Position":{"X":-6.5,"Y":14.5}},{"Position":{"X":-6.5,"Y":-14.5}},{"Position":{"X":6.5,"Y":14.5}},{"Position":{"X":6.5,"Y":-14.5}},{"Position":{"X":24.0,"Y":0.0}},{"Position":{"X":38.0,"Y":0.0}}]'
       _moleSpawnPointsJson: '[{"Position":{"X":-31.3134,"Y":-16.7531}},{"Position":{"X":13.1419,"Y":-19.205}},{"Position":{"X":30.2786,"Y":11.348}},{"Position":{"X":40.3652,"Y":-19.1848}},{"Position":{"X":10.5436,"Y":12.5817}},{"Position":{"X":-3.2296,"Y":18.2155}},{"Position":{"X":-25.8877,"Y":12.8618}},{"Position":{"X":3.8056,"Y":-2.2613}},{"Position":{"X":31.096,"Y":-17.7785}},{"Position":{"X":-22.1631,"Y":19.7846}},{"Position":{"X":-22.2597,"Y":-17.5754}},{"Position":{"X":24.0432,"Y":-13.3859}},{"Position":{"X":1.8093,"Y":-13.8077}},{"Position":{"X":37.7444,"Y":-6.0609}},{"Position":{"X":-11.7756,"Y":-3.3027}},{"Position":{"X":2.6041,"Y":-19.7425}},{"Position":{"X":-12.989,"Y":21.5817}},{"Position":{"X":-29.8711,"Y":19.4307}},{"Position":{"X":12.7099,"Y":-11.4076}},{"Position":{"X":13.5494,"Y":5.0671}},{"Position":{"X":19.4482,"Y":-17.3371}},{"Position":{"X":-16.7285,"Y":-13.0379}},{"Position":{"X":18.4288,"Y":-9.0978}},{"Position":{"X":31.3181,"Y":20.3015}},{"Position":{"X":36.5294,"Y":18.9935}},{"Position":{"X":-30.8255,"Y":-9.196}},{"Position":{"X":-36.335,"Y":18.0611}},{"Position":{"X":-0.8775,"Y":-3.7376}},{"Position":{"X":-4.0637,"Y":-9.1666}},{"Position":{"X":-17.6636,"Y":11.49}},{"Position":{"X":15.894,"Y":12.3988}},{"Position":{"X":34.4653,"Y":-9.6624}},{"Position":{"X":-10.3499,"Y":3.4541}},{"Position":{"X":-4.0762,"Y":1.7021}},{"Position":{"X":-1.2061,"Y":9.6913}},{"Position":{"X":-22.1251,"Y":-11.0552}},{"Position":{"X":4.7232,"Y":9.0709}},{"Position":{"X":11.531,"Y":18.2396}},{"Position":{"X":24.7258,"Y":17.4801}},{"Position":{"X":-11.3321,"Y":-10.9705}},{"Position":{"X":3.0823,"Y":20.7061}},{"Position":{"X":23.6029,"Y":9.3062}},{"Position":{"X":-8.1845,"Y":-20.002}},{"Position":{"X":-36.3424,"Y":-20.8701}},{"Position":{"X":40.0614,"Y":2.0205}},{"Position":{"X":-38.1218,"Y":2.9974}},{"Position":{"X":34.0239,"Y":1.3715}},{"Position":{"X":10.8389,"Y":-3.3604}},{"Position":{"X":-36.7406,"Y":10.0051}},{"Position":{"X":-9.5952,"Y":11.5469}},{"Position":{"X":17.4195,"Y":17.7988}}]'
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Sweeper Ring
       _environmentHalfSizeJson: '{"X":17,"Y":17}'
@@ -1442,6 +1459,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":10.3923,"Y":6.0}},{"Position":{"X":-6.0,"Y":10.3923}},{"Position":{"X":-10.3923,"Y":-6.0}},{"Position":{"X":6.0,"Y":-10.3923}},{"Position":{"X":5.1764,"Y":19.3185}},{"Position":{"X":-19.3185,"Y":5.1764}},{"Position":{"X":-5.1764,"Y":-19.3185}},{"Position":{"X":19.3185,"Y":-5.1764}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Olympics
       _environmentHalfSizeJson: '{   "X": 21.902232,   "Y": 12.32 }'
@@ -1457,6 +1475,7 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":-34.0,"Y":14.0}},{"Position":{"X":-34.0,"Y":2.0}},{"Position":{"X":34.0,"Y":14.0}},{"Position":{"X":34.0,"Y":2.0}},{"Position":{"X":-8.0,"Y":18.0}},{"Position":{"X":8.0,"Y":18.0}},{"Position":{"X":-8.0,"Y":-14.0}},{"Position":{"X":8.0,"Y":-14.0}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: Twin Prisms
       _environmentHalfSizeJson: '{"X":21.902232,"Y":12.32}'
@@ -1763,10 +1782,11 @@ MonoBehaviour:
       _powerUpSpawnPointsJson: '[{"Position":{"X":18.5,"Y":-3.0}},{"Position":{"X":9.0,"Y":6.5}},{"Position":{"X":-0.5,"Y":-3.0}},{"Position":{"X":9.0,"Y":-12.5}},{"Position":{"X":19.6066,"Y":7.6066}},{"Position":{"X":-1.6066,"Y":7.6066}},{"Position":{"X":-1.6066,"Y":-13.6066}},{"Position":{"X":19.6066,"Y":-13.6066}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: 
+      _gateTrapsJson: 
       _cameraBoundariesJson: 
     - _environmentName: 
       _environmentHalfSizeJson: '{"X":20.0,"Y":11.0}'
-      _wallsJson: '[{"Id":1,"Points":[{"X":-21.0,"Y":11.0},{"X":21.0,"Y":11.0},{"X":21.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":2,"Points":[{"X":-21.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-11.0},{"X":-21.0,"Y":-11.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":3,"Points":[{"X":-21.0,"Y":-12.0},{"X":-20.0,"Y":-12.0},{"X":-20.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":4,"Points":[{"X":20.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":12.0},{"X":20.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}}]'
+      _wallsJson: '[{"Id":1,"Points":[{"X":-21.0,"Y":11.0},{"X":21.0,"Y":11.0},{"X":21.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":2,"Points":[{"X":-21.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-11.0},{"X":-21.0,"Y":-11.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":3,"Points":[{"X":-21.0,"Y":-12.0},{"X":-20.0,"Y":-12.0},{"X":-20.0,"Y":-4.0},{"X":-21.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":4,"Points":[{"X":-21.0,"Y":4.0},{"X":-20.0,"Y":4.0},{"X":-20.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":5,"Points":[{"X":20.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-4.0},{"X":20.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":6,"Points":[{"X":20.0,"Y":4.0},{"X":21.0,"Y":4.0},{"X":21.0,"Y":12.0},{"X":20.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":10,"Points":[{"X":-21.0,"Y":4.0},{"X":-21.0,"Y":5.0},{"X":-22.294096,"Y":4.829629},{"X":-22.0352764,"Y":3.86370325}],"Position":{"X":0.0,"Y":0.0}},{"Id":11,"Points":[{"X":-22.0352764,"Y":3.86370325},{"X":-22.294096,"Y":4.829629},{"X":-23.5,"Y":4.330127},{"X":-23.0,"Y":3.46410155}],"Position":{"X":0.0,"Y":0.0}},{"Id":12,"Points":[{"X":-23.0,"Y":3.46410155},{"X":-23.5,"Y":4.330127},{"X":-24.5355339,"Y":3.535534},{"X":-23.8284264,"Y":2.828427}],"Position":{"X":0.0,"Y":0.0}},{"Id":13,"Points":[{"X":-23.8284264,"Y":2.828427},{"X":-24.5355339,"Y":3.535534},{"X":-25.3301277,"Y":2.50000024},{"X":-24.4641018,"Y":2.00000024}],"Position":{"X":0.0,"Y":0.0}},{"Id":14,"Points":[{"X":-24.4641018,"Y":2.00000024},{"X":-25.3301277,"Y":2.50000024},{"X":-25.82963,"Y":1.29409564},{"X":-24.8637028,"Y":1.03527653}],"Position":{"X":0.0,"Y":0.0}},{"Id":15,"Points":[{"X":-24.8637028,"Y":1.03527653},{"X":-25.82963,"Y":1.29409564},{"X":-26.0,"Y":-4.371139E-07},{"X":-25.0,"Y":-3.496911E-07}],"Position":{"X":0.0,"Y":0.0}},{"Id":16,"Points":[{"X":-25.0,"Y":-3.496911E-07},{"X":-26.0,"Y":-4.371139E-07},{"X":-25.82963,"Y":-1.2940954},{"X":-24.8637028,"Y":-1.03527629}],"Position":{"X":0.0,"Y":0.0}},{"Id":17,"Points":[{"X":-24.8637028,"Y":-1.03527629},{"X":-25.82963,"Y":-1.2940954},{"X":-25.3301277,"Y":-2.49999976},{"X":-24.4641018,"Y":-1.99999988}],"Position":{"X":0.0,"Y":0.0}},{"Id":18,"Points":[{"X":-24.4641018,"Y":-1.99999988},{"X":-25.3301277,"Y":-2.49999976},{"X":-24.5355339,"Y":-3.53553343},{"X":-23.8284264,"Y":-2.82842684}],"Position":{"X":0.0,"Y":0.0}},{"Id":19,"Points":[{"X":-23.8284264,"Y":-2.82842684},{"X":-24.5355339,"Y":-3.53553343},{"X":-23.5,"Y":-4.33012724},{"X":-23.0,"Y":-3.46410179}],"Position":{"X":0.0,"Y":0.0}},{"Id":20,"Points":[{"X":-23.0,"Y":-3.46410179},{"X":-23.5,"Y":-4.33012724},{"X":-22.2940941,"Y":-4.82962942},{"X":-22.0352764,"Y":-3.86370349}],"Position":{"X":0.0,"Y":0.0}},{"Id":21,"Points":[{"X":-22.0352764,"Y":-3.86370349},{"X":-22.2940941,"Y":-4.82962942},{"X":-21.0,"Y":-5.0},{"X":-21.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":30,"Points":[{"X":21.0,"Y":-4.0},{"X":21.0,"Y":-5.0},{"X":22.294096,"Y":-4.829629},{"X":22.0352764,"Y":-3.86370325}],"Position":{"X":0.0,"Y":0.0}},{"Id":31,"Points":[{"X":22.0352764,"Y":-3.86370325},{"X":22.294096,"Y":-4.829629},{"X":23.5,"Y":-4.33012724},{"X":23.0,"Y":-3.46410179}],"Position":{"X":0.0,"Y":0.0}},{"Id":32,"Points":[{"X":23.0,"Y":-3.46410179},{"X":23.5,"Y":-4.33012724},{"X":24.5355339,"Y":-3.535534},{"X":23.8284264,"Y":-2.828427}],"Position":{"X":0.0,"Y":0.0}},{"Id":33,"Points":[{"X":23.8284264,"Y":-2.828427},{"X":24.5355339,"Y":-3.535534},{"X":25.3301277,"Y":-2.5},{"X":24.4641018,"Y":-2.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":34,"Points":[{"X":24.4641018,"Y":-2.0},{"X":25.3301277,"Y":-2.5},{"X":25.82963,"Y":-1.29409528},{"X":24.8637028,"Y":-1.03527617}],"Position":{"X":0.0,"Y":0.0}},{"Id":35,"Points":[{"X":24.8637028,"Y":-1.03527617},{"X":25.82963,"Y":-1.29409528},{"X":26.0,"Y":0.0},{"X":25.0,"Y":0.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":36,"Points":[{"X":25.0,"Y":0.0},{"X":26.0,"Y":0.0},{"X":25.82963,"Y":1.29409528},{"X":24.8637028,"Y":1.03527617}],"Position":{"X":0.0,"Y":0.0}},{"Id":37,"Points":[{"X":24.8637028,"Y":1.03527617},{"X":25.82963,"Y":1.29409528},{"X":25.3301277,"Y":2.5},{"X":24.4641018,"Y":2.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":38,"Points":[{"X":24.4641018,"Y":2.0},{"X":25.3301277,"Y":2.5},{"X":24.5355339,"Y":3.535534},{"X":23.8284264,"Y":2.828427}],"Position":{"X":0.0,"Y":0.0}},{"Id":39,"Points":[{"X":23.8284264,"Y":2.828427},{"X":24.5355339,"Y":3.535534},{"X":23.5,"Y":4.33012724},{"X":23.0,"Y":3.46410179}],"Position":{"X":0.0,"Y":0.0}},{"Id":40,"Points":[{"X":23.0,"Y":3.46410179},{"X":23.5,"Y":4.33012724},{"X":22.294096,"Y":4.829629},{"X":22.0352764,"Y":3.86370325}],"Position":{"X":0.0,"Y":0.0}},{"Id":41,"Points":[{"X":22.0352764,"Y":3.86370325},{"X":22.294096,"Y":4.829629},{"X":21.0,"Y":5.0},{"X":21.0,"Y":4.0}],"Position":{"X":0.0,"Y":0.0}}]'
       _lavaWallsJson: '[]'
       _talentCardsJson: 
       _environmentSpringsJson: 
@@ -1774,10 +1794,11 @@ MonoBehaviour:
       _teleportGatesJson: 
       _rotatingWheelsJson: 
       _fieldBarriersJson: '[{"Position":{"X":-12.0,"Y":6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":12.0,"Y":6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":-12.0,"Y":-6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":12.0,"Y":-6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1}]'
-      _stageBoundriesWallsJson: '[{"Id":1,"Points":[{"X":-21.0,"Y":11.0},{"X":21.0,"Y":11.0},{"X":21.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":2,"Points":[{"X":-21.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-11.0},{"X":-21.0,"Y":-11.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":3,"Points":[{"X":-21.0,"Y":-12.0},{"X":-20.0,"Y":-12.0},{"X":-20.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":4,"Points":[{"X":20.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":12.0},{"X":20.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}}]'
+      _stageBoundriesWallsJson: '[{"Id":1,"Points":[{"X":-21.0,"Y":11.0},{"X":21.0,"Y":11.0},{"X":21.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":2,"Points":[{"X":-21.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-11.0},{"X":-21.0,"Y":-11.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":3,"Points":[{"X":-21.0,"Y":-12.0},{"X":-20.0,"Y":-12.0},{"X":-20.0,"Y":-4.0},{"X":-21.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":4,"Points":[{"X":-21.0,"Y":4.0},{"X":-20.0,"Y":4.0},{"X":-20.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":5,"Points":[{"X":20.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-4.0},{"X":20.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":6,"Points":[{"X":20.0,"Y":4.0},{"X":21.0,"Y":4.0},{"X":21.0,"Y":12.0},{"X":20.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}}]'
       _powerUpSpawnPointsJson: 
       _moleSpawnPointsJson: 
       _scoreGatesJson: '[{"Id":1,"Position":{"X":0.0,"Y":0.0},"RotationDegrees":0.0}]'
+      _gateTrapsJson: '[{"Id":1,"WallId":50,"WallPoints":[{"X":0.0,"Y":-0.5},{"X":8.0,"Y":-0.5},{"X":8.0,"Y":0.5},{"X":0.0,"Y":0.5}],"AreaPolygons":[{"Points":[{"X":-21.0,"Y":4.0},{"X":-22.7355347,"Y":3.6038754},{"X":-24.127327,"Y":2.493959},{"X":-24.8997116,"Y":0.89008373},{"X":-24.8997116,"Y":-0.8900835},{"X":-24.127327,"Y":-2.493959},{"X":-22.7355347,"Y":-3.60387516},{"X":-21.0,"Y":-4.0}]}],"OpenPosition":{"X":-20.5,"Y":-12.0},"ClosedPosition":{"X":-20.5,"Y":-4.0},"OpenRotationDegrees":90.0,"ClosedRotationDegrees":90.0,"LocalRotationPivot":{"X":0.0,"Y":0.0},"MovementSpeed":16.0,"SecondsStayClosed":3.0,"SecondsStayOpen":2.0,"IsAttachedToRotationWheel":false,"AttachToRotationWheelId":0},{"Id":2,"WallId":51,"WallPoints":[{"X":0.0,"Y":-0.5},{"X":8.0,"Y":-0.5},{"X":8.0,"Y":0.5},{"X":0.0,"Y":0.5}],"AreaPolygons":[{"Points":[{"X":21.0,"Y":-4.0},{"X":22.7355347,"Y":-3.6038754},{"X":24.1273251,"Y":-2.49395943},{"X":24.8997116,"Y":-0.8900839},{"X":24.8997116,"Y":0.8900835},{"X":24.127327,"Y":2.49395919},{"X":22.7355347,"Y":3.60387516},{"X":21.0,"Y":4.0}]}],"OpenPosition":{"X":20.5,"Y":-12.0},"ClosedPosition":{"X":20.5,"Y":-4.0},"OpenRotationDegrees":90.0,"ClosedRotationDegrees":90.0,"LocalRotationPivot":{"X":0.0,"Y":0.0},"MovementSpeed":16.0,"SecondsStayClosed":3.0,"SecondsStayOpen":2.0,"IsAttachedToRotationWheel":false,"AttachToRotationWheelId":0}]'
       _cameraBoundariesJson: '{"TopLeft":{"X":-20.0,"Y":11.0},"BottomRight":{"X":20.0,"Y":-11.0}}'
   AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b0000000e0000000f00000010000000
   WhacAMoleLayoutIndexes: 1500000016000000

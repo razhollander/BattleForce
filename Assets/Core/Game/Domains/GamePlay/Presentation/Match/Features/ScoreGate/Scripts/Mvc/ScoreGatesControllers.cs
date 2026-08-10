@@ -61,7 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _controllers.Add(id, controller);
 
             ApplyTeamColor(controller, lastScoredTeamId);
-            controller.SetScoreMultiplier(scoreMultiplier);
+            controller.SetScoreMultiplier(scoreMultiplier, shouldPunchOnIncrease: false);
         }
 
         public void InterpolateScoreGateTransform(ushort id, Vector2 position, Quaternion rotation)
@@ -84,7 +84,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         {
             if (_controllers.TryGetValue(id, out var controller))
             {
-                controller.SetScoreMultiplier(scoreMultiplier);
+                controller.SetScoreMultiplier(scoreMultiplier, shouldPunchOnIncrease: true);
             }
         }
 

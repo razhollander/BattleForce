@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _powerUpSpawnPointsJson;
         [TextArea(1, 5)] [SerializeField] private string _moleSpawnPointsJson;
         [TextArea(1, 5)] [SerializeField] private string _scoreGatesJson;
+        [TextArea(1, 5)] [SerializeField] private string _gateTrapsJson;
         [TextArea(1, 5)] [SerializeField] private string _cameraBoundariesJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
@@ -110,6 +111,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             _scoreGatesJson = scoreGatesJson;
         }
 
+        public void SetGateTrapsJson(string gateTrapsJson)
+        {
+            _gateTrapsJson = gateTrapsJson;
+        }
+
         public void SetCameraBoundariesJson(string cameraBoundariesJson)
         {
             _cameraBoundariesJson = cameraBoundariesJson;
@@ -183,6 +189,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                 return default;
             }
             return _scoreGatesJson.FromJson<ScoreGateConfig[]>();
+        }
+
+        public EnvironmentGateTrapConfig[] GetGateTraps()
+        {
+            if (string.IsNullOrEmpty(_gateTrapsJson))
+            {
+                return default;
+            }
+            return _gateTrapsJson.FromJson<EnvironmentGateTrapConfig[]>();
         }
     }
 }

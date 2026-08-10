@@ -13,6 +13,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         // not real travel, so it is never counted as a gate pass. Real per-tick movement is a fraction of a unit.
         public float TeleportDetectionSegmentLength = 8f;
 
+        // ScoreGateObstacle mass + solver tuning. Only the server body reads these (the client view reads gate geometry
+        // from SharedGamePlayConfig). Direct control over how heavy the gate feels: when ScoreGateMass > 0 it overrides
+        // the density-derived mass, so tuning that one number changes how far a ram/talent shoves the gate. When 0, the
+        // mass falls back to ScoreGateDensity * area.
+        public float ScoreGateMass = 20f;
+        public float ScoreGateDensity = 4f; // used to build the fixtures; ScoreGateMass overrides the resulting mass when > 0
+        public float ScoreGateRestitution = 0.2f;
+        public float ScoreGateLinearDamping = 1.5f; // a shoved gate drifts and settles instead of sliding forever
+        public float ScoreGateAngularDamping = 1.5f; // a spun gate decays after a couple of turns
+
         // How hard each talent shoves the gate. Values are impulse PER UNIT MASS (and spin PER UNIT INERTIA), so they
         // stay meaningful when ScoreGateDensity changes. Ram/Rock/FrigidBlock/bullets push through the solver and need
         // no value here; these cover the talents whose projectiles are sensors (no solver impulse) or that hit via a cast.

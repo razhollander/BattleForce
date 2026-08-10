@@ -213,6 +213,25 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 #endif
         }
 
+        public void SetGateTraps(EnvironmentGateTrapConfig[] gateTraps, int index)
+        {
+            var json = JsonConvert.SerializeObject(gateTraps);
+
+            if (_environmentLayoutConfigs.TryGetValue(index, out var environmentLayout))
+            {
+                environmentLayout.SetGateTrapsJson(json);
+            }
+            else
+            {
+                var newLayout = new EnvironmentLayoutConfig("", "");
+                newLayout.SetGateTrapsJson(json);
+                _environmentLayoutConfigs[index] = newLayout;
+            }
+#if UNITY_EDITOR
+            Core.Scripts.Editor.Utils.EditorUtils.SaveScriptableObject(this);
+#endif
+        }
+
         public void SetCameraBoundaries(S2CModels.CameraBoundariesConfig cameraBoundaries, int index)
         {
             var json = JsonConvert.SerializeObject(cameraBoundaries);
@@ -254,6 +273,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                     CheckConfigArray(layout.GetEnvironmentSprings(), $"Layout {index} EnvironmentSpring", errorBuilder);
                     CheckConfigArray(layout.GetEnvironmentSpikes(), $"Layout {index} EnvironmentSpike", errorBuilder);
                     CheckConfigArray(layout.GetTeleportGates(), $"Layout {index} TeleportGate", errorBuilder);
+                    CheckConfigArray(layout.GetGateTraps(), $"Layout {index} GateTrap", errorBuilder);
 
                     var wheels = layout.GetRotatingWheels();
                     if (wheels != null)

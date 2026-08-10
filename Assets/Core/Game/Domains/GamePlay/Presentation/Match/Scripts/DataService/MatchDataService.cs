@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchSoulGhostModel> SoulGhosts { get; private set; }
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
         public List<MatchScoreGateModel> ScoreGates { get; private set; }
+        public List<MatchEnvironmentGateTrapModel> GateTraps { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
         public List<MatchMoleModel> Moles { get; private set; }
@@ -74,6 +75,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
             ScoreGates = new List<MatchScoreGateModel>(networkConfig.MaxCap.ConcurrentScoreGates);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
+            GateTraps = new List<MatchEnvironmentGateTrapModel>(networkConfig.MaxCap.ConcurrentEnvironmentGateTraps);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -215,6 +217,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             MolesHitPerTeam.TryAdd(teamId, 0);
         }
 
+        public MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap)
+        {
+            GateTraps.Add(gateTrap);
+            return gateTrap;
+        }
+
+        public MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId)
+        {
+            for (int i = 0; i < GateTraps.Count; i++)
+            {
+                if (GateTraps[i].Id == gateTrapId)
+                {
+                    return GateTraps[i];
+                }
+            }
+
+            LogService.LogError($"Couldn't find gate trap with id {gateTrapId}");
+            return null;
+        }
+
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
         {
             var newWall = new MatchEnvironmentWallModel(id, points, localPosition, worldPosition, worldRotationAngle);
@@ -294,6 +316,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FrigidBlocks.Clear();
             ScoreGates.Clear();
             ChickenEggs.Clear();
+            GateTraps.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)

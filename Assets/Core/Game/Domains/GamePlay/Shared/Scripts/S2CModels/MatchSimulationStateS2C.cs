@@ -26,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<GalacticForceFieldS2C> GalacticForceFields;
         public FixedUnorderedList<MoleStateS2C> Moles;
         public FixedUnorderedList<ScoreGateStateS2C> ScoreGates;
+        public FixedUnorderedList<EnvironmentGateTrapStateS2C> GateTraps;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
         public Dictionary<ushort, int> MolesHitPerTeamId;
@@ -41,7 +42,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public float MapSizeMultiplier;
         
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks,
-            int maxMoles, int maxScoreGates)
+            int maxMoles, int maxScoreGates, int maxGateTraps)
         {
             // The lock on capacity must stay in sync with MaxCap.ConcurrentLockOnTargets, a caster can lock on every enemy, power up ball and mole at once
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxPlayers - 1 + maxPowerUpBalls + maxMoles));
@@ -58,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             GalacticForceFields = new FixedUnorderedList<GalacticForceFieldS2C>(maxGalacticForceFields);
             Moles = new FixedUnorderedList<MoleStateS2C>(maxMoles);
             ScoreGates = new FixedUnorderedList<ScoreGateStateS2C>(maxScoreGates);
+            GateTraps = new FixedUnorderedList<EnvironmentGateTrapStateS2C>(maxGateTraps);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
             MolesHitPerTeamId = new Dictionary<ushort, int>(maxTeams);
@@ -109,6 +111,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             foreach (var scoreGate in ScoreGates.AsSpan())
             {
                 scoreGate.Serialize(writer);
+            }
+
+            // Gate traps only ride the full snapshot - during the match a single GateTrapClosing net event drives them.
+            var gateTrapsCount = GateTraps.Count;
+            writer.Put((byte)gateTrapsCount);
+            foreach (var gateTrap in GateTraps.AsSpan())
+            {
+                gateTrap.Serialize(writer);
             }
 
             foreach (var kvp in GemsPerTeamId)
@@ -251,6 +261,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var scoreGate = ref ScoreGates.AddAndGet();
                 scoreGate.Deserialize(reader);
+            }
+
+            var gateTrapsCount = reader.GetByte();
+            GateTraps.Clear();
+            for (var i = 0; i < gateTrapsCount; i++)
+            {
+                ref var gateTrap = ref GateTraps.AddAndGet();
+                gateTrap.Deserialize(reader);
             }
 
             GemsPerTeamId.Clear();
@@ -1185,6 +1203,19 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No score gate for id {scoreGateId}!");
         }
 
+        public ref EnvironmentGateTrapStateS2C GetGateTrapById(ushort gateTrapId)
+        {
+            for (int i = 0; i < GateTraps.Count; i++)
+            {
+                if (GateTraps[i].Id == gateTrapId)
+                {
+                    return ref GateTraps.GetByIndex(i);
+                }
+            }
+
+            throw new System.Exception($"No gate trap for id {gateTrapId}!");
+        }
+
         public void AddMolesHitForTeam(ushort teamId, int molesHitDelta)
         {
             MolesHitPerTeamId[teamId] += molesHitDelta;
@@ -1228,6 +1259,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             GalacticForceFields.Clear();
             Moles.Clear();
             ScoreGates.Clear();
+            GateTraps.Clear();
             FieldBarriersOrderedByTeamId.Clear();
         }
     }

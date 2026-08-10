@@ -33,6 +33,24 @@ namespace Core.Game.Domains.GamePlay.Editor
         private const float ARENA_HALF_Y = 11f;
         private const float WALL_THICKNESS = 1f;
 
+        // A half circular pit bulges out of the middle of each side wall, exactly like the ones in layout 0. Its radius
+        // is also the half height of the gap it leaves in the wall, so the pit's mouth is the gap itself.
+        private const float PIT_RADIUS = 4f;
+        private const int PIT_ARC_SEGMENTS = 12;
+        private const ushort LEFT_PIT_FIRST_ARC_WALL_ID = 10;
+        private const ushort RIGHT_PIT_FIRST_ARC_WALL_ID = 30;
+
+        // The gate trap wall is a portcullis hidden inside the lower half of the side wall; it slides up to plug the
+        // pit's mouth the moment somebody flies in.
+        private const ushort LEFT_GATE_TRAP_ID = 1;
+        private const ushort RIGHT_GATE_TRAP_ID = 2;
+        private const ushort LEFT_GATE_TRAP_WALL_ID = 50;
+        private const ushort RIGHT_GATE_TRAP_WALL_ID = 51;
+        private const float GATE_TRAP_MOVEMENT_SPEED = 16f;
+        private const float GATE_TRAP_SECONDS_STAY_CLOSED = 3f;
+        private const float GATE_TRAP_SECONDS_STAY_OPEN = 2f;
+        private const int GATE_TRAP_AREA_POINTS = 8;
+
         [MenuItem("BF/GatePass/1 - Setup Configs And Layout")]
         public static void SetupConfigsAndLayout()
         {
@@ -41,6 +59,16 @@ namespace Core.Game.Domains.GamePlay.Editor
             SetupEnvironmentLayout();
             AssetDatabase.SaveAssets();
             Debug.Log("[GatePassSetup] Configs + layout done. GatePass layout authored at index " + GATEPASS_LAYOUT_INDEX + ".");
+        }
+
+        // Re-authors only the layout (arena walls, the two pits, the boundaries and the gate traps), leaving the shared
+        // and simulation tuning values untouched - use it after changing the layout geometry above.
+        [MenuItem("BF/GatePass/3 - Rebuild Layout Only")]
+        public static void RebuildLayoutOnly()
+        {
+            SetupEnvironmentLayout();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[GatePassSetup] Layout " + GATEPASS_LAYOUT_INDEX + " rebuilt: walls, pits, boundaries and gate traps.");
         }
 
         [MenuItem("BF/GatePass/2 - Create Gate Prefab And Bind")]
@@ -59,11 +87,6 @@ namespace Core.Game.Domains.GamePlay.Editor
             var shared = AssetDatabase.LoadAssetAtPath<SharedGamePlayConfig>(SHARED_CONFIG_PATH);
             shared.ScoreGatePostSize = new Vector2(1.5f, 1.5f);
             shared.ScoreGateGapWidth = 4f;
-            shared.ScoreGateMass = 20f;
-            shared.ScoreGateDensity = 4f;
-            shared.ScoreGateRestitution = 0.2f;
-            shared.ScoreGateLinearDamping = 1.5f;
-            shared.ScoreGateAngularDamping = 1.5f;
             EditorUtility.SetDirty(shared);
         }
 
@@ -75,6 +98,11 @@ namespace Core.Game.Domains.GamePlay.Editor
             inner.EnabledBonusStageTypes = new List<StageType> { StageType.WhacAMole, StageType.GatePass };
             inner.DefaultGatePassEnvironmentId = GATEPASS_LAYOUT_INDEX;
             inner.GatePass ??= new GatePassConfig();
+            inner.GatePass.ScoreGateMass = 20f;
+            inner.GatePass.ScoreGateDensity = 4f;
+            inner.GatePass.ScoreGateRestitution = 0.2f;
+            inner.GatePass.ScoreGateLinearDamping = 1.5f;
+            inner.GatePass.ScoreGateAngularDamping = 1.5f;
             EditorUtility.SetDirty(sim);
         }
 
@@ -87,10 +115,13 @@ namespace Core.Game.Domains.GamePlay.Editor
             // Newtonsoft JSON straight onto the layout. Camera + score gates already use Newtonsoft in their setters.
             var layout = GetOrCreateLayout(env, GATEPASS_LAYOUT_INDEX);
             layout.SetEnvironmentHalfSizeJson(JsonConvert.SerializeObject(new NumVec(ARENA_HALF_X, ARENA_HALF_Y)));
-            layout.SetWallsJson(JsonConvert.SerializeObject(BuildBorderWalls()));
+            layout.SetWallsJson(JsonConvert.SerializeObject(BuildArenaWalls()));
             layout.SetLavaWallsJson(JsonConvert.SerializeObject(new WallConfig[0]));
-            layout.SetStageBoundariesJson(JsonConvert.SerializeObject(BuildBorderWalls())); // same rectangle keeps players inside
+            // The pit arcs are deliberately left out of the boundaries: a player sitting in a pit must not read as
+            // outside the stage and get snapped back out of it.
+            layout.SetStageBoundariesJson(JsonConvert.SerializeObject(BuildBorderWalls()));
             layout.SetFieldBarriersJson(JsonConvert.SerializeObject(BuildTeamBarriers()));
+            layout.SetGateTrapsJson(JsonConvert.SerializeObject(BuildGateTraps()));
 
             env.SetCameraBoundaries(new CameraBoundariesConfig(new NumVec(-ARENA_HALF_X, ARENA_HALF_Y), new NumVec(ARENA_HALF_X, -ARENA_HALF_Y)), GATEPASS_LAYOUT_INDEX);
             env.SetScoreGates(new[] { new ScoreGateConfig(1, NumVec.Zero, 0f) }, GATEPASS_LAYOUT_INDEX);
@@ -116,19 +147,139 @@ namespace Core.Game.Domains.GamePlay.Editor
             return layout;
         }
 
+        // Top and bottom run the full width; each side wall is split in two so the pit's mouth stays open between them.
         private static WallConfig[] BuildBorderWalls()
         {
             var halfEdgeLength = ARENA_HALF_X + WALL_THICKNESS;
-            var halfSideLength = ARENA_HALF_Y + WALL_THICKNESS;
             var halfThickness = WALL_THICKNESS * 0.5f;
+            var sideHalfLength = (ARENA_HALF_Y + WALL_THICKNESS - PIT_RADIUS) * 0.5f;
+            var sideCenterY = PIT_RADIUS + sideHalfLength;
+            var sideCenterX = ARENA_HALF_X + halfThickness;
 
             return new[]
             {
                 MakeRectWall(1, 0f, ARENA_HALF_Y + halfThickness, halfEdgeLength, halfThickness),   // top
                 MakeRectWall(2, 0f, -(ARENA_HALF_Y + halfThickness), halfEdgeLength, halfThickness), // bottom
-                MakeRectWall(3, -(ARENA_HALF_X + halfThickness), 0f, halfThickness, halfSideLength),  // left
-                MakeRectWall(4, ARENA_HALF_X + halfThickness, 0f, halfThickness, halfSideLength),     // right
+                MakeRectWall(3, -sideCenterX, -sideCenterY, halfThickness, sideHalfLength),          // left, below the pit
+                MakeRectWall(4, -sideCenterX, sideCenterY, halfThickness, sideHalfLength),           // left, above the pit
+                MakeRectWall(5, sideCenterX, -sideCenterY, halfThickness, sideHalfLength),           // right, below the pit
+                MakeRectWall(6, sideCenterX, sideCenterY, halfThickness, sideHalfLength),            // right, above the pit
             };
+        }
+
+        private static WallConfig[] BuildArenaWalls()
+        {
+            var walls = new List<WallConfig>(BuildBorderWalls());
+            walls.AddRange(BuildPitArcWalls(GetPitCenterX(isLeftPit: true), LEFT_PIT_FIRST_ARC_WALL_ID, isLeftPit: true));
+            walls.AddRange(BuildPitArcWalls(GetPitCenterX(isLeftPit: false), RIGHT_PIT_FIRST_ARC_WALL_ID, isLeftPit: false));
+            return walls.ToArray();
+        }
+
+        // The pit hangs off the outer face of the side wall, so its mouth is flush with the gap left between the two
+        // side wall pieces.
+        private static float GetPitCenterX(bool isLeftPit)
+        {
+            var pitCenterX = ARENA_HALF_X + WALL_THICKNESS;
+            return isLeftPit ? -pitCenterX : pitCenterX;
+        }
+
+        // Each arc piece is a quad between the inner and the outer radius, so the ring of them reads as one wall of the
+        // same thickness as the arena border.
+        private static WallConfig[] BuildPitArcWalls(float pitCenterX, ushort firstWallId, bool isLeftPit)
+        {
+            var arcWalls = new WallConfig[PIT_ARC_SEGMENTS];
+            var outerRadius = PIT_RADIUS + WALL_THICKNESS;
+            var degreesPerSegment = 180f / PIT_ARC_SEGMENTS;
+            // Both arcs sweep the half of the circle that faces away from the arena: 90 to 270 on the left, -90 to 90 on the right.
+            var firstSegmentDegrees = GetPitFirstArcDegrees(isLeftPit);
+
+            for (int i = 0; i < PIT_ARC_SEGMENTS; i++)
+            {
+                var startDegrees = firstSegmentDegrees + degreesPerSegment * i;
+                var endDegrees = startDegrees + degreesPerSegment;
+
+                var points = new[]
+                {
+                    GetPointOnPitCircle(pitCenterX, PIT_RADIUS, startDegrees),
+                    GetPointOnPitCircle(pitCenterX, outerRadius, startDegrees),
+                    GetPointOnPitCircle(pitCenterX, outerRadius, endDegrees),
+                    GetPointOnPitCircle(pitCenterX, PIT_RADIUS, endDegrees),
+                };
+
+                arcWalls[i] = new WallConfig((ushort)(firstWallId + i), points);
+            }
+
+            return arcWalls;
+        }
+
+        private static NumVec GetPointOnPitCircle(float pitCenterX, float radius, float degrees)
+        {
+            var radians = degrees * Mathf.Deg2Rad;
+            return new NumVec(pitCenterX + radius * Mathf.Cos(radians), radius * Mathf.Sin(radians));
+        }
+
+        // Both traps are identical mirrors: a bar that lives inside the lower side wall and slides straight up into the
+        // pit's mouth, sealing whoever flew in.
+        private static EnvironmentGateTrapConfig[] BuildGateTraps()
+        {
+            return new[]
+            {
+                BuildGateTrap(LEFT_GATE_TRAP_ID, LEFT_GATE_TRAP_WALL_ID, isLeftPit: true),
+                BuildGateTrap(RIGHT_GATE_TRAP_ID, RIGHT_GATE_TRAP_WALL_ID, isLeftPit: false),
+            };
+        }
+
+        private static EnvironmentGateTrapConfig BuildGateTrap(ushort id, ushort wallId, bool isLeftPit)
+        {
+            var mouthHeight = PIT_RADIUS * 2f;
+            var halfThickness = WALL_THICKNESS * 0.5f;
+            var wallCenterX = isLeftPit ? -(ARENA_HALF_X + halfThickness) : ARENA_HALF_X + halfThickness;
+
+            return new EnvironmentGateTrapConfig
+            {
+                Id = id,
+                WallId = wallId,
+                // Authored along +X from its origin, so at 90 degrees it stands upright and fills the mouth upwards.
+                WallPoints = new[]
+                {
+                    new NumVec(0f, -halfThickness),
+                    new NumVec(mouthHeight, -halfThickness),
+                    new NumVec(mouthHeight, halfThickness),
+                    new NumVec(0f, halfThickness),
+                },
+                AreaPolygons = new[] { BuildGateTrapAreaPolygon(GetPitCenterX(isLeftPit), isLeftPit) },
+                OpenPosition = new NumVec(wallCenterX, -(ARENA_HALF_Y + WALL_THICKNESS)),
+                ClosedPosition = new NumVec(wallCenterX, -PIT_RADIUS),
+                OpenRotationDegrees = 90f,
+                ClosedRotationDegrees = 90f,
+                LocalRotationPivot = NumVec.Zero,
+                MovementSpeed = GATE_TRAP_MOVEMENT_SPEED,
+                SecondsStayClosed = GATE_TRAP_SECONDS_STAY_CLOSED,
+                SecondsStayOpen = GATE_TRAP_SECONDS_STAY_OPEN,
+                IsAttachedToRotationWheel = false,
+                AttachToRotationWheelId = 0,
+            };
+        }
+
+        // The sensing area is the pit's inside, closed off by the chord across its mouth - a player only counts as
+        // caught once they are past the wall line the bar rises through.
+        private static GateTrapAreaPolygonConfig BuildGateTrapAreaPolygon(float pitCenterX, bool isLeftPit)
+        {
+            var points = new NumVec[GATE_TRAP_AREA_POINTS];
+            var degreesPerStep = 180f / (GATE_TRAP_AREA_POINTS - 1);
+            var firstPointDegrees = GetPitFirstArcDegrees(isLeftPit);
+
+            for (int i = 0; i < GATE_TRAP_AREA_POINTS; i++)
+            {
+                points[i] = GetPointOnPitCircle(pitCenterX, PIT_RADIUS, firstPointDegrees + degreesPerStep * i);
+            }
+
+            return new GateTrapAreaPolygonConfig { Points = points };
+        }
+
+        private static float GetPitFirstArcDegrees(bool isLeftPit)
+        {
+            return isLeftPit ? 90f : -90f;
         }
 
         private static WallConfig MakeRectWall(ushort id, float centerX, float centerY, float halfWidth, float halfHeight)

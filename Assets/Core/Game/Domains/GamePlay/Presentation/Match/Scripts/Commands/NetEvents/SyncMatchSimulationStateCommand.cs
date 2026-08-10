@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.GateTraps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
@@ -29,6 +30,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.TalentCards.Scripts
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
@@ -53,6 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchEnvironmentGateTrapsControllers _environmentGateTrapsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private IEnvironmentSpikeControllers _environmentSpikeControllers;
         private ITalentCardControllers _talentCardControllers;
@@ -106,6 +109,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _bulletControllers = _diContainer.Resolve<IMatchBulletControllers>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentGateTrapsControllers = _diContainer.Resolve<IMatchEnvironmentGateTrapsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentSpikeControllers = _diContainer.Resolve<IEnvironmentSpikeControllers>();
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
@@ -161,6 +165,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _matchDataService.ClearAll();
             _bulletControllers.DestroyAll();
             _environmentWallsControllers.DestroyAll();
+            _environmentGateTrapsControllers.DestroyAll();
             _environmentSpringControllers.DestroyAll();
             _environmentSpikeControllers.DestroyAll();
             _environmentLavaWallsControllers.DestroyAll();
@@ -213,6 +218,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateTeamBoards();
             var teleportGatesPerWheelId = CreateTeleportGates(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier, teleportGatesPerWheelId);
+            CreateGateTraps(mapSizeMultiplier); // after the wheels, so a trap riding one can already place itself on it
             CreateFieldBarriers(mapSizeMultiplier);
             CreateSwapField();
             CreateKOPRojectiles();
@@ -642,6 +648,91 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
         
+        // Gate traps come straight from the layout, exactly like the server reads them; only the live state comes over
+        // the wire, so a client that joins mid-cycle picks the swing up where the server has it.
+        private void CreateGateTraps(float mapSizeMultiplier)
+        {
+            var gateTrapConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetGateTraps();
+            if (gateTrapConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var ticksPerSecond = _networkConfig.TicksPerSeconds;
+            var deltaTime = _networkConfig.DeltaTime;
+            var wheelCalculationTick = GetTicksPassedSincePreparationPhaseEneded();
+
+            foreach (var gateTrapConfig in gateTrapConfigs)
+            {
+                var gateTrapModel = BuildGateTrapModel(gateTrapConfig, mapSizeMultiplier, ticksPerSecond);
+                ApplyGateTrapStateFromSnapshot(gateTrapModel);
+                _matchDataService.AddGateTrap(gateTrapModel);
+                gateTrapModel.StepToTick(_stateOccouredOnTick, wheelCalculationTick, deltaTime, GetRotatingWheelOfGateTrap(gateTrapModel));
+                _environmentGateTrapsControllers.CreateGateTrap(gateTrapModel.Id);
+            }
+        }
+
+        private MatchEnvironmentGateTrapModel BuildGateTrapModel(EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier, int ticksPerSecond)
+        {
+            var wallPoints = new Vector2[gateTrapConfig.WallPoints.Length];
+            for (int i = 0; i < wallPoints.Length; i++)
+            {
+                wallPoints[i] = gateTrapConfig.WallPoints[i] * mapSizeMultiplier;
+            }
+
+            var openPosition = gateTrapConfig.OpenPosition * mapSizeMultiplier;
+            var closedPosition = gateTrapConfig.ClosedPosition * mapSizeMultiplier;
+            var transitionDurationInTicks = EnvironmentGateTrapUtils.CalculateTransitionDurationInTicks(openPosition, closedPosition,
+                gateTrapConfig.OpenRotationDegrees, gateTrapConfig.ClosedRotationDegrees, gateTrapConfig.MovementSpeed * mapSizeMultiplier, ticksPerSecond);
+
+            return new MatchEnvironmentGateTrapModel(
+                gateTrapConfig.Id,
+                wallPoints,
+                openPosition,
+                closedPosition,
+                gateTrapConfig.OpenRotationDegrees,
+                gateTrapConfig.ClosedRotationDegrees,
+                gateTrapConfig.LocalRotationPivot * mapSizeMultiplier,
+                transitionDurationInTicks,
+                EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayClosed, ticksPerSecond),
+                EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayOpen, ticksPerSecond),
+                gateTrapConfig.IsAttachedToRotationWheel,
+                gateTrapConfig.AttachToRotationWheelId);
+        }
+
+        private void ApplyGateTrapStateFromSnapshot(MatchEnvironmentGateTrapModel gateTrapModel)
+        {
+            foreach (var gateTrapState in _simulationState.GateTraps.AsSpan())
+            {
+                if (gateTrapState.Id != gateTrapModel.Id)
+                {
+                    continue;
+                }
+
+                gateTrapModel.State = gateTrapState.State;
+                gateTrapModel.StateEndTick = gateTrapState.StateEndTick;
+                return;
+            }
+        }
+
+        private MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrapModel)
+        {
+            if (!gateTrapModel.IsAttachedToRotationWheel)
+            {
+                return null;
+            }
+
+            foreach (var wheelModel in _matchDataService.RotatingWheels)
+            {
+                if (wheelModel.Id == gateTrapModel.AttachedToRotationWheelId)
+                {
+                    return wheelModel;
+                }
+            }
+
+            return null;
+        }
+
         private void CreateSwapField()
         {
             foreach (var swapField in _simulationState.SwapFields.AsSpan())

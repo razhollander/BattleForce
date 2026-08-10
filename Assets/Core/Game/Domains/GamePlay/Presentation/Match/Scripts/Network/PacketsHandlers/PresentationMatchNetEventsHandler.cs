@@ -319,6 +319,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        // The trap's whole cycle is derived from this one event, so the model only needs the state it puts the trap in;
+        // UpdateGateTraps walks it from Closing all the way back to Open on its own.
+        public void ProcessGateTrapClosingEvents(CapacityList<GateTrapClosingNetEventS2C> gateTrapClosingNetEvents)
+        {
+            if (gateTrapClosingNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var gateTrapClosingNetEvent in gateTrapClosingNetEvents)
+            {
+                var gateTrapModel = _matchDataService.GetGateTrap(gateTrapClosingNetEvent.GateTrapId);
+
+                if (gateTrapModel == null)
+                {
+                    continue;
+                }
+
+                gateTrapModel.State = GateTrapState.Closing;
+                gateTrapModel.StateEndTick = gateTrapClosingNetEvent.ClosedOnTick;
+                gateTrapModel.IsWaitingForOpenCooldown = false;
+            }
+        }
+
         // An expired mole is not gone yet, it only starts its pre-hide shake and stays hittable until it goes into its
         // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleHitEvents, and one
         // that hides on its own leaves no event, so its stale model entry is cleared with the rest on the next full sync.

@@ -19,6 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public PowerUpSpawnPointConfig[] PowerUpSpawnPoints { get; private set; }
         public MoleSpawnPointConfig[] MoleSpawnPoints { get; private set; }
         public ScoreGateConfig[] ScoreGates { get; private set; }
+        public EnvironmentGateTrapConfig[] GateTraps { get; private set; }
 
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         
@@ -43,6 +44,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             PowerUpSpawnPoints = environmentLayoutConfig.GetPowerUpSpawnPoints();
             MoleSpawnPoints = environmentLayoutConfig.GetMoleSpawnPoints();
             ScoreGates = environmentLayoutConfig.GetScoreGates();
+            GateTraps = environmentLayoutConfig.GetGateTraps();
         }
     }
 }

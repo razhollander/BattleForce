@@ -148,6 +148,8 @@ namespace Core.Scripts.Network
         public int GoldenMoleDamagedNetEvents = 64;
         public int ConcurrentScoreGates = 4;
         public int ScoreGatePassedNetEvents = 64;
+        public int ConcurrentEnvironmentGateTraps = 16;
+        public int GateTrapClosingNetEvents = 32;
 
         [Serializable]
         public class EnvironmentRotatingWheel

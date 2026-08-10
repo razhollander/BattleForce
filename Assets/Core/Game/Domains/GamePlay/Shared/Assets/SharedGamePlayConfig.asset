@@ -40,7 +40,3 @@ MonoBehaviour:
   MoleHideShakeDurationSeconds: 1
   ScoreGatePostSize: {x: 1.5, y: 1.5}
   ScoreGateGapWidth: 4
-  ScoreGateDensity: 4
-  ScoreGateRestitution: 0.2
-  ScoreGateLinearDamping: 1.5
-  ScoreGateAngularDamping: 1.5

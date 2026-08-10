@@ -144,6 +144,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateEnvironmentSpikes(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier);
             CreateTeleportGates(mapSizeMultiplier);
+            CreateGateTraps(mapSizeMultiplier); // after the wheels, so a trap can register its wall with the wheel it rides
             CreateFieldBarriers(mapSizeMultiplier);
         }
         
@@ -385,14 +386,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             var postSize = _sharedGamePlayConfig.ScoreGatePostSize.ToNumericsVector2() * mapSizeMultiplier;
             var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * mapSizeMultiplier;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
 
             foreach (var scoreGateConfig in scoreGateConfigs)
             {
                 var position = scoreGateConfig.Position * mapSizeMultiplier;
                 _matchDataService.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees);
                 _physicsSimulator.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees, postSize, gapWidth,
-                    _sharedGamePlayConfig.ScoreGateMass, _sharedGamePlayConfig.ScoreGateDensity, _sharedGamePlayConfig.ScoreGateRestitution,
-                    _sharedGamePlayConfig.ScoreGateLinearDamping, _sharedGamePlayConfig.ScoreGateAngularDamping);
+                    gatePassConfig.ScoreGateMass, gatePassConfig.ScoreGateDensity, gatePassConfig.ScoreGateRestitution,
+                    gatePassConfig.ScoreGateLinearDamping, gatePassConfig.ScoreGateAngularDamping);
             }
         }
 
@@ -578,6 +580,108 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation);
             _physicsSimulator.AddTeleportGate(gateAId, gateAWorldPosition, gateAWorldRotation, gateSize);
             _physicsSimulator.AddTeleportGate(gateBId, gateBWorldPosition, gateBWorldRotation, gateSize);
+        }
+
+        // A gate trap owns one regular environment wall and drives its transform, so the wall collides like every other
+        // wall and the trap only has to decide where it should be this tick.
+        private void CreateGateTraps(float mapSizeMultiplier)
+        {
+            var gateTrapConfigs = _matchEnvironmentConfigDataService.GateTraps;
+            if (gateTrapConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var gateTrapConfig in gateTrapConfigs)
+            {
+                var gateTrap = AddGateTrapToEnvironment(gateTrapConfig, mapSizeMultiplier);
+                AddGateTrapWallToEnvironment(gateTrap, gateTrapConfig, mapSizeMultiplier);
+
+                ref var gateTrapState = ref _matchDataService.SimulationState.GateTraps.AddAndGet();
+                gateTrapState.Id = gateTrap.Id;
+                gateTrapState.State = GateTrapState.Open;
+                gateTrapState.StateEndTick = 0; // a fresh stage arms every trap immediately
+            }
+        }
+
+        private MatchEnvironmentGateTrapModel AddGateTrapToEnvironment(EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            var ticksPerSecond = _networkConfig.TicksPerSeconds;
+            var gateTrap = _matchDataService.EnvironmentData.AddGateTrap(gateTrapConfig.Id, gateTrapConfig.WallId);
+
+            gateTrap.OpenPosition = gateTrapConfig.OpenPosition * mapSizeMultiplier;
+            gateTrap.ClosedPosition = gateTrapConfig.ClosedPosition * mapSizeMultiplier;
+            gateTrap.OpenRotationDegrees = gateTrapConfig.OpenRotationDegrees;
+            gateTrap.ClosedRotationDegrees = gateTrapConfig.ClosedRotationDegrees;
+            gateTrap.LocalRotationPivot = gateTrapConfig.LocalRotationPivot * mapSizeMultiplier;
+            gateTrap.IsAttachedToRotationWheel = gateTrapConfig.IsAttachedToRotationWheel;
+            gateTrap.AttachedToRotationWheelId = gateTrapConfig.AttachToRotationWheelId;
+            gateTrap.AreaPolygons = ScaleGateTrapAreaPolygons(gateTrapConfig, mapSizeMultiplier);
+            // The travelled distance scales with the map, so the speed scales with it too and the cycle keeps its authored timing.
+            gateTrap.TransitionDurationInTicks = EnvironmentGateTrapUtils.CalculateTransitionDurationInTicks(gateTrap.OpenPosition, gateTrap.ClosedPosition,
+                gateTrap.OpenRotationDegrees, gateTrap.ClosedRotationDegrees, gateTrapConfig.MovementSpeed * mapSizeMultiplier, ticksPerSecond);
+            gateTrap.StayClosedDurationInTicks = EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayClosed, ticksPerSecond);
+            gateTrap.StayOpenDurationInTicks = EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayOpen, ticksPerSecond);
+
+            return gateTrap;
+        }
+
+        private void AddGateTrapWallToEnvironment(MatchEnvironmentGateTrapModel gateTrap, EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            var calculationTick = 0;
+
+            EnvironmentGateTrapUtils.CalculateWallTransform(gateTrap.OpenPosition, gateTrap.ClosedPosition, gateTrap.OpenRotationDegrees, gateTrap.ClosedRotationDegrees,
+                gateTrap.LocalRotationPivot, 0f, out var localPosition, out var localRotation);
+
+            var worldPosition = localPosition;
+            var worldRotation = localRotation;
+
+            if (gateTrap.IsAttachedToRotationWheel)
+            {
+                var wheelConfig = _matchEnvironmentConfigDataService.RotatingWheels.FindWithId(gateTrap.AttachedToRotationWheelId);
+                EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                    calculationTick, wheelConfig.RotationSpeed, _networkConfig.DeltaTime, wheelConfig.CenterPosition * mapSizeMultiplier, localPosition, localRotation,
+                    out worldPosition, out worldRotation
+                );
+
+                _matchDataService.EnvironmentData.GetRotatingWheel(gateTrap.AttachedToRotationWheelId).AddWall(gateTrap.WallId);
+            }
+
+            var wallPoints = new Vector2[gateTrapConfig.WallPoints.Length];
+            for (int i = 0; i < wallPoints.Length; i++)
+            {
+                wallPoints[i] = gateTrapConfig.WallPoints[i] * mapSizeMultiplier;
+            }
+
+            AddWallToEnvironment(gateTrap.WallId, wallPoints, localPosition, worldPosition, worldRotation);
+            // Unlike a wheel's own walls the trap wall swings, so its local rotation is not zero and the wheel step needs it.
+            _matchDataService.EnvironmentData.GetWall(gateTrap.WallId).Transform.LocalRotationDegrees = localRotation;
+        }
+
+        private Vector2[][] ScaleGateTrapAreaPolygons(EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            if (gateTrapConfig.AreaPolygons.IsNullOrEmpty())
+            {
+                LogService.LogError($"Gate trap {gateTrapConfig.Id} has no area polygons, it will never close!");
+                return System.Array.Empty<Vector2[]>();
+            }
+
+            var areaPolygons = new Vector2[gateTrapConfig.AreaPolygons.Length][];
+
+            for (int polygonIndex = 0; polygonIndex < areaPolygons.Length; polygonIndex++)
+            {
+                var polygonPoints = gateTrapConfig.AreaPolygons[polygonIndex].Points;
+                var scaledPoints = new Vector2[polygonPoints.Length];
+
+                for (int pointIndex = 0; pointIndex < polygonPoints.Length; pointIndex++)
+                {
+                    scaledPoints[pointIndex] = polygonPoints[pointIndex] * mapSizeMultiplier;
+                }
+
+                areaPolygons[polygonIndex] = scaledPoints;
+            }
+
+            return areaPolygons;
         }
 
         private void CreateRotatingWheels(float mapSizeMultiplier)

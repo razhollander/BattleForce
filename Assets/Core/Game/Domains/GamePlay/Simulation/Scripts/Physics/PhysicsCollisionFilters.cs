@@ -48,7 +48,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
-                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost);
+                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate);
                     break;
                 case PhysicsBodyType.FrigidBlock:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
@@ -125,7 +126,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
                     break;
                 // The gate is a heavy free body: everything that can shove a wall-like object should be able to shove it,
-                // and bullets must stop on it instead of flying through the posts.
+                // bullets must stop on it instead of flying through the posts, and its own posts must stop on walls/rocks
+                // instead of being shoved through them.
                 case PhysicsBodyType.ScoreGate:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
@@ -135,7 +137,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.SoulGhost)
-                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
+                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
+                                    | GetCollisionMask(PhysicsCollisionType.Wall);
                     break;
                 // A mole is a sensor that only needs to notice the things that can whack it: bullets, spaceships carrying a talent that spins whatever it touches, and the projectiles of such talents.
                 // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnMolesCommand resolves that overlap instead.

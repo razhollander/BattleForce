@@ -50,7 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 maxCap.ConcurrentGalacticForceFields,
                 maxCap.ConcurrentFrigidBlocks,
                 maxCap.ConcurrentMoles,
-                maxCap.ConcurrentScoreGates);
+                maxCap.ConcurrentScoreGates,
+                maxCap.ConcurrentEnvironmentGateTraps);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);

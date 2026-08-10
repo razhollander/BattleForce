@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchEnvironmentWallModel> EnvironmentWalls { get; }
         List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; }
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
+        List<MatchEnvironmentGateTrapModel> GateTraps { get; }
         List<MatchSwapFieldModel> SwapFields { get; }
         HashSet<ushort> TeamIds {get; }
         int PreperationPhaseStartedOnTick { get; set; }
@@ -65,6 +66,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
+        MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap);
+        MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId);
         MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);

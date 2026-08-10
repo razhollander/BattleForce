@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
@@ -56,6 +57,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
         private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
         private readonly CapacityList<ScoreGatePassedNetEventS2C> _cachedUnprocessedScoreGatePassedEvents;
+        private readonly CapacityList<GateTrapClosingNetEventS2C> _cachedUnprocessedGateTrapClosingEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
         private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
@@ -159,6 +161,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
             _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
             _cachedUnprocessedScoreGatePassedEvents = new CapacityList<ScoreGatePassedNetEventS2C>(networkConfig.MaxCap.ScoreGatePassedNetEvents);
+            _cachedUnprocessedGateTrapClosingEvents = new CapacityList<GateTrapClosingNetEventS2C>(networkConfig.MaxCap.GateTrapClosingNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
@@ -287,6 +290,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
             ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
             ProcessScoreGatePassedEvents(latestFullTickPacket.ScoreGatePassedNetEvents, ignoreEventsNotAboveTick);
+            ProcessGateTrapClosingEvents(latestFullTickPacket.GateTrapClosingNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents, ignoreEventsNotAboveTick);
@@ -351,6 +355,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
+            UpdateGateTraps(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
             UpdateFishingRodTipsTransform(simulationState);
@@ -1077,6 +1082,42 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        // The server only ever announces the moment a trap starts closing, so the rest of the cycle - staying closed,
+        // opening and the open cooldown - is played out here from the same authored durations the server used.
+        private void UpdateGateTraps(int tick)
+        {
+            if (_matchDataService.GateTraps.Count == 0)
+            {
+                return;
+            }
+
+            var wheelCalculationTick = _matchDataService.IsInPreparationPhase ? 0 : tick - _matchDataService.PreperationPhaseEndedOnTick;
+            var deltaTime = _networkConfig.DeltaTime;
+
+            foreach (var gateTrap in _matchDataService.GateTraps)
+            {
+                gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, GetRotatingWheelOfGateTrap(gateTrap));
+            }
+        }
+
+        private MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap)
+        {
+            if (!gateTrap.IsAttachedToRotationWheel)
+            {
+                return null;
+            }
+
+            foreach (var wheelModel in _matchDataService.RotatingWheels)
+            {
+                if (wheelModel.Id == gateTrap.AttachedToRotationWheelId)
+                {
+                    return wheelModel;
+                }
+            }
+
+            return null;
+        }
+
         private void UpdatePowerUpBallsTransform(MatchSimulationStateS2C simulationState)
         {
             foreach (var powerUpBallModel in _matchDataService.PowerUpBalls)
@@ -1407,6 +1448,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedScoreGatePassedEvents.Sort();
                 _presentationNetEventsHandler.ProcessScoreGatePassedEvents(_cachedUnprocessedScoreGatePassedEvents);
+            }
+        }
+
+        private void ProcessGateTrapClosingEvents(FixedUnorderedList<GateTrapClosingNetEventS2C> gateTrapClosingNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedGateTrapClosingEvents.Clear();
+
+            foreach (var netEvent in gateTrapClosingNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedGateTrapClosingEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedGateTrapClosingEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedGateTrapClosingEvents.Sort();
+                _presentationNetEventsHandler.ProcessGateTrapClosingEvents(_cachedUnprocessedGateTrapClosingEvents);
             }
         }
 

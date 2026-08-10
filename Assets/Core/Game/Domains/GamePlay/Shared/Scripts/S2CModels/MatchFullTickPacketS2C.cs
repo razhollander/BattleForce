@@ -95,6 +95,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<MoleExpiredNetEventS2C> MoleExpiredNetEvents;
         public FixedUnorderedList<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents;
         public FixedUnorderedList<ScoreGatePassedNetEventS2C> ScoreGatePassedNetEvents;
+        public FixedUnorderedList<GateTrapClosingNetEventS2C> GateTrapClosingNetEvents;
 
         public MatchFullTickPacketS2C()
         {
@@ -105,7 +106,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         {
             CurrentSimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer,
                 maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, sharedGamePlayConfig.MaxTeamsAmount, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields, maxCap.ConcurrentFrigidBlocks,
-                maxCap.ConcurrentMoles, maxCap.ConcurrentScoreGates);
+                maxCap.ConcurrentMoles, maxCap.ConcurrentScoreGates, maxCap.ConcurrentEnvironmentGateTraps);
 
             BulletSpawnNetEvents = new FixedUnorderedList<BulletSpawnNetEventS2C>(maxCap.BulletSpawnNetEvents);
 
@@ -195,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             MoleExpiredNetEvents = new FixedUnorderedList<MoleExpiredNetEventS2C>(maxCap.MoleExpiredNetEvents);
             GoldenMoleDamagedNetEvents = new FixedUnorderedList<GoldenMoleDamagedNetEventS2C>(maxCap.GoldenMoleDamagedNetEvents);
             ScoreGatePassedNetEvents = new FixedUnorderedList<ScoreGatePassedNetEventS2C>(maxCap.ScoreGatePassedNetEvents);
+            GateTrapClosingNetEvents = new FixedUnorderedList<GateTrapClosingNetEventS2C>(maxCap.GateTrapClosingNetEvents);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -287,6 +289,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 10)) != 0) SerializedMoleExpiredNetEvents(writer);
             if ((eventMask2 & (1UL << 11)) != 0) SerializedGoldenMoleDamagedNetEvents(writer);
             if ((eventMask2 & (1UL << 12)) != 0) SerializedScoreGatePassedNetEvents(writer);
+            if ((eventMask2 & (1UL << 13)) != 0) SerializedGateTrapClosingNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -305,6 +308,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (MoleExpiredNetEvents.Count > 0) eventMask2 |= 1UL << 10;
             if (GoldenMoleDamagedNetEvents.Count > 0) eventMask2 |= 1UL << 11;
             if (ScoreGatePassedNetEvents.Count > 0) eventMask2 |= 1UL << 12;
+            if (GateTrapClosingNetEvents.Count > 0) eventMask2 |= 1UL << 13;
             return eventMask2;
         }
 
@@ -629,6 +633,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 12)) != 0) DeserializedScoreGatePassedNetEvents(reader);
             else ScoreGatePassedNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 13)) != 0) DeserializedGateTrapClosingNetEvents(reader);
+            else GateTrapClosingNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -2115,6 +2122,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref ScoreGatePassedNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedGateTrapClosingNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)GateTrapClosingNetEvents.Count);
+            foreach (var netEvent in GateTrapClosingNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedGateTrapClosingNetEvents(NetDataReader reader)
+        {
+            GateTrapClosingNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref GateTrapClosingNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

@@ -29,15 +29,9 @@ public class SharedGamePlayConfig : ScriptableObject
     public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
     public float MoleHideShakeDurationSeconds = 1f; // once its lifetime ends the mole shakes in place before hiding, and stays hittable while it does
 
-    // GatePass ScoreGateObstacle geometry + mass. Both the server (body) and the client (view) read these, so they
-    // live in the Shared config. One gate = two square posts of ScoreGatePostSize with ScoreGateGapWidth between them.
+    // GatePass ScoreGateObstacle geometry. Both the server (body) and the client (view) read these, so they live in the
+    // Shared config. One gate = two square posts of ScoreGatePostSize with ScoreGateGapWidth between them. The gate's
+    // mass/solver tuning is server-only and lives in GatePassConfig instead.
     public UnityEngine.Vector2 ScoreGatePostSize = new UnityEngine.Vector2(1.5f, 1.5f);
     public float ScoreGateGapWidth = 4f;
-    // Direct control over how heavy the gate feels. When > 0 it overrides the density-derived mass, so tuning this one
-    // number changes how far a ram/talent shoves the gate. When 0, the mass falls back to ScoreGateDensity * area.
-    public float ScoreGateMass = 20f;
-    public float ScoreGateDensity = 4f; // used to build the fixtures; ScoreGateMass overrides the resulting mass when > 0
-    public float ScoreGateRestitution = 0.2f;
-    public float ScoreGateLinearDamping = 1.5f; // a shoved gate drifts and settles instead of sliding forever
-    public float ScoreGateAngularDamping = 1.5f; // a spun gate decays after a couple of turns
 }

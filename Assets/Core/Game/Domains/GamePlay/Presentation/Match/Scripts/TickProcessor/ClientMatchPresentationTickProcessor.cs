@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEnvironmentSpikePlayerCollisionNetEventsCommand _handleEnvironmentSpikePlayerCollisionNetEventsCommand;
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
+        private readonly UpdateGateTrapsViewCommand _updateGateTrapsViewCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;
         private readonly HandleDeactivateSwapTalentNetEventsCommand _handleDeactivateSwapTalentNetEventsCommand;
         private readonly UpdateSwapFieldsTransformCommand _updateSwapFieldsTransformCommand;
@@ -143,6 +144,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEnvironmentSpikePlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents.HandleEnvironmentSpikePlayerCollisionNetEventsCommand>();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
             _updateObjectTransformInsideRotatingWheelsCommand = commandFactory.CreateCommandVoid<UpdateObjectTransformInsideRotatingWheelsCommand>();
+            _updateGateTrapsViewCommand = commandFactory.CreateCommandVoid<UpdateGateTrapsViewCommand>();
             _handlePreparationPhaseEndedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePreparationPhaseEndedNetEventsCommand>();
             _handleDeactivateSwapTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSwapTalentNetEventsCommand>();
             _updateSwapFieldsTransformCommand = commandFactory.CreateCommandVoid<UpdateSwapFieldsTransformCommand>();
@@ -304,6 +306,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
+            _updateGateTrapsViewCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute();
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();

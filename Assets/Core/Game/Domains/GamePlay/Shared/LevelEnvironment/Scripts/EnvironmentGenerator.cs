@@ -18,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
         [SerializeField] private List<PowerUpSpawnPoint> _powerUpSpawnPoints;
         [SerializeField] private List<MoleSpawnPoint> _moleSpawnPoints;
         [SerializeField] private List<ScoreGateSpawnPoint> _scoreGates;
+        [SerializeField] private List<GateTrapSpawnPoint> _gateTraps;
         [SerializeField] private Transform _cameraTopLeftBoundary;
         [SerializeField] private Transform _cameraBottomRightBoundary;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -62,6 +63,64 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             }
 
             _environmentConfig.SetScoreGates(scoreGateConfigs, index);
+        }
+
+        [Button]
+        public void RefreshGateTraps(int index)
+        {
+            var gateTrapConfigs = new EnvironmentGateTrapConfig[_gateTraps.Count];
+
+            for (int i = 0; i < _gateTraps.Count; i++)
+            {
+                gateTrapConfigs[i] = BuildGateTrapConfig(_gateTraps[i]);
+            }
+
+            _environmentConfig.SetGateTraps(gateTrapConfigs, index);
+        }
+
+        private EnvironmentGateTrapConfig BuildGateTrapConfig(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            var areaPolygons = new GateTrapAreaPolygonConfig[gateTrapSpawnPoint.AreaPolygons.Count];
+
+            for (int i = 0; i < areaPolygons.Length; i++)
+            {
+                var areaPolygon = gateTrapSpawnPoint.AreaPolygons[i];
+                var points = areaPolygon.GetPointsRelativeToObject().Select(p => p.ToNumericsVector2()).ToArray();
+                WarnIfTooManyPoints(points.Length, $"GateTrap {gateTrapSpawnPoint.Id} area polygon {i}");
+                areaPolygons[i] = new GateTrapAreaPolygonConfig { Points = points };
+            }
+
+            var wallPoints = gateTrapSpawnPoint.WallShape.GetPointsCCW().Select(p => p.ToNumericsVector2()).ToArray();
+            WarnIfTooManyPoints(wallPoints.Length, $"GateTrap {gateTrapSpawnPoint.Id} wall");
+
+            return new EnvironmentGateTrapConfig
+            {
+                Id = gateTrapSpawnPoint.Id,
+                WallId = gateTrapSpawnPoint.WallId,
+                WallPoints = wallPoints,
+                AreaPolygons = areaPolygons,
+                OpenPosition = gateTrapSpawnPoint.OpenPose.position.ToVector2XY().ToNumericsVector2(),
+                ClosedPosition = gateTrapSpawnPoint.ClosedPose.position.ToVector2XY().ToNumericsVector2(),
+                OpenRotationDegrees = gateTrapSpawnPoint.OpenPose.eulerAngles.z,
+                ClosedRotationDegrees = gateTrapSpawnPoint.ClosedPose.eulerAngles.z,
+                LocalRotationPivot = gateTrapSpawnPoint.LocalRotationPivot == null
+                    ? System.Numerics.Vector2.Zero
+                    : gateTrapSpawnPoint.LocalRotationPivot.localPosition.ToVector2XY().ToNumericsVector2(),
+                MovementSpeed = gateTrapSpawnPoint.MovementSpeed,
+                SecondsStayClosed = gateTrapSpawnPoint.SecondsStayClosed,
+                SecondsStayOpen = gateTrapSpawnPoint.SecondsStayOpen,
+                IsAttachedToRotationWheel = gateTrapSpawnPoint.IsAttachedToRotationWheel,
+                AttachToRotationWheelId = gateTrapSpawnPoint.AttachToRotationWheelId
+            };
+        }
+
+        // The wall becomes a Box2D polygon and the areas are tested against it, so both are capped at the same 8 points.
+        private void WarnIfTooManyPoints(int pointsCount, string authoredObjectName)
+        {
+            if (pointsCount > GateTrapAreaPolygonConfig.MAX_POINTS)
+            {
+                Debug.LogError($"{authoredObjectName} has {pointsCount} points, only {GateTrapAreaPolygonConfig.MAX_POINTS} are supported!");
+            }
         }
 
         [Button]

@@ -28,6 +28,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private const float PASS_ELASTIC_AMPLITUDE = 1.15f;
         private const float PASS_ELASTIC_PERIOD = 0.35f;
 
+        // Multiplier bump: a springy scale punch when the "xN" indicator climbs.
+        private const float MULTIPLIER_PUNCH_STRENGTH = 0.6f;
+        private const float MULTIPLIER_PUNCH_DURATION_IN_SECONDS = 0.45f;
+        private const int MULTIPLIER_PUNCH_VIBRATO = 6;
+        private const float MULTIPLIER_PUNCH_ELASTICITY = 0.7f;
+
         [SerializeField] private Transform _leftPost;
         [SerializeField] private Transform _rightPost;
         [SerializeField] private SpriteRenderer[] _tintableRenderers;
@@ -39,7 +45,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private Color _neutralLineColor = Color.white;
         private Color _baseLineColor = Color.white;
         private float _baseLineAlpha = 1f;
+        private Vector3 _multiplierBaseScale = Vector3.one;
+        private Quaternion _multiplierWorldRotation = Quaternion.identity;
         private Tween _idleBreathTween;
+        private Tween _multiplierPunchTween;
         private Sequence _passSequence;
 
         public Transform Transform { get; private set; }
@@ -48,6 +57,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         public void SetTransform(Vector2 position, Quaternion rotation)
         {
             Transform.SetPositionAndRotation(position, rotation);
+
+            // The label rides along to the gate's corner but must stay readable, so its world orientation is pinned to
+            // the authored tilt and never inherits the gate's (interpolated) spin.
+            if (_multiplierText != null)
+            {
+                _multiplierText.transform.rotation = _multiplierWorldRotation;
+            }
         }
 
         // Posts sit on the local X axis at +/-(gap/2 + postHalfWidth). Sprites are assumed authored at 1 unit, so the
@@ -85,6 +101,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             {
                 _multiplierText.text = text;
             }
+        }
+
+        // Springy pop fired when the multiplier climbs, drawing the eye to the freshly raised "xN".
+        public void PlayMultiplierPunch()
+        {
+            if (_multiplierText == null)
+            {
+                return;
+            }
+
+            _multiplierPunchTween?.Kill();
+            var multiplierTransform = _multiplierText.transform;
+            multiplierTransform.localScale = _multiplierBaseScale;
+            _multiplierPunchTween = multiplierTransform.DOPunchScale(_multiplierBaseScale * MULTIPLIER_PUNCH_STRENGTH,
+                MULTIPLIER_PUNCH_DURATION_IN_SECONDS, MULTIPLIER_PUNCH_VIBRATO, MULTIPLIER_PUNCH_ELASTICITY);
         }
 
         public void SetTeamColor(Color color)
@@ -147,6 +178,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
                 _baseLineColor = _neutralLineColor;
                 _baseLineAlpha = _neutralLineColor.a;
             }
+
+            if (_multiplierText != null)
+            {
+                _multiplierBaseScale = _multiplierText.transform.localScale;
+                _multiplierWorldRotation = _multiplierText.transform.localRotation;
+            }
         }
 
         public void OnSpawned()
@@ -159,8 +196,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         {
             _idleBreathTween?.Kill();
             _passSequence?.Kill();
+            _multiplierPunchTween?.Kill();
             _idleBreathTween = null;
             _passSequence = null;
+            _multiplierPunchTween = null;
+
+            if (_multiplierText != null)
+            {
+                _multiplierText.transform.localScale = _multiplierBaseScale;
+            }
+
             gameObject.SetActive(false);
         }
 

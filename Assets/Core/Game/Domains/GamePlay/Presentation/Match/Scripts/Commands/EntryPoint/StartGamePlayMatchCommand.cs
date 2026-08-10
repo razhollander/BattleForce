@@ -11,6 +11,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.GateTraps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
@@ -62,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchEnvironmentGateTrapsControllers _environmentGateTrapsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private IEnvironmentSpikeControllers _environmentSpikeControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
@@ -115,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentGateTrapsControllers = _diContainer.Resolve<IMatchEnvironmentGateTrapsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentSpikeControllers = _diContainer.Resolve<IEnvironmentSpikeControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
@@ -175,6 +178,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _nukeShockwaveEffectController.InitEntryPoint();
             _galacticPullStarEffectControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _environmentGateTrapsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();
             _environmentSpikeControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();
