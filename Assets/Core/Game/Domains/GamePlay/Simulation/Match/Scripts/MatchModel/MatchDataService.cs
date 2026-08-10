@@ -142,6 +142,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             scoreGate.Position = position;
             scoreGate.Rotation = rotationDegrees.ToRadians().AngleToVector();
             scoreGate.LastScoredTeamId = 0;
+            scoreGate.ScoreMultiplier = 1;
             return scoreGate;
         }
 

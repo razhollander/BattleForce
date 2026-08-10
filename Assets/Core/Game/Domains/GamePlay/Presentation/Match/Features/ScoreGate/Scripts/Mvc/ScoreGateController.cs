@@ -43,6 +43,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _view.SetTeamColor(color);
         }
 
+        public void PlayPassAnimation()
+        {
+            _view.PlayPassAnimation();
+        }
+
+        // The indicator shows what the next pass will award. x1 carries no bonus, so it is left blank and only x2+ shows.
+        public void SetScoreMultiplier(byte scoreMultiplier)
+        {
+            _view.SetMultiplierText(scoreMultiplier > 1 ? $"x{scoreMultiplier}" : string.Empty);
+        }
+
         public void Destroy()
         {
             _view.Despawn();

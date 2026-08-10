@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             return _controllers.ContainsKey(id);
         }
 
-        public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, float mapSizeMultiplier)
+        public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, byte scoreMultiplier, float mapSizeMultiplier)
         {
             if (_controllers.ContainsKey(id))
             {
@@ -61,6 +61,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _controllers.Add(id, controller);
 
             ApplyTeamColor(controller, lastScoredTeamId);
+            controller.SetScoreMultiplier(scoreMultiplier);
         }
 
         public void InterpolateScoreGateTransform(ushort id, Vector2 position, Quaternion rotation)
@@ -76,6 +77,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             if (_controllers.TryGetValue(id, out var controller))
             {
                 ApplyTeamColor(controller, teamId);
+            }
+        }
+
+        public void SetScoreMultiplier(ushort id, byte scoreMultiplier)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                controller.SetScoreMultiplier(scoreMultiplier);
+            }
+        }
+
+        public void PlayScoreGatePassedAnimation(ushort id)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                controller.PlayPassAnimation();
             }
         }
 

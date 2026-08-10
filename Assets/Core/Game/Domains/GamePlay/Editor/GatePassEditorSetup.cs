@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -26,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Editor
         private const string SCORE_GATE_ASSETS_DIR = "Assets/Core/Game/Domains/GamePlay/Presentation/Match/Features/ScoreGate/Assets";
         private const string PREFAB_PATH = SCORE_GATE_ASSETS_DIR + "/ScoreGate.prefab";
         private const string POST_SPRITE_PATH = SCORE_GATE_ASSETS_DIR + "/ScoreGatePostSquare.png";
+        private const string MULTIPLIER_FONT_PATH = "Assets/Core/Plugins/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset";
 
         private const float ARENA_HALF_X = 20f;
         private const float ARENA_HALF_Y = 11f;
@@ -198,6 +200,7 @@ namespace Core.Game.Domains.GamePlay.Editor
 
             var leftPost = CreatePost("PostLeft", root.transform, postSprite);
             var rightPost = CreatePost("PostRight", root.transform, postSprite);
+            var multiplierText = CreateMultiplierText("MultiplierText", root.transform);
 
             var serializedView = new SerializedObject(view);
             serializedView.FindProperty("_leftPost").objectReferenceValue = leftPost.transform;
@@ -206,6 +209,7 @@ namespace Core.Game.Domains.GamePlay.Editor
             tintables.arraySize = 2;
             tintables.GetArrayElementAtIndex(0).objectReferenceValue = leftPost.GetComponent<SpriteRenderer>();
             tintables.GetArrayElementAtIndex(1).objectReferenceValue = rightPost.GetComponent<SpriteRenderer>();
+            serializedView.FindProperty("_multiplierText").objectReferenceValue = multiplierText;
             serializedView.ApplyModifiedPropertiesWithoutUndo();
 
             PrefabUtility.SaveAsPrefabAsset(root, PREFAB_PATH);
@@ -219,6 +223,25 @@ namespace Core.Game.Domains.GamePlay.Editor
             var spriteRenderer = post.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = sprite;
             return post;
+        }
+
+        // World-space label centered in the gap that shows the x2/x3/x4 next-pass multiplier. Starts blank (x1 = no bonus).
+        private static TextMeshPro CreateMultiplierText(string name, Transform parent)
+        {
+            var textObject = new GameObject(name);
+            textObject.transform.SetParent(parent, false);
+            textObject.transform.localPosition = new Vector3(0f, 0f, -1f); // in front of the posts
+
+            var text = textObject.AddComponent<TextMeshPro>();
+            text.font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(MULTIPLIER_FONT_PATH);
+            text.text = string.Empty;
+            text.fontSize = 6;
+            text.fontStyle = FontStyles.Bold;
+            text.alignment = TextAlignmentOptions.Center;
+            text.rectTransform.sizeDelta = new Vector2(6f, 3f);
+            text.GetComponent<MeshRenderer>().sortingOrder = 10; // above the gate posts
+
+            return text;
         }
 
         private static void BindPrefabToInstaller()

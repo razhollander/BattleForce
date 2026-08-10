@@ -515,9 +515,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
-        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId)
+        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, byte scoreMultiplier)
         {
-            var model = new MatchScoreGateModel(id, position.ToUnityVector2(), rotation.ToUnityVector2(), lastScoredTeamId);
+            var model = new MatchScoreGateModel(id, position.ToUnityVector2(), rotation.ToUnityVector2(), lastScoredTeamId, scoreMultiplier);
             ScoreGates.Add(model);
             return model;
         }
@@ -556,6 +556,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             if (TryGetScoreGate(id, out var scoreGate))
             {
                 scoreGate.LastScoredTeamId = teamId;
+            }
+        }
+
+        public void SetScoreGateMultiplier(ushort id, byte scoreMultiplier)
+        {
+            if (TryGetScoreGate(id, out var scoreGate))
+            {
+                scoreGate.ScoreMultiplier = scoreMultiplier;
             }
         }
 

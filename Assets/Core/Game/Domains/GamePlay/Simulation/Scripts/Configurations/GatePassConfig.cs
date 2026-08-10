@@ -5,6 +5,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     {
         public float StageDurationSeconds = 60f;
         public int ScorePerPass = 1;
+        // Consecutive passes by the same team through a gate multiply the score (x1, x2, ...) up to this cap. A pass by a
+        // different team resets that gate's streak back to x1.
+        public int MaxGatePassMultiplier = 4;
         public float PassScoreCooldownSeconds = 0.4f; // one player cannot re-score on the same gate faster than this
         // A single-tick movement longer than this (in unscaled units) is a teleport (Swap, Soul respawn, teleport gate),
         // not real travel, so it is never counted as a gate pass. Real per-tick movement is a fraction of a unit.

@@ -103,19 +103,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void ScorePass(PlayerStateS2C player, ushort scoreGateId)
         {
             var simulationState = _matchDataService.SimulationState;
-            var score = _gamePlayConfigService.GamePlayConfig.GatePass.ScorePerPass;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            ref var scoreGate = ref simulationState.GetScoreGateById(scoreGateId);
+
+            // A streak of same-team passes multiplies the score up to the configured cap; a pass by any other team (or the
+            // very first pass on a fresh gate) starts the streak over at x1.
+            var isSameTeamStreak = scoreGate.LastScoredTeamId == player.TeamId;
+            var multiplier = isSameTeamStreak ? scoreGate.ScoreMultiplier : (byte)1;
+            var score = gatePassConfig.ScorePerPass * multiplier;
 
             simulationState.AddMolesHitForTeam(player.TeamId, score);
             var teamBonusScoreTotal = simulationState.MolesHitPerTeamId[player.TeamId];
             var byPlayerBonusScoreTotal = simulationState.AddMolesHitScoreForPlayer(player.Id, score);
 
-            ref var scoreGate = ref simulationState.GetScoreGateById(scoreGateId);
+            // The stored multiplier is what the NEXT pass will award, so it ratchets up after each scored pass and drives
+            // the client's x2/x3/x4 indicator.
+            var nextMultiplier = (byte)Math.Min(multiplier + 1, gatePassConfig.MaxGatePassMultiplier);
             scoreGate.LastScoredTeamId = player.TeamId;
+            scoreGate.ScoreMultiplier = nextMultiplier;
 
-            var cooldownTicks = (int)MathF.Ceiling(_gamePlayConfigService.GamePlayConfig.GatePass.PassScoreCooldownSeconds * _networkConfig.TicksPerSeconds);
+            var cooldownTicks = (int)MathF.Ceiling(gatePassConfig.PassScoreCooldownSeconds * _networkConfig.TicksPerSeconds);
             _scoreGatePassTrackerService.StartPassScoreCooldown(player.Id, scoreGateId, _processedTick + cooldownTicks);
 
-            _netEventsDataService.AddScoreGatePassedNetEvent(_processedTick, scoreGateId, player.Id, player.TeamId, (byte)score, teamBonusScoreTotal, byPlayerBonusScoreTotal);
+            _netEventsDataService.AddScoreGatePassedNetEvent(_processedTick, scoreGateId, player.Id, player.TeamId, (byte)score, nextMultiplier, teamBonusScoreTotal, byPlayerBonusScoreTotal);
         }
     }
 }

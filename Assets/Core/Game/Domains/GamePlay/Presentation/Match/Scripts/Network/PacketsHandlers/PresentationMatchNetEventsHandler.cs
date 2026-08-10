@@ -314,6 +314,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _matchDataService.SetTeamMolesHit(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
                 _matchDataService.SetPlayerMolesHitScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
                 _matchDataService.SetScoreGateLastScoredTeam(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
+                _matchDataService.SetScoreGateMultiplier(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.NewScoreMultiplier);
                 _cachedPresentationEventsService.ScoreGatePassedNetEvents.Add(scoreGatePassedNetEvent);
             }
         }

@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort ByPlayerId;
         public ushort ByTeamId;
         public byte ScoreGained;
+        public byte NewScoreMultiplier; // multiplier the gate's NEXT pass will award after this one, drives the x2/x3 indicator
         public int TeamBonusScoreTotal;
         public int ByPlayerBonusScoreTotal;
 
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put((byte)ByPlayerId);
             writer.Put((byte)ByTeamId);
             writer.Put(ScoreGained);
+            writer.Put(NewScoreMultiplier);
             writer.Put(TeamBonusScoreTotal);
             writer.Put(ByPlayerBonusScoreTotal);
         }
@@ -32,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             ByPlayerId = reader.GetByte();
             ByTeamId = reader.GetByte();
             ScoreGained = reader.GetByte();
+            NewScoreMultiplier = reader.GetByte();
             TeamBonusScoreTotal = reader.GetInt();
             ByPlayerBonusScoreTotal = reader.GetInt();
         }

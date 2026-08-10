@@ -2941,7 +2941,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddScoreGatePassedNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamBonusScoreTotal, int byPlayerBonusScoreTotal)
+        public void AddScoreGatePassedNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, ushort byTeamId, byte scoreGained, byte newScoreMultiplier, int teamBonusScoreTotal, int byPlayerBonusScoreTotal)
         {
             foreach (var kvp in ScoreGatePassedNetEventsPerClient)
             {
@@ -2951,6 +2951,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.ByPlayerId = byPlayerId;
                 packet.ByTeamId = byTeamId;
                 packet.ScoreGained = scoreGained;
+                packet.NewScoreMultiplier = newScoreMultiplier;
                 packet.TeamBonusScoreTotal = teamBonusScoreTotal;
                 packet.ByPlayerBonusScoreTotal = byPlayerBonusScoreTotal;
             }

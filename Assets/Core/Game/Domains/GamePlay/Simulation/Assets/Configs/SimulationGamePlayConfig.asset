@@ -216,9 +216,9 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
-    IsWhacAMoleModeEnabled: 1
+    AreBonusStagesEnabled: 1
     WhacAMoleEveryXStages: 1
-    EnabledBonusStageTypes: 0200000003000000
+    EnabledBonusStageTypes: 03000000
     DefaultWhacAMoleEnvironmentId: 22
     DefaultGatePassEnvironmentId: 23
     WhacAMole:
@@ -237,6 +237,7 @@ MonoBehaviour:
     GatePass:
       StageDurationSeconds: 60
       ScorePerPass: 1
+      MaxGatePassMultiplier: 4
       PassScoreCooldownSeconds: 0.4
       TeleportDetectionSegmentLength: 8
       KOPushImpulse: 6

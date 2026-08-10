@@ -685,8 +685,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var scoreGate in _simulationState.ScoreGates.AsSpan())
             {
-                _matchDataService.AddScoreGate(scoreGate.Id, scoreGate.Position, scoreGate.Rotation, scoreGate.LastScoredTeamId);
-                _scoreGatesControllers.CreateScoreGate(scoreGate.Id, scoreGate.Position.ToUnityVector2(), scoreGate.Rotation.ToQuaternion(), scoreGate.LastScoredTeamId, mapSizeMultiplier);
+                _matchDataService.AddScoreGate(scoreGate.Id, scoreGate.Position, scoreGate.Rotation, scoreGate.LastScoredTeamId, scoreGate.ScoreMultiplier);
+                _scoreGatesControllers.CreateScoreGate(scoreGate.Id, scoreGate.Position.ToUnityVector2(), scoreGate.Rotation.ToQuaternion(), scoreGate.LastScoredTeamId, scoreGate.ScoreMultiplier, mapSizeMultiplier);
             }
         }
 
