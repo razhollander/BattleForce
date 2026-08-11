@@ -72,7 +72,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.PowerUpBall:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
-                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.TeamFloor:
@@ -131,7 +130,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                 case PhysicsBodyType.ScoreGate:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
-                                    | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)

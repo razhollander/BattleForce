@@ -1025,6 +1025,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7198031060412758599, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.00024414062
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198031060412758599, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.000015258789
+      objectReference: {fileID: 0}
     - target: {fileID: 7249973912953480431, guid: 6274671779d664b18ac4f105f5b3b0fd, type: 3}
       propertyPath: m_Name
       value: MatchCanvas

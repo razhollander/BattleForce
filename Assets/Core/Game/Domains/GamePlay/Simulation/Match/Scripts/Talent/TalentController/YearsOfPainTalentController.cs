@@ -8,6 +8,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Scripts.Extensions;
@@ -23,6 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private TryHitMoleCommand _tryHitMoleCommand;
@@ -44,13 +46,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
         
         public YearsOfPainTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _commandFactory = commandFactory;
         }
 
@@ -130,19 +133,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 }
             }
 
-            // Independently of the enemy/mole hit, the rectangle shoves and spins any score gate it covers.
-            if (_matchDataService.SimulationState.ScoreGates.Count > 0
-                && _physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.ScoreGate, PhysicsBodyType.ScoreGate, out var hitGateData)
-                && hitGateData.PhysicsBodyType == PhysicsBodyType.ScoreGate)
-            {
-                PushScoreGate(hitGateData.Id, direction);
-            }
+            // Independently of the enemy/mole hit, the rectangle shoves and spins every score gate it covers.
+            PushOverlappedScoreGates(center, colliderSize * 0.5f, direction);
 
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddActivateYearsOfPainTalentNetEventS2C(tick, _casterPlayerId, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
+        }
+
+        // A gate is two posts with a wide clear gap between them, so a shape cast against the post fixtures misses every
+        // swing aimed at the middle of the gate. The gate is one rigid body, so the hit is tested against its whole
+        // footprint (posts plus gap) instead and the shove lands wherever the rectangle covers the gate.
+        private void PushOverlappedScoreGates(System.Numerics.Vector2 rectangleCenter, System.Numerics.Vector2 rectangleHalfExtents, System.Numerics.Vector2 direction)
+        {
+            var simulationState = _matchDataService.SimulationState;
+            if (simulationState.ScoreGates.Count == 0)
+            {
+                return;
+            }
+
+            var postSize = _sharedGamePlayConfig.ScoreGatePostSize.ToNumericsVector2() * simulationState.MapSizeMultiplier;
+            var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * simulationState.MapSizeMultiplier;
+
+            foreach (var scoreGate in simulationState.ScoreGates.AsSpan())
+            {
+                if (!ScoreGateGeometryUtils.DoesRotatedRectangleOverlapGate(rectangleCenter, rectangleHalfExtents, direction, scoreGate.Position, scoreGate.Rotation, postSize, gapWidth))
+                {
+                    continue;
+                }
+
+                PushScoreGate(scoreGate.Id, direction);
+            }
         }
 
         private void PushScoreGate(ushort scoreGateId, System.Numerics.Vector2 direction)

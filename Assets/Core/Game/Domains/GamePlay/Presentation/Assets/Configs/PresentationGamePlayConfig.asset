@@ -19,8 +19,9 @@ MonoBehaviour:
   TeamFloor: {fileID: 11400000, guid: c4cc2d03286a1424da9b1d4ea5299300, type: 2}
   Teleports: {fileID: 11400000, guid: 524ce82838156428ab0c05a22c0196d1, type: 2}
   FieldBarriers: {fileID: 11400000, guid: f3565c0d3e16a47bd813e32036d0bfb2, type: 2}
+  IsHapticsEnabled: 0
   HapticsConfig: {fileID: 11400000, guid: 98eba74a2ce484f0490a67113c877eed, type: 2}
-  CoolBGMusic: 1
+  CoolBGMusic: 0
   CoolBGMusicConfig: {fileID: 11400000, guid: 17e1cb34fb88748d59a7d925c94b82b5, type: 2}
   ShouldOverrideClientId: 0
   ClientIdOverride: 1

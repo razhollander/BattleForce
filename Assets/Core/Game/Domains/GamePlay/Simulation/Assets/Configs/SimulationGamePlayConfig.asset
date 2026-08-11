@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SimulationAssembly::Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations.SimulationGamePlayConfig
   InnerConfig:
     PlayerSpaceship:
-      StartHealth: 1
+      StartHealth: 3
       TargetMovementSpeed: 5
       RotationSpeed: 150
       ShootCooldown: 0.35
@@ -184,14 +184,12 @@ MonoBehaviour:
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
-      ObtainablePowerUps: 03000000
+      ObtainablePowerUps: 03000000010000000200000004000000
       GalacticPullDurationSeconds: 4
       GalacticPullForce: 70
       NukeForce: 50
       NukeMinSpinAmount: 200
       NukeMaxSpinAmount: 300
-      NukeScoreGatePushImpulse: 12
-      NukeScoreGateSpinImpulse: 5
       ShuffleSwapIntervalInSeconds: 0.25
     EnvironmentSprings:
       Force: 55
@@ -203,8 +201,8 @@ MonoBehaviour:
       DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
     DeafultEnvironmentId: 3
-    ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 0
+    ShouldChooseRandomStage: 1
+    ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
@@ -219,8 +217,8 @@ MonoBehaviour:
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
     AreBonusStagesEnabled: 1
-    BonusStageEveryXStages: 1
-    EnabledBonusStageTypes: 0300000000000000
+    BonusStageEveryXStages: 4
+    EnabledBonusStageTypes: 0300000002000000
     DefaultWhacAMoleEnvironmentId: 22
     DefaultGatePassEnvironmentId: 23
     WhacAMole:
@@ -242,21 +240,23 @@ MonoBehaviour:
       MaxGatePassMultiplier: 4
       PassScoreCooldownSeconds: 0.4
       TeleportDetectionSegmentLength: 8
-      ScoreGateMass: 2.5
-      ScoreGateDensity: 4
+      ScoreGateMass: 2
+      ScoreGateDensity: 2
       ScoreGateRestitution: 0.2
       ScoreGateLinearDamping: 1.5
       ScoreGateAngularDamping: 1.5
-      KOPushImpulse: 6
-      KOSpinImpulse: 3
-      HeadbuttPushImpulse: 14
-      HeadbuttSpinImpulse: 4
-      ChickenEggSpinImpulse: 5
-      GrapplingHookReactionImpulse: 2
-      MagneticPullImpulse: 6
-      YearsOfPainPushImpulse: 8
-      YearsOfPainSpinImpulse: 3
-      WaterGunPushImpulsePerSecond: 10
+      KOPushImpulse: 36
+      KOSpinImpulse: 10
+      HeadbuttPushImpulse: 42
+      HeadbuttSpinImpulse: 12
+      ChickenEggSpinImpulse: 4
+      GrapplingHookReactionImpulse: 24
+      MagneticPullImpulse: 72
+      YearsOfPainPushImpulse: 96
+      YearsOfPainSpinImpulse: 36
+      WaterGunPushImpulsePerSecond: 240
+      NukePushImpulse: 120
+      NukeSpinImpulse: 45
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0

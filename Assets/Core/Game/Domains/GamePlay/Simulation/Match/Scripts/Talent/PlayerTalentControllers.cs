@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _umbrellaTalentController = new UmbrellaTalentController(netEventsDataService, matchDataService, gamePlayConfigService, networkConfig, commandFactory);
             _magneticPullTalentController = new MagneticPullTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _chickenTalentController = new ChickenTalentController(matchDataService, netEventsDataService, gamePlayConfigService, networkConfig, physicsSimulator, commandFactory);
-            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
+            _yearsOfPainTalentController = new YearsOfPainTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _waterGunTalentController = new WaterGunTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _headbuttTalentController = new HeadbuttTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory);
             _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory, playersInLavaTrackerService);

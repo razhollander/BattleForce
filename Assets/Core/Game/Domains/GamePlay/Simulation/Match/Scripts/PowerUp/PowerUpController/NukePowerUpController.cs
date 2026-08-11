@@ -68,7 +68,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 _tryAddForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
             }
 
-            PushScoreGatesAwayFromCaster(casterPosition, config.NukeScoreGatePushImpulse, config.NukeScoreGateSpinImpulse);
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+            PushScoreGatesAwayFromCaster(casterPosition, gatePassConfig.NukePushImpulse, gatePassConfig.NukeSpinImpulse);
 
             _netEventsDataService.AddActivateNukePowerUpNetEvent(tick, _casterPlayerId, casterPosition);
         }
