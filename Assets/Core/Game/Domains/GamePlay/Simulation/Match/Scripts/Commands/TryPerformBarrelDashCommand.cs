@@ -48,9 +48,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var spaceshipConfig = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship;
-            
+            var dashDirection = spaceshipConfig.ShouldBarrelDashTowardsPlayerDirection ? playerSpaceship.Transform.Direction : playerSpaceship.AimDirection;
+
             _trySpinPlayerCommand.SetPlayer(_playerId).SetSpinAmount(spaceshipConfig.BarrelDashSpinAmount).SetTick(_processedTick).Execute();
-            _tryAddForceToPlayerCommand.SetPlayerId(_playerId).SetForce(playerSpaceship.AimDirection * spaceshipConfig.BarrelDashForce).ShouldTurnOffEngine(false).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_playerId).SetForce(dashDirection * spaceshipConfig.BarrelDashForce).ShouldTurnOffEngine(false).Execute();
             _netEventsDataService.AddPerformBarrelDashNetEvent(_processedTick, _playerId);
         }
 

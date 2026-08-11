@@ -34,6 +34,7 @@ MonoBehaviour:
       CanBarrelDash: 1
       BarrelDashForce: 25
       BarrelDashSpinAmount: 57
+      ShouldBarrelDashTowardsPlayerDirection: 1
     PlayerBullet:
       MoveSpeed: 10
       Radius: 0.14154

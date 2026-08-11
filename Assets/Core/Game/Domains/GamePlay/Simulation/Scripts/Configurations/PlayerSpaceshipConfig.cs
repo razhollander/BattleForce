@@ -1,3 +1,5 @@
+using ConditionalField;
+
 namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
 {
     [System.Serializable]
@@ -23,5 +25,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public bool CanBarrelDash = true;
         public float BarrelDashForce = 40f;
         public float BarrelDashSpinAmount = 50f;
+        [ConditionalField(nameof(CanBarrelDash), true)]
+        public bool ShouldBarrelDashTowardsPlayerDirection = false;
     }
 }
