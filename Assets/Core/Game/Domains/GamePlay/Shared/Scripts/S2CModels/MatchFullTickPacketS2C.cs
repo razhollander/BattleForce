@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents;
         public FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents;
         public FixedUnorderedList<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents;
+        public FixedUnorderedList<PerformBarrelDashNetEventS2C> PerformBarrelDashNetEvents;
         public FixedUnorderedList<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents;
         public FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents;
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
@@ -162,6 +163,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             DeactivateWaterGunTalentNetEvents = new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(maxCap.DeactivateWaterGunTalentNetEvents);
             ActivateHeadbuttChargingNetEvents = new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(maxCap.ActivateHeadbuttChargingNetEvents);
             PerformHeadbuttDashNetEvents = new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(maxCap.PerformHeadbuttDashNetEvents);
+            PerformBarrelDashNetEvents = new FixedUnorderedList<PerformBarrelDashNetEventS2C>(maxCap.PerformBarrelDashNetEvents);
             HeadbuttHitEnemyNetEvents = new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(maxCap.HeadbuttHitEnemyNetEvents);
             DeactivateHeadbuttTalentNetEvents = new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(maxCap.DeactivateHeadbuttTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
@@ -290,6 +292,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 11)) != 0) SerializedGoldenMoleDamagedNetEvents(writer);
             if ((eventMask2 & (1UL << 12)) != 0) SerializedScoreGatePassedNetEvents(writer);
             if ((eventMask2 & (1UL << 13)) != 0) SerializedGateTrapClosingNetEvents(writer);
+            if ((eventMask2 & (1UL << 14)) != 0) SerializedPerformBarrelDashNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -309,6 +312,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (GoldenMoleDamagedNetEvents.Count > 0) eventMask2 |= 1UL << 11;
             if (ScoreGatePassedNetEvents.Count > 0) eventMask2 |= 1UL << 12;
             if (GateTrapClosingNetEvents.Count > 0) eventMask2 |= 1UL << 13;
+            if (PerformBarrelDashNetEvents.Count > 0) eventMask2 |= 1UL << 14;
             return eventMask2;
         }
 
@@ -636,6 +640,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 13)) != 0) DeserializedGateTrapClosingNetEvents(reader);
             else GateTrapClosingNetEvents.Clear();
+
+            if ((eventMask2 & (1UL << 14)) != 0) DeserializedPerformBarrelDashNetEvents(reader);
+            else PerformBarrelDashNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1726,6 +1733,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref PerformHeadbuttDashNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPerformBarrelDashNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PerformBarrelDashNetEvents.Count);
+            foreach (var netEvent in PerformBarrelDashNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPerformBarrelDashNetEvents(NetDataReader reader)
+        {
+            PerformBarrelDashNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PerformBarrelDashNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

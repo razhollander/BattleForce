@@ -99,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateWaterGunTalentNetEventS2C> _cachedUnprocessedDeactivateWaterGunTalentEvents;
         private readonly CapacityList<ActivateHeadbuttChargingNetEventS2C> _cachedUnprocessedActivateHeadbuttChargingEvents;
         private readonly CapacityList<PerformHeadbuttDashNetEventS2C> _cachedUnprocessedPerformHeadbuttDashEvents;
+        private readonly CapacityList<PerformBarrelDashNetEventS2C> _cachedUnprocessedPerformBarrelDashEvents;
         private readonly CapacityList<HeadbuttHitEnemyNetEventS2C> _cachedUnprocessedHeadbuttHitEnemyEvents;
         private readonly CapacityList<DeactivateHeadbuttTalentNetEventS2C> _cachedUnprocessedDeactivateHeadbuttTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
@@ -203,6 +204,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateWaterGunTalentEvents = new CapacityList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents);
             _cachedUnprocessedActivateHeadbuttChargingEvents = new CapacityList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents);
             _cachedUnprocessedPerformHeadbuttDashEvents = new CapacityList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents);
+            _cachedUnprocessedPerformBarrelDashEvents = new CapacityList<PerformBarrelDashNetEventS2C>(networkConfig.MaxCap.PerformBarrelDashNetEvents);
             _cachedUnprocessedHeadbuttHitEnemyEvents = new CapacityList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents);
             _cachedUnprocessedDeactivateHeadbuttTalentEvents = new CapacityList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents);
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
@@ -319,6 +321,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessDeactivateWaterGunTalentEvents(latestFullTickPacket.DeactivateWaterGunTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateHeadbuttChargingEvents(latestFullTickPacket.ActivateHeadbuttChargingNetEvents, ignoreEventsNotAboveTick);
             ProcessPerformHeadbuttDashEvents(latestFullTickPacket.PerformHeadbuttDashNetEvents, ignoreEventsNotAboveTick);
+            ProcessPerformBarrelDashEvents(latestFullTickPacket.PerformBarrelDashNetEvents, ignoreEventsNotAboveTick);
             ProcessHeadbuttHitEnemyEvents(latestFullTickPacket.HeadbuttHitEnemyNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateHeadbuttTalentEvents(latestFullTickPacket.DeactivateHeadbuttTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents, ignoreEventsNotAboveTick);
@@ -355,6 +358,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
+            ReconcileGateTrapsFromState(simulationState); // before the step below, so a re-synced trap is stepped to now
             UpdateGateTraps(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
@@ -1082,8 +1086,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        // The server only ever announces the moment a trap starts closing, so the rest of the cycle - staying closed,
-        // opening and the open cooldown - is played out here from the same authored durations the server used.
+        // The GateTrapClosing event is what starts a swing on the exact tick, and the rest of the cycle - staying closed,
+        // opening and the open cooldown - is played out here from the same authored durations the server used. A client
+        // that lost the event is put back in line by ReconcileGateTrapsFromState instead of staying wrong all stage.
         private void UpdateGateTraps(int tick)
         {
             if (_matchDataService.GateTraps.Count == 0)
@@ -1097,6 +1102,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var gateTrap in _matchDataService.GateTraps)
             {
                 gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, GetRotatingWheelOfGateTrap(gateTrap));
+            }
+        }
+
+        // The closing event is unreliable and short lived, so the authoritative state rides every tick too. Adopting it
+        // only when it actually differs keeps the common case free and repairs a client that never saw the event.
+        private void ReconcileGateTrapsFromState(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var gateTrapState in simulationState.GateTraps.AsSpan())
+            {
+                if (!_matchDataService.TryGetGateTrap(gateTrapState.Id, out var gateTrapModel))
+                {
+                    continue;
+                }
+
+                var isAlreadyInSync = gateTrapModel.State == gateTrapState.State && gateTrapModel.StateEndTick == gateTrapState.StateEndTick;
+
+                if (isAlreadyInSync)
+                {
+                    continue;
+                }
+
+                gateTrapModel.State = gateTrapState.State;
+                gateTrapModel.StateEndTick = gateTrapState.StateEndTick;
             }
         }
 
@@ -2102,6 +2130,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPerformHeadbuttDashEvents.Sort();
                 _presentationNetEventsHandler.ProcessPerformHeadbuttDashEvents(_cachedUnprocessedPerformHeadbuttDashEvents);
+            }
+        }
+
+        private void ProcessPerformBarrelDashEvents(FixedUnorderedList<PerformBarrelDashNetEventS2C> netEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPerformBarrelDashEvents.Clear();
+            foreach (var netEvent in netEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPerformBarrelDashEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPerformBarrelDashEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformBarrelDashEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformBarrelDashEvents(_cachedUnprocessedPerformBarrelDashEvents);
             }
         }
 

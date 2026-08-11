@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         // original names so the existing SimulationGamePlayConfig.asset values survive.
         public bool AreBonusStagesEnabled = true;
         [ConditionalField(nameof(AreBonusStagesEnabled), true)]
-        public int WhacAMoleEveryXStages = 3;
+        public int BonusStageEveryXStages = 4;
         // Which bonus stage types the rotation may pick from. The rotation never repeats the same type twice in a
         // row, so with both entries present the bonus stages strictly alternate Whac-A-Mole <-> GatePass.
         [ConditionalField(nameof(AreBonusStagesEnabled), true)]

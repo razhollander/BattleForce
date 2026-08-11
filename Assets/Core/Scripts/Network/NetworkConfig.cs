@@ -110,6 +110,7 @@ namespace Core.Scripts.Network
         public int DeactivateWaterGunTalentNetEvents = 128;
         public int ActivateHeadbuttChargingNetEvents = 128;
         public int PerformHeadbuttDashNetEvents = 128;
+        public int PerformBarrelDashNetEvents = 128;
         public int HeadbuttHitEnemyNetEvents = 128;
         public int DeactivateHeadbuttTalentNetEvents = 128;
         public int CreateMagneticPullFieldNetEvents = 128;

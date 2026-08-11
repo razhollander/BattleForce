@@ -1,4 +1,4 @@
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
@@ -16,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IScoreGatesControllers _scoreGatesControllers;
-        private IMoleHitScoreEffectController _scoreEffectController;
+        private IScoreGainedEffectController _scoreGainedEffectController;
         private ITeamsBoardUIController _teamsBoardUIController;
         private IMatchPlayerUIControllers _playerUIControllers;
         private IAudioService _audioService;
@@ -25,7 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
             _scoreGatesControllers = _diContainer.Resolve<IScoreGatesControllers>();
-            _scoreEffectController = _diContainer.Resolve<IMoleHitScoreEffectController>();
+            _scoreGainedEffectController = _diContainer.Resolve<IScoreGainedEffectController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
@@ -44,7 +45,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 if (_scoreGatesControllers.TryGetScoreGatePosition(scoreGatePassedNetEvent.ScoreGateId, out var gatePosition))
                 {
-                    _scoreEffectController.PlayEffect(scoreGatePassedNetEvent.ScoreGained, gatePosition);
+                    Color? outlineAndUnderlineColor = _scoreGatesControllers.TryGetTeamColor(scoreGatePassedNetEvent.ByTeamId, out var teamColor)
+                        ? teamColor
+                        : null;
+                    _scoreGainedEffectController.PlayEffect(scoreGatePassedNetEvent.ScoreGained, gatePosition, outlineAndUnderlineColor);
                 }
 
                 _scoreGatesControllers.SetTeamColor(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
@@ -54,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _playerUIControllers.UpdatePlayerMolesHitScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
             }
 
-            _audioService.PlayAudio(AudioClipType.MoleHit); // reuses the bonus-score sound until a dedicated gate clip exists
+            _audioService.PlayAudio(AudioClipType.ScoreGatePassed);
             scoreGatePassedNetEvents.Clear();
         }
     }

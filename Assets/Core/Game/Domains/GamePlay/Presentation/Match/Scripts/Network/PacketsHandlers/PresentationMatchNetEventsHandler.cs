@@ -1198,6 +1198,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPerformBarrelDashEvents(CapacityList<PerformBarrelDashNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.PerformBarrelDashNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessHeadbuttHitEnemyEvents(CapacityList<HeadbuttHitEnemyNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;

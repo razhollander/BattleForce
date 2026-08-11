@@ -237,6 +237,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return null;
         }
 
+        // The reconcile path runs on packets that can arrive before the traps are built, so a miss here is expected and quiet.
+        public bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap)
+        {
+            for (int i = 0; i < GateTraps.Count; i++)
+            {
+                if (GateTraps[i].Id == gateTrapId)
+                {
+                    gateTrap = GateTraps[i];
+                    return true;
+                }
+            }
+
+            gateTrap = null;
+            return false;
+        }
+
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
         {
             var newWall = new MatchEnvironmentWallModel(id, points, localPosition, worldPosition, worldRotationAngle);

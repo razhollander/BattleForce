@@ -16,7 +16,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private GameObject _healthBarGameObject;
         [SerializeField] private TextMeshProUGUI _molesHitScoreText;
         [SerializeField] private GameObject _molesHitScoreContainer;
+        [SerializeField] private TextMeshProUGUI _gatePassScoreText;
+        [SerializeField] private GameObject _gatePassScoreContainer;
         [SerializeField]private CanvasGroup _canvasGroup;
+
+        private TextMeshProUGUI _activeScoreText;
 
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
@@ -68,12 +72,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             HideHealthBar();
             _molesHitScoreContainer.SetActive(true);
+            _activeScoreText = _molesHitScoreText;
             UpdateMolesHitScore(molesHitScore);
         }
 
-        public void UpdateMolesHitScore(int molesHitScore)
+        public void ShowGatePassScore(int gatePassScore)
         {
-            _molesHitScoreText.text = molesHitScore.ToString();
+            HideHealthBar();
+            _gatePassScoreContainer.SetActive(true);
+            _activeScoreText = _gatePassScoreText;
+            UpdateMolesHitScore(gatePassScore);
+        }
+
+        public void UpdateMolesHitScore(int score)
+        {
+            _activeScoreText.text = score.ToString();
         }
 
         public void UpdateTalents(TalentVisualData[] talents)

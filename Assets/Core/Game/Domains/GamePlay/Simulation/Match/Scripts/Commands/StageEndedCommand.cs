@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -59,6 +60,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private PlayerStateS2C GetPlayerToFocusOn()
         {
+            // In bonus stages the winner is the winning-team player who contributed the most score, not the one who
+            // landed a winning blow (there is no elimination in bonus stages).
+            if (_matchDataService.SimulationState.StageType.IsBonusStage())
+            {
+                return GetTopScoringPlayerInWinningTeam();
+            }
+
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
                 if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId && _playerIdDoingWinningBlow == player.Id)
@@ -85,6 +93,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             LogService.LogError("Somehow didnt find player to focus on");
             return null;
+        }
+
+        private PlayerStateS2C GetTopScoringPlayerInWinningTeam()
+        {
+            PlayerStateS2C topScoringPlayer = null;
+
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.TeamId != _winningTeamId)
+                {
+                    continue;
+                }
+
+                // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
+                if (topScoringPlayer == null || player.MolesHitScore > topScoringPlayer.MolesHitScore ||
+                    (player.MolesHitScore == topScoringPlayer.MolesHitScore && player.Id < topScoringPlayer.Id))
+                {
+                    topScoringPlayer = player;
+                }
+            }
+
+            if (topScoringPlayer == null)
+            {
+                LogService.LogError("Somehow didnt find player to focus on");
+            }
+
+            return topScoringPlayer;
         }
     }
 }

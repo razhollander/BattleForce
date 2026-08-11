@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly TrySpinPlayerCommand _trySpinPlayerCommand;
         private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private readonly PushScoreGateCommand _pushScoreGateCommand;
         private ushort _casterPlayerId;
 
         public PowerUpType PowerUpType => PowerUpType.Nuke;
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
             _gamePlayConfigService = gamePlayConfigService;
             _trySpinPlayerCommand = commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _pushScoreGateCommand = commandFactory.CreateCommandVoid<PushScoreGateCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -66,7 +68,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp.PowerUpCon
                 _tryAddForceToPlayerCommand.SetPlayerId(playerState.Id).SetForce(pushDirection * nukeForce).ShouldTurnOffEngine(false).Execute();
             }
 
+            PushScoreGatesAwayFromCaster(casterPosition, config.NukeScoreGatePushImpulse, config.NukeScoreGateSpinImpulse);
+
             _netEventsDataService.AddActivateNukePowerUpNetEvent(tick, _casterPlayerId, casterPosition);
+        }
+
+        // On a GatePass stage the nuke shoves every score gate too, mirroring how it pushes enemy players: away from the
+        // caster with a random spin. No-op on any stage that authored no gates.
+        private void PushScoreGatesAwayFromCaster(Vector2 casterPosition, float pushImpulse, float spinImpulse)
+        {
+            foreach (var scoreGate in _matchDataService.SimulationState.ScoreGates.AsSpan())
+            {
+                var dir = scoreGate.Position - casterPosition;
+                var isAtSamePosition = dir.LengthSquared() == 0f;
+                var pushDirection = isAtSamePosition ? RNG.NextFloat(0f, 360f).AngleToVector() : dir.NormalizeSafe();
+                var spinSign = RNG.NextBool() ? 1f : -1f;
+
+                _pushScoreGateCommand
+                    .SetScoreGateId(scoreGate.Id)
+                    .SetImpulse(pushDirection * pushImpulse)
+                    .SetWorldContactPoint(scoreGate.Position)
+                    .SetExtraSpinImpulse(spinImpulse * spinSign)
+                    .Execute();
+            }
         }
     }
 }

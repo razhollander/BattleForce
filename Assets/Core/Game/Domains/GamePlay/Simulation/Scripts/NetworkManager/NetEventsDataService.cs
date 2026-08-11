@@ -82,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> DeactivateWaterGunTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>> PerformBarrelDashNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
@@ -170,6 +171,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> _deactivateWaterGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> _activateHeadbuttChargingNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> _performHeadbuttDashNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PerformBarrelDashNetEventS2C>> _performBarrelDashNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> _headbuttHitEnemyNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> _deactivateHeadbuttTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
@@ -257,6 +259,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateWaterGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateHeadbuttChargingNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(maxConcurrentPlayers);
             PerformHeadbuttDashNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(maxConcurrentPlayers);
+            PerformBarrelDashNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>>(maxConcurrentPlayers);
             HeadbuttHitEnemyNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(maxConcurrentPlayers);
             DeactivateHeadbuttTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(maxConcurrentPlayers);
             LayChickenEggNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
@@ -368,6 +371,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _deactivateWaterGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents), maxConcurrentPlayers);
             _activateHeadbuttChargingNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(() => new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents), maxConcurrentPlayers);
             _performHeadbuttDashNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(() => new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents), maxConcurrentPlayers);
+            _performBarrelDashNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformBarrelDashNetEventS2C>>(() => new FixedUnorderedList<PerformBarrelDashNetEventS2C>(networkConfig.MaxCap.PerformBarrelDashNetEvents), maxConcurrentPlayers);
             _headbuttHitEnemyNetEventsListPool = new ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(() => new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents), maxConcurrentPlayers);
             _deactivateHeadbuttTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents), maxConcurrentPlayers);
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
@@ -803,6 +807,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 PerformHeadbuttDashNetEventsPerClient.Add(clientId, _performHeadbuttDashNetEventsListPool.Get());
             }
+            if (!PerformBarrelDashNetEventsPerClient.ContainsKey(clientId))
+            {
+                PerformBarrelDashNetEventsPerClient.Add(clientId, _performBarrelDashNetEventsListPool.Get());
+            }
             if (!HeadbuttHitEnemyNetEventsPerClient.ContainsKey(clientId))
             {
                 HeadbuttHitEnemyNetEventsPerClient.Add(clientId, _headbuttHitEnemyNetEventsListPool.Get());
@@ -1109,6 +1117,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             performHeadbuttDashList.Clear();
             _performHeadbuttDashNetEventsListPool.Return(performHeadbuttDashList);
 
+            var performBarrelDashList = PerformBarrelDashNetEventsPerClient[clientId];
+            performBarrelDashList.Clear();
+            _performBarrelDashNetEventsListPool.Return(performBarrelDashList);
+
             var headbuttHitEnemyList = HeadbuttHitEnemyNetEventsPerClient[clientId];
             headbuttHitEnemyList.Clear();
             _headbuttHitEnemyNetEventsListPool.Return(headbuttHitEnemyList);
@@ -1232,6 +1244,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateWaterGunTalentNetEventsPerClient.Remove(clientId);
             ActivateHeadbuttChargingNetEventsPerClient.Remove(clientId);
             PerformHeadbuttDashNetEventsPerClient.Remove(clientId);
+            PerformBarrelDashNetEventsPerClient.Remove(clientId);
             HeadbuttHitEnemyNetEventsPerClient.Remove(clientId);
             DeactivateHeadbuttTalentNetEventsPerClient.Remove(clientId);
             LayChickenEggNetEventsPerClient.Remove(clientId);
@@ -2310,6 +2323,17 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
 
+            if (PerformBarrelDashNetEventsPerClient.TryGetValue(clientId, out var performBarrelDashNetEvents))
+            {
+                for (int i = performBarrelDashNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (performBarrelDashNetEvents[i].OccuredOnTick < tick)
+                    {
+                        performBarrelDashNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (PerformHeadbuttDashNetEventsPerClient.TryGetValue(clientId, out var performHeadbuttDashNetEvents))
             {
                 for (int i = performHeadbuttDashNetEvents.Count - 1; i >= 0; i--)
@@ -3070,6 +3094,16 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in PerformHeadbuttDashNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddPerformBarrelDashNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in PerformBarrelDashNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

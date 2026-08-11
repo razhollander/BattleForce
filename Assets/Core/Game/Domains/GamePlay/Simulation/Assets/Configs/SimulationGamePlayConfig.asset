@@ -184,12 +184,14 @@ MonoBehaviour:
       MaxConcurrentPowerUpBalls: 5
       MoveSpeed: 5
       Radius: 1.269
-      ObtainablePowerUps: 03000000010000000200000004000000
+      ObtainablePowerUps: 03000000
       GalacticPullDurationSeconds: 4
       GalacticPullForce: 70
       NukeForce: 50
       NukeMinSpinAmount: 200
       NukeMaxSpinAmount: 300
+      NukeScoreGatePushImpulse: 12
+      NukeScoreGateSpinImpulse: 5
       ShuffleSwapIntervalInSeconds: 0.25
     EnvironmentSprings:
       Force: 55
@@ -202,7 +204,7 @@ MonoBehaviour:
       Size: {x: 4.1362, y: 1.663131}
     DeafultEnvironmentId: 3
     ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 1
+    ShouldChooseRandomTalentsForPlayer: 0
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
@@ -217,12 +219,12 @@ MonoBehaviour:
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
     AreBonusStagesEnabled: 1
-    WhacAMoleEveryXStages: 1
-    EnabledBonusStageTypes: 03000000
+    BonusStageEveryXStages: 1
+    EnabledBonusStageTypes: 0300000000000000
     DefaultWhacAMoleEnvironmentId: 22
     DefaultGatePassEnvironmentId: 23
     WhacAMole:
-      StageDurationSeconds: 15
+      StageDurationSeconds: 45
       MinMoleSpawnIntervalSeconds: 1
       MaxMoleSpawnIntervalSeconds: 2
       MaxConcurrentMoles: 8
@@ -235,11 +237,16 @@ MonoBehaviour:
       GoldenMoleLives: 3
       GoldenMoleScoreOnKill: 3
     GatePass:
-      StageDurationSeconds: 60
+      StageDurationSeconds: 45
       ScorePerPass: 1
       MaxGatePassMultiplier: 4
       PassScoreCooldownSeconds: 0.4
       TeleportDetectionSegmentLength: 8
+      ScoreGateMass: 2.5
+      ScoreGateDensity: 4
+      ScoreGateRestitution: 0.2
+      ScoreGateLinearDamping: 1.5
+      ScoreGateAngularDamping: 1.5
       KOPushImpulse: 6
       KOSpinImpulse: 3
       HeadbuttPushImpulse: 14

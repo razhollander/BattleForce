@@ -1,6 +1,6 @@
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IMoleControllers _moleControllers;
         private ITeamsBoardUIController _teamsBoardUIController;
         private IAudioService _audioService;
-        private IMoleHitScoreEffectController _moleHitScoreEffectController;
+        private IScoreGainedEffectController _scoreGainedEffectController;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IMatchPlayerUIControllers _playerUIControllers;
@@ -30,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _audioService = _diContainer.Resolve<IAudioService>();
-            _moleHitScoreEffectController = _diContainer.Resolve<IMoleHitScoreEffectController>();
+            _scoreGainedEffectController = _diContainer.Resolve<IScoreGainedEffectController>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 // The score is awarded to the team of the player who landed the hit, so its popup shows on that player.
                 var playerPosition = _playerControllers.GetPlayerPosition(moleHitNetEvent.ByPlayerId);
-                _moleHitScoreEffectController.PlayEffect(moleHitNetEvent.ScoreGained, playerPosition);
+                _scoreGainedEffectController.PlayEffect(moleHitNetEvent.ScoreGained, playerPosition);
 
                 _moleControllers.SetMoleHit(moleHitNetEvent.MoleId);
                 _teamsBoardUIController.UpdateTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);

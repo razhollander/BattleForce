@@ -501,7 +501,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &2778380866625836296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -804,7 +804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1400
+      value: 1668.7476
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -954,7 +954,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 350
+      value: 618.74756
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1104,7 +1104,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1750
+      value: 2018.7476
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1344,7 +1344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6253306233417174168, guid: 5efb55ad05c8b4d2fab35f4f725e6389, type: 3}
       propertyPath: m_Name
-      value: WhacAMoleCanvas
+      value: MatchTimerCountdownCanvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1462,7 +1462,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 268.74756
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1612,7 +1612,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 700
+      value: 968.74756
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1762,7 +1762,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1050
+      value: 1318.7476
       objectReference: {fileID: 0}
     - target: {fileID: 4123453233464706171, guid: b1fc66d4df2304a49a0ce492359ab836, type: 3}
       propertyPath: m_AnchoredPosition.y

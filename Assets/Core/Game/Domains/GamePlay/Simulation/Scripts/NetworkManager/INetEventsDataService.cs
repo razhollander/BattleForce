@@ -78,6 +78,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> DeactivateWaterGunTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>> PerformBarrelDashNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
@@ -184,6 +185,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDestroyFrigidBlockNetEvent(int onTick, ushort blockId);
         void AddActivateHeadbuttChargingNetEvent(int onTick, ushort casterPlayerId);
         void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId);
+        void AddPerformBarrelDashNetEvent(int onTick, ushort casterPlayerId);
         void AddHeadbuttHitEnemyNetEvent(int onTick, ushort casterPlayerId, ushort enemyPlayerId);
         void AddDeactivateHeadbuttTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
     }

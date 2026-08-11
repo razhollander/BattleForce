@@ -57,5 +57,8 @@ namespace Core.Scripts.Services.AudioService
         MoleSpawned = 56,
         MoleHit = 57,
         MoleDespawned = 58,
+        ScoreGatePassed = 59,
+        BarrelDash = 60,
+        TimerTick = 61,
     }
 }

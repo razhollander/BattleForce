@@ -1795,10 +1795,48 @@ MonoBehaviour:
       _rotatingWheelsJson: 
       _fieldBarriersJson: '[{"Position":{"X":-12.0,"Y":6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":12.0,"Y":6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":-12.0,"Y":-6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1},{"Position":{"X":12.0,"Y":-6.60000038},"Size":{"X":3.0,"Y":3.0},"Shape":1}]'
       _stageBoundriesWallsJson: '[{"Id":1,"Points":[{"X":-21.0,"Y":11.0},{"X":21.0,"Y":11.0},{"X":21.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":2,"Points":[{"X":-21.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-11.0},{"X":-21.0,"Y":-11.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":3,"Points":[{"X":-21.0,"Y":-12.0},{"X":-20.0,"Y":-12.0},{"X":-20.0,"Y":-4.0},{"X":-21.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":4,"Points":[{"X":-21.0,"Y":4.0},{"X":-20.0,"Y":4.0},{"X":-20.0,"Y":12.0},{"X":-21.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":5,"Points":[{"X":20.0,"Y":-12.0},{"X":21.0,"Y":-12.0},{"X":21.0,"Y":-4.0},{"X":20.0,"Y":-4.0}],"Position":{"X":0.0,"Y":0.0}},{"Id":6,"Points":[{"X":20.0,"Y":4.0},{"X":21.0,"Y":4.0},{"X":21.0,"Y":12.0},{"X":20.0,"Y":12.0}],"Position":{"X":0.0,"Y":0.0}}]'
-      _powerUpSpawnPointsJson: 
+      _powerUpSpawnPointsJson: '[{"Position":{"X":0.0,"Y":8.5}},{"Position":{"X":-16.5,"Y":0.0}},{"Position":{"X":16.5,"Y":0.0}},{"Position":{"X":-7.0,"Y":-8.5}},{"Position":{"X":7.0,"Y":-8.5}}]'
       _moleSpawnPointsJson: 
       _scoreGatesJson: '[{"Id":1,"Position":{"X":0.0,"Y":0.0},"RotationDegrees":0.0}]'
-      _gateTrapsJson: '[{"Id":1,"WallId":50,"WallPoints":[{"X":0.0,"Y":-0.5},{"X":8.0,"Y":-0.5},{"X":8.0,"Y":0.5},{"X":0.0,"Y":0.5}],"AreaPolygons":[{"Points":[{"X":-21.0,"Y":4.0},{"X":-22.7355347,"Y":3.6038754},{"X":-24.127327,"Y":2.493959},{"X":-24.8997116,"Y":0.89008373},{"X":-24.8997116,"Y":-0.8900835},{"X":-24.127327,"Y":-2.493959},{"X":-22.7355347,"Y":-3.60387516},{"X":-21.0,"Y":-4.0}]}],"OpenPosition":{"X":-20.5,"Y":-12.0},"ClosedPosition":{"X":-20.5,"Y":-4.0},"OpenRotationDegrees":90.0,"ClosedRotationDegrees":90.0,"LocalRotationPivot":{"X":0.0,"Y":0.0},"MovementSpeed":16.0,"SecondsStayClosed":3.0,"SecondsStayOpen":2.0,"IsAttachedToRotationWheel":false,"AttachToRotationWheelId":0},{"Id":2,"WallId":51,"WallPoints":[{"X":0.0,"Y":-0.5},{"X":8.0,"Y":-0.5},{"X":8.0,"Y":0.5},{"X":0.0,"Y":0.5}],"AreaPolygons":[{"Points":[{"X":21.0,"Y":-4.0},{"X":22.7355347,"Y":-3.6038754},{"X":24.1273251,"Y":-2.49395943},{"X":24.8997116,"Y":-0.8900839},{"X":24.8997116,"Y":0.8900835},{"X":24.127327,"Y":2.49395919},{"X":22.7355347,"Y":3.60387516},{"X":21.0,"Y":4.0}]}],"OpenPosition":{"X":20.5,"Y":-12.0},"ClosedPosition":{"X":20.5,"Y":-4.0},"OpenRotationDegrees":90.0,"ClosedRotationDegrees":90.0,"LocalRotationPivot":{"X":0.0,"Y":0.0},"MovementSpeed":16.0,"SecondsStayClosed":3.0,"SecondsStayOpen":2.0,"IsAttachedToRotationWheel":false,"AttachToRotationWheelId":0}]'
+      _gateTrapsJson: "[\n  {\n    \"Id\": 1,\n    \"WallId\": 50,\n    \"WallPoints\":
+        [\n      {\n        \"X\": 0,\n        \"Y\": -0.5\n      },\n      {\n       
+        \"X\": 8,\n        \"Y\": -0.5\n      },\n      {\n        \"X\": 8,\n       
+        \"Y\": 0.5\n      },\n      {\n        \"X\": 0,\n        \"Y\": 0.5\n     
+        }\n    ],\n    \"AreaPolygons\": [\n      {\n        \"Points\": [\n         
+        {\n            \"X\": -21,\n            \"Y\": 4\n          },\n         
+        {\n            \"X\": -22.7355347,\n            \"Y\": 3.6038754\n         
+        },\n          {\n            \"X\": -24.127327,\n            \"Y\": 2.493959\n         
+        },\n          {\n            \"X\": -24.8997116,\n            \"Y\": 0.89008373\n         
+        },\n          {\n            \"X\": -24.8997116,\n            \"Y\": -0.8900835\n         
+        },\n          {\n            \"X\": -24.127327,\n            \"Y\": -2.493959\n         
+        },\n          {\n            \"X\": -22.7355347,\n            \"Y\": -3.60387516\n         
+        },\n          {\n            \"X\": -21,\n            \"Y\": -4\n         
+        }\n        ]\n      }\n    ],\n    \"OpenPosition\": {\n      \"X\": -20.5,\n     
+        \"Y\": -12\n    },\n    \"ClosedPosition\": {\n      \"X\": -20.5,\n     
+        \"Y\": -4\n    },\n    \"OpenRotationDegrees\": 90,\n    \"ClosedRotationDegrees\":
+        90,\n    \"LocalRotationPivot\": {\n      \"X\": 0,\n      \"Y\": 0\n   
+        },\n    \"MovementSpeed\": 32,\n    \"SecondsStayClosed\": 3,\n    \"SecondsStayOpen\":
+        2,\n    \"IsAttachedToRotationWheel\": false,\n    \"AttachToRotationWheelId\":
+        0\n  },\n  {\n    \"Id\": 2,\n    \"WallId\": 51,\n    \"WallPoints\": [\n     
+        {\n        \"X\": 0,\n        \"Y\": -0.5\n      },\n      {\n        \"X\":
+        8,\n        \"Y\": -0.5\n      },\n      {\n        \"X\": 8,\n        \"Y\":
+        0.5\n      },\n      {\n        \"X\": 0,\n        \"Y\": 0.5\n      }\n   
+        ],\n    \"AreaPolygons\": [\n      {\n        \"Points\": [\n          {\n           
+        \"X\": 21,\n            \"Y\": -4\n          },\n          {\n           
+        \"X\": 22.7355347,\n            \"Y\": -3.6038754\n          },\n         
+        {\n            \"X\": 24.1273251,\n            \"Y\": -2.49395943\n         
+        },\n          {\n            \"X\": 24.8997116,\n            \"Y\": -0.8900839\n         
+        },\n          {\n            \"X\": 24.8997116,\n            \"Y\": 0.8900835\n         
+        },\n          {\n            \"X\": 24.127327,\n            \"Y\": 2.49395919\n         
+        },\n          {\n            \"X\": 22.7355347,\n            \"Y\": 3.60387516\n         
+        },\n          {\n            \"X\": 21,\n            \"Y\": 4\n         
+        }\n        ]\n      }\n    ],\n    \"OpenPosition\": {\n      \"X\": 20.5,\n     
+        \"Y\": -12\n    },\n    \"ClosedPosition\": {\n      \"X\": 20.5,\n     
+        \"Y\": -4\n    },\n    \"OpenRotationDegrees\": 90,\n    \"ClosedRotationDegrees\":
+        90,\n    \"LocalRotationPivot\": {\n      \"X\": 0,\n      \"Y\": 0\n   
+        },\n    \"MovementSpeed\": 32,\n    \"SecondsStayClosed\": 3,\n    \"SecondsStayOpen\":
+        2,\n    \"IsAttachedToRotationWheel\": false,\n    \"AttachToRotationWheelId\":
+        0\n  }\n]"
       _cameraBoundariesJson: '{"TopLeft":{"X":-20.0,"Y":11.0},"BottomRight":{"X":20.0,"Y":-11.0}}'
   AvailableLayoutIndexes: 000000000300000004000000050000000a0000000b0000000e0000000f00000010000000
   WhacAMoleLayoutIndexes: 1500000016000000

@@ -83,6 +83,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateWaterGunTalentNetEventsCommand _handleDeactivateWaterGunTalentNetEventsCommand;
         private readonly HandleActivateHeadbuttChargingNetEventsCommand _handleActivateHeadbuttChargingNetEventsCommand;
         private readonly HandlePerformHeadbuttDashNetEventsCommand _handlePerformHeadbuttDashNetEventsCommand;
+        private readonly HandlePerformBarrelDashNetEventsCommand _handlePerformBarrelDashNetEventsCommand;
         private readonly HandleDeactivateHeadbuttTalentNetEventsCommand _handleDeactivateHeadbuttTalentNetEventsCommand;
         private readonly HandleHeadbuttHitEnemyNetEventsCommand _handleHeadbuttHitEnemyNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
@@ -107,7 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
         private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
-        private readonly UpdateWhacAMoleCountdownCommand _updateWhacAMoleCountdownCommand;
+        private readonly UpdateMatchTimerCountdownCommand _updateMatchTimerCountdownCommand;
         private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
         private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
         private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
@@ -180,6 +181,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateWaterGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateWaterGunTalentNetEventsCommand>();
             _handleActivateHeadbuttChargingNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateHeadbuttChargingNetEventsCommand>();
             _handlePerformHeadbuttDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformHeadbuttDashNetEventsCommand>();
+            _handlePerformBarrelDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformBarrelDashNetEventsCommand>();
             _handleDeactivateHeadbuttTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateHeadbuttTalentNetEventsCommand>();
             _handleHeadbuttHitEnemyNetEventsCommand = commandFactory.CreateCommandVoid<HandleHeadbuttHitEnemyNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
@@ -205,7 +207,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
-            _updateWhacAMoleCountdownCommand = commandFactory.CreateCommandVoid<UpdateWhacAMoleCountdownCommand>();
+            _updateMatchTimerCountdownCommand = commandFactory.CreateCommandVoid<UpdateMatchTimerCountdownCommand>();
             _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
             _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
             _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
@@ -256,7 +258,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTickDeltas();
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
             _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
-            _updateWhacAMoleCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _updateMatchTimerCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleGoldenMoleDamagedNetEventsCommand.Execute();
             _handleMoleHitNetEventsCommand.Execute();
@@ -288,6 +290,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateWaterGunTalentNetEventsCommand.Execute();
             _handleActivateHeadbuttChargingNetEventsCommand.Execute();
             _handlePerformHeadbuttDashNetEventsCommand.Execute();
+            _handlePerformBarrelDashNetEventsCommand.Execute();
             _handleDeactivateHeadbuttTalentNetEventsCommand.Execute();
             _handleHeadbuttHitEnemyNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();

@@ -262,7 +262,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7892996417539986511, guid: 70645d7c2bebc4a16b72453b0f82963d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 70645d7c2bebc4a16b72453b0f82963d, type: 3}
   m_Color: {r: 0.45, g: 0.95, b: 1, a: 0.75}
   m_FlipX: 0
   m_FlipY: 0
@@ -282,6 +282,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5489282573844322401}
   - component: {fileID: 8075284927250738682}
+  - component: {fileID: 8903822429972095567}
+  - component: {fileID: 5257559383737607949}
   m_Layer: 0
   m_Name: PostLeft
   m_TagString: Untagged
@@ -353,7 +355,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7892996417539986511, guid: 70645d7c2bebc4a16b72453b0f82963d, type: 3}
+  m_Sprite: {fileID: 5234880176756325818, guid: d21796d46e4714a6488aaf4dd953f16b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -363,6 +365,30 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8903822429972095567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127388035600589513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererOutlineEffectView
+--- !u!114 &5257559383737607949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127388035600589513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererShadowEffectView
 --- !u!1 &7934440404595060400
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,6 +399,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1615561309797312569}
   - component: {fileID: 1701763118898306151}
+  - component: {fileID: 6331148285178468198}
+  - component: {fileID: 3858091082911186012}
   m_Layer: 0
   m_Name: PostRight
   m_TagString: Untagged
@@ -444,7 +472,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7892996417539986511, guid: 70645d7c2bebc4a16b72453b0f82963d, type: 3}
+  m_Sprite: {fileID: 5234880176756325818, guid: d21796d46e4714a6488aaf4dd953f16b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -454,6 +482,30 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &6331148285178468198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7934440404595060400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96cae5d54f2c4dce9e17e5115c1ac18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererOutlineEffectView
+--- !u!114 &3858091082911186012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7934440404595060400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d64d8c5bee0a4c7ea0f7399a8e18992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreAssembly::Core.URPRenderFeatures.SpriteRendererSilhouetteRenderFeature.Scripts.SpriteRendererShadowEffectView
 --- !u!1 &9077176122944219117
 GameObject:
   m_ObjectHideFlags: 0

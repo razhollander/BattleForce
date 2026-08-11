@@ -53,6 +53,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.ShowMolesHitScore(molesHitScore);
         }
 
+        public void ShowGatePassScore(int gatePassScore)
+        {
+            _view.ShowGatePassScore(gatePassScore);
+        }
+
         public void UpdateMolesHitScore(int molesHitScore)
         {
             _view.UpdateMolesHitScore(molesHitScore);

@@ -72,7 +72,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _worldCameraController.ShakeCamera(10f,0.5f);
             }
             
-            if (_matchDataService.TryGetKingedPlayers(out var kingedPlayers) && !kingedPlayers.IsNullOrEmpty())
+            if (_matchDataService.StageType.IsBonusStage())
+            {
+                // In bonus stages the camera locks onto the winning-team player who contributed the most score.
+                foreach (var stageEndEvent in stageEndEvents)
+                {
+                    var isThereOnlyOneTeam = stageEndEvent.WinningTeamId == 0;
+
+                    if (isThereOnlyOneTeam)
+                    {
+                        continue;
+                    }
+
+                    ZoomCameraOnPlayer(stageEndEvent.PlayerIdToFocusOn);
+                }
+            }
+            else if (_matchDataService.TryGetKingedPlayers(out var kingedPlayers) && !kingedPlayers.IsNullOrEmpty())
             {
                 foreach (var stageEndEvent in stageEndEvents)
                 {

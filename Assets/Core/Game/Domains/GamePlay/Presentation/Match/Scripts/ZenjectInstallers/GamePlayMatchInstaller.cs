@@ -21,9 +21,9 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -74,9 +74,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
-        [SerializeField] private MoleHitScoreEffectView _moleHitScoreEffectViewPrefab;
+        [SerializeField] private ScoreGainedEffectView _scoreGainedEffectViewPrefab;
         [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
-        [SerializeField] private WhacAMoleCountdownView _whacAMoleCountdownView;
+        [SerializeField] private MatchTimerCountdownView _matchTimerCountdownView;
         [SerializeField] private MoleView _moleViewPrefab;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
         [SerializeField] private HeadbuttHitEffectView _headbuttHitEffectViewPrefab;
@@ -139,9 +139,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
-            Container.BindInterfacesTo<MoleHitScoreEffectController>().AsSingle().WithArguments(_moleHitScoreEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<ScoreGainedEffectController>().AsSingle().WithArguments(_scoreGainedEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
-            Container.BindInterfacesTo<WhacAMoleCountdownController>().AsSingle().WithArguments(_whacAMoleCountdownView).NonLazy();
+            Container.BindInterfacesTo<MatchTimerCountdownController>().AsSingle().WithArguments(_matchTimerCountdownView).NonLazy();
             Container.BindInterfacesTo<MoleControllers>().AsSingle().WithArguments(_moleViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();

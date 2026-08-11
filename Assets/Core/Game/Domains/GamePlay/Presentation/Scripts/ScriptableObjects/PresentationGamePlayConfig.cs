@@ -17,6 +17,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
         [EditableRef] public TeamFloorConfig TeamFloor;
         [EditableRef] public EnvironmentTeleportConfig Teleports;
         [EditableRef] public EnvironmentFieldBarriersConfig FieldBarriers;
+        public bool IsHapticsEnabled = true;
         [EditableRef] public HapticsConfig HapticsConfig;
         public bool CoolBGMusic = false;
         [EditableRef] public CoolBGMusicConfig CoolBGMusicConfig;

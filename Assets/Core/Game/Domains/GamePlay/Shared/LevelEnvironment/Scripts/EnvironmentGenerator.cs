@@ -65,21 +65,33 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             _environmentConfig.SetScoreGates(scoreGateConfigs, index);
         }
 
+        // A trap that is not fully authored is reported by id and left out, so one unassigned reference cannot take the
+        // whole bake down with a nameless NullReferenceException.
         [Button]
         public void RefreshGateTraps(int index)
         {
-            var gateTrapConfigs = new EnvironmentGateTrapConfig[_gateTraps.Count];
+            var gateTrapConfigs = new List<EnvironmentGateTrapConfig>(_gateTraps.Count);
 
-            for (int i = 0; i < _gateTraps.Count; i++)
+            foreach (var gateTrapSpawnPoint in _gateTraps)
             {
-                gateTrapConfigs[i] = BuildGateTrapConfig(_gateTraps[i]);
+                var gateTrapConfig = BuildGateTrapConfig(gateTrapSpawnPoint);
+
+                if (gateTrapConfig != null)
+                {
+                    gateTrapConfigs.Add(gateTrapConfig);
+                }
             }
 
-            _environmentConfig.SetGateTraps(gateTrapConfigs, index);
+            _environmentConfig.SetGateTraps(gateTrapConfigs.ToArray(), index);
         }
 
         private EnvironmentGateTrapConfig BuildGateTrapConfig(GateTrapSpawnPoint gateTrapSpawnPoint)
         {
+            if (!IsGateTrapFullyAuthored(gateTrapSpawnPoint))
+            {
+                return null;
+            }
+
             var areaPolygons = new GateTrapAreaPolygonConfig[gateTrapSpawnPoint.AreaPolygons.Count];
 
             for (int i = 0; i < areaPolygons.Length; i++)
@@ -112,6 +124,40 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
                 IsAttachedToRotationWheel = gateTrapSpawnPoint.IsAttachedToRotationWheel,
                 AttachToRotationWheelId = gateTrapSpawnPoint.AttachToRotationWheelId
             };
+        }
+
+        private bool IsGateTrapFullyAuthored(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            if (gateTrapSpawnPoint == null)
+            {
+                Debug.LogError("The gate traps list has an empty slot, skipping it.");
+                return false;
+            }
+
+            var missingReferenceName = GetMissingGateTrapReferenceName(gateTrapSpawnPoint);
+
+            if (missingReferenceName == null)
+            {
+                return true;
+            }
+
+            Debug.LogError($"GateTrap {gateTrapSpawnPoint.Id} on '{gateTrapSpawnPoint.name}' has no {missingReferenceName} assigned, skipping it.", gateTrapSpawnPoint);
+            return false;
+        }
+
+        private string GetMissingGateTrapReferenceName(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            if (gateTrapSpawnPoint.WallShape == null) return nameof(gateTrapSpawnPoint.WallShape);
+            if (gateTrapSpawnPoint.OpenPose == null) return nameof(gateTrapSpawnPoint.OpenPose);
+            if (gateTrapSpawnPoint.ClosedPose == null) return nameof(gateTrapSpawnPoint.ClosedPose);
+            if (gateTrapSpawnPoint.AreaPolygons.IsNullOrEmpty()) return nameof(gateTrapSpawnPoint.AreaPolygons);
+
+            foreach (var areaPolygon in gateTrapSpawnPoint.AreaPolygons)
+            {
+                if (areaPolygon == null) return nameof(gateTrapSpawnPoint.AreaPolygons) + " (it has an empty slot)";
+            }
+
+            return null;
         }
 
         // The wall becomes a Box2D polygon and the areas are tested against it, so both are capped at the same 8 points.

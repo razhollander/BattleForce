@@ -9,9 +9,9 @@ using DG.Tweening;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts
 {
-    public class MoleHitScoreEffectView : MonoBehaviour, IPoolable
+    public class ScoreGainedEffectView : MonoBehaviour, IPoolable
     {
         [SerializeField] private OutlinedTextView _text;
 
@@ -41,11 +41,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEff
 
         private readonly List<Awaitable> _animationTasks = new List<Awaitable>(3);
         private float _textAlpha;
+        private Color _defaultOutlineColor;
+        private Color _defaultUnderlineColor;
+        private bool _hasCachedDefaultColors;
 
-        public async Awaitable PlayAndDespawn(byte gainedScore, Vector2 position, CancellationTokenSource cancellationTokenSource)
+        // outlineAndUnderlineColor is null for popups (e.g. mole hits) that keep the prefab's colours; the gate-pass popup
+        // passes the scoring team's colour so the "+score" matches the team that passed the gate.
+        public async Awaitable PlayAndDespawn(byte gainedScore, Vector2 position, Color? outlineAndUnderlineColor, CancellationTokenSource cancellationTokenSource)
         {
+            CacheDefaultColorsIfNeeded();
+
             transform.position = position;
             _text.SetText($"+{gainedScore}");
+            _text.OutlineColor = outlineAndUnderlineColor ?? _defaultOutlineColor;
+            _text.UnderlineColor = outlineAndUnderlineColor ?? _defaultUnderlineColor;
 
             SetTextAlpha(0f);
             transform.localScale = Vector3.zero;
@@ -97,6 +106,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEff
         {
             _textAlpha = alpha;
             _text.SetAlpha(alpha);
+        }
+
+        // The prefab's colours are the fallback for non-coloured popups, so they are cached before any recolour overwrites them.
+        private void CacheDefaultColorsIfNeeded()
+        {
+            if (_hasCachedDefaultColors)
+            {
+                return;
+            }
+
+            _defaultOutlineColor = _text.OutlineColor;
+            _defaultUnderlineColor = _text.UnderlineColor;
+            _hasCachedDefaultColors = true;
         }
 
         public void OnCreated() { }

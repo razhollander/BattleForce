@@ -192,7 +192,7 @@ GameObject:
   - component: {fileID: 1108610125285480830}
   - component: {fileID: 1192209281468319034}
   m_Layer: 0
-  m_Name: MoleHitScoreIndicator
+  m_Name: ScoreGainedIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa0439174b344f45a0395c9e25f34c5d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.MoleHitScoreEffect.Scripts.MoleHitScoreEffectView
+  m_EditorClassIdentifier: PresentationMatchAssembly::Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts.ScoreGainedEffectView
   _text: {fileID: 5127658169739247345}
   _minJumpDistanceX: -2
   _maxJumpDistanceX: 2
@@ -647,6 +647,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CoreAssembly::Core.Scripts.Helpers.OutlinedTextView
   _texts:
-  - {fileID: 6455190655695517483}
   - {fileID: 3755152538394417381}
+  - {fileID: 6455190655695517483}
   - {fileID: 5817252694903099049}
+  _outlineText: {fileID: 6455190655695517483}
+  _underlineText: {fileID: 5817252694903099049}

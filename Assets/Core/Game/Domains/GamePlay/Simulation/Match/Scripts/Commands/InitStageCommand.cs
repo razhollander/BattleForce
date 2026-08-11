@@ -18,6 +18,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
@@ -30,7 +31,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class InitStageCommand : BaseCommand, ICommandVoid
     {
-        private static int _stageNumber = 1;
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
@@ -45,6 +45,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
+        private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IFrigidBlocksController _frigidBlocksController;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
@@ -72,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
+            _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _frigidBlocksController = _diContainer.Resolve<IFrigidBlocksController>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
@@ -88,20 +90,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
             RestartStageData();
+            _stageDataService.IncrementStagesEnteredAmount();
             var stageType = ResolveStageTypeForCurrentStage();
             _matchDataService.SimulationState.StageType = stageType;
             SetupBonusStageData(stageType);
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(stageType, mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
-            _stageNumber++;
         }
 
+        // A match opens on a DeathMatch unless the cadence lands a bonus stage on the very first stage
+        // (BonusStageEveryXStages == 1), which is intentionally allowed.
         private StageType ResolveStageTypeForCurrentStage()
         {
             var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
-            var isRotationConfigured = gamePlayConfig.AreBonusStagesEnabled && gamePlayConfig.WhacAMoleEveryXStages > 0;
-            var didReachBonusStage = isRotationConfigured && _stageNumber % gamePlayConfig.WhacAMoleEveryXStages == 0;
+            var currentStageNumber = _stageDataService.AmountOfStagesEntered;
+            var isRotationConfigured = gamePlayConfig.AreBonusStagesEnabled && gamePlayConfig.BonusStageEveryXStages > 0;
+            var didReachBonusStage = isRotationConfigured && currentStageNumber % gamePlayConfig.BonusStageEveryXStages == 0;
 
             return didReachBonusStage ? _bonusStageRotationService.ResolveNextBonusStageType() : StageType.DeathMatch;
         }
@@ -215,6 +220,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTalentsManager.ResetAllTalentsData();
             _frigidBlocksController.ResetData();
             _playersPowerUpsManager.RemoveAllPowerUps();
+            _powerUpsSpawnerService.RestartSpawnTimer();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
             _playersTouchingWallDataService.ClearAllData();
@@ -273,7 +279,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
                 else if (_gamePlayConfigService.GamePlayConfig.ShouldAddTalentEveryXStages)
                 {
-                    var didReachStage = _stageNumber % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
+                    var didReachStage = _stageDataService.AmountOfStagesEntered % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
                     if (didReachStage)
                     {
                         _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
@@ -592,8 +598,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
+            // Runs after every other wall layer, so this sees the whole layout's wall ids - including earlier traps'.
             foreach (var gateTrapConfig in gateTrapConfigs)
             {
+                if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(gateTrapConfig.WallId, out _))
+                {
+                    // Two walls sharing an id makes CopyWallStateToBody drive both bodies onto one transform, dragging
+                    // an authored wall around with the trap, so the trap is dropped instead of breaking the arena.
+                    LogService.LogError($"Gate trap {gateTrapConfig.Id} reuses wall id {gateTrapConfig.WallId}, which the layout already owns! Skipping this gate trap.");
+                    continue;
+                }
+
                 var gateTrap = AddGateTrapToEnvironment(gateTrapConfig, mapSizeMultiplier);
                 AddGateTrapWallToEnvironment(gateTrap, gateTrapConfig, mapSizeMultiplier);
 

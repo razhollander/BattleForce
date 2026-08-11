@@ -20,7 +20,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scrip
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
-using Core.Game.Domains.GamePlay.Presentation.Match.Features.WhacAMoleCountdown.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
@@ -87,7 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private IPreparationPhaseCountdownController _preparationPhaseCountdownController;
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private IMoleControllers _moleControllers;
-        private IWhacAMoleCountdownController _whacAMoleCountdownController;
+        private IMatchTimerCountdownController _matchTimerCountdownController;
 
         private MatchSimulationStateS2C _simulationState;
         private int _stateOccouredOnTick;
@@ -142,7 +142,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _preparationPhaseCountdownController = _diContainer.Resolve<IPreparationPhaseCountdownController>();
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
-            _whacAMoleCountdownController = _diContainer.Resolve<IWhacAMoleCountdownController>();
+            _matchTimerCountdownController = _diContainer.Resolve<IMatchTimerCountdownController>();
         }
 
         public void Execute()
@@ -189,7 +189,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _lockOnTargetEffectController.DestroyAll();
             _moleControllers.DestroyAll();
             _preparationPhaseCountdownController.StopCountdown();
-            _whacAMoleCountdownController.HideCountdown();
+            _matchTimerCountdownController.HideCountdown();
         }
 
         private void CreateAll()

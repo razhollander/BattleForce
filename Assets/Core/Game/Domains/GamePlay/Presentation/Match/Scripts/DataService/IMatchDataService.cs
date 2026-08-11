@@ -68,6 +68,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
         MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap);
         MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId);
+        bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap);
         MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);

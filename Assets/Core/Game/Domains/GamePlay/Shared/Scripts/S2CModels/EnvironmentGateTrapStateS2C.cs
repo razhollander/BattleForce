@@ -5,8 +5,9 @@ using LiteNetLib.Utils;
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 {
     /// <summary>
-    /// The only gate trap data that is not derivable from the layout config. It rides along the full state snapshot so a
-    /// rejoining client can pick the cycle up mid-swing; during the match a single GateTrapClosing net event carries it.
+    /// The only gate trap data that is not derivable from the layout config, and small enough (6 bytes) to ride both the
+    /// full snapshot and the per-tick delta. The GateTrapClosing net event is still what starts a client's swing on the
+    /// exact tick; the delta copy is the safety net that re-syncs a client which lost that event to packet loss.
     /// </summary>
     [Serializable]
     public struct EnvironmentGateTrapStateS2C : INetSerializable, IEquatable<ushort>
