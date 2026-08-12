@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.CommandFactory;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -15,23 +16,28 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly NetPacketProcessor _packetProcessor;
         private readonly NetworkConfig _networkConfig;
         private readonly NetworkS2CPacketsSender _packetsSender;
+        private readonly ICommandFactory _commandFactory;
+
+        private HandleClientDisconnectedCommand _handleClientDisconnectedCommand;
 
         public int ConnectedPeersCount => _netManager.ConnectedPeersCount;
         public event Action OnPacketReceivedEvent;
         public event Action<long> OnClientPeerDisconnectedEvent;
 
-        public ServerNetworkManager(NetworkConfig networkConfig)
+        public ServerNetworkManager(NetworkConfig networkConfig, ICommandFactory commandFactory)
         {
             _networkConfig = networkConfig;
+            _commandFactory = commandFactory;
             _packetProcessor = new NetPacketProcessor();
             _packetsListener = new NetworkC2SPacketsListener(_networkConfig);
             _netManager = new NetManagerWrapper();
             _netManager.SetPacketsListener(_packetsListener);
             _packetsSender = new NetworkS2CPacketsSender(_packetProcessor);
         }
-        
+
         public void InitEntryPoint(int port)
         {
+            _handleClientDisconnectedCommand = _commandFactory.CreateCommandVoid<HandleClientDisconnectedCommand>();
             AddListeners();
             RegisterAutoSerializedTypes();
             StartServer(port);
@@ -50,6 +56,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
 
         private void OnClientPeerDisconnected(long clientId)
         {
+            _handleClientDisconnectedCommand.SetClientId(clientId).Execute();
             OnClientPeerDisconnectedEvent?.Invoke(clientId);
         }
 

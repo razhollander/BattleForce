@@ -182,7 +182,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
-                // check if connected first??
+                if (!kvp.Value.IsConnected)
+                {
+                    continue;
+                }
+
                 var clientId = kvp.Key;
                 _fullTickPacket.BulletSpawnNetEvents = _netEventsDataService.BulletSpawnNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerJoinAcceptNetEvents = _netEventsDataService.MatchMakingPlayerJoinAcceptNetEventsPerClient[clientId];

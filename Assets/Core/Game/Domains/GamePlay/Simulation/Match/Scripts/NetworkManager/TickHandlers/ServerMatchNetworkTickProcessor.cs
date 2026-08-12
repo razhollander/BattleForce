@@ -183,7 +183,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 if (!kvp.Value.IsConnected)
                 {
-                    return;
+                    continue;
                 }
 
                 var clientId = kvp.Key;
@@ -248,13 +248,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var currentSimulationState = _matchDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
-
-            //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
+            
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
                 if (!kvp.Value.IsConnected)
                 {
-                    return;
+                    continue;
                 }
 
                 var clientId = kvp.Key;
