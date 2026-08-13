@@ -330,9 +330,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var gateTrapClosingNetEvent in gateTrapClosingNetEvents)
             {
-                var gateTrapModel = _matchDataService.GetGateTrap(gateTrapClosingNetEvent.GateTrapId);
-
-                if (gateTrapModel == null)
+                // A closing event can land before the full sync has built the traps, so a miss here is expected and quiet.
+                if (!_matchDataService.TryGetGateTrap(gateTrapClosingNetEvent.GateTrapId, out var gateTrapModel))
                 {
                     continue;
                 }

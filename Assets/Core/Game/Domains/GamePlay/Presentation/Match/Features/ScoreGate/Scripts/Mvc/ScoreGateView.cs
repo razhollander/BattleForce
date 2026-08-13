@@ -44,7 +44,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private Vector3 _baseLineScale = Vector3.one;
         private Color _neutralLineColor = Color.white;
         private Color _baseLineColor = Color.white;
-        private float _baseLineAlpha = 1f;
         private Vector3 _multiplierBaseScale = Vector3.one;
         private Quaternion _multiplierWorldRotation = Quaternion.identity;
         private Tween _idleBreathTween;
@@ -60,10 +59,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
 
             // The label rides along to the gate's corner but must stay readable, so its world orientation is pinned to
             // the authored tilt and never inherits the gate's (interpolated) spin.
-            if (_multiplierText != null)
-            {
-                _multiplierText.transform.rotation = _multiplierWorldRotation;
-            }
+            _multiplierText.transform.rotation = _multiplierWorldRotation;
         }
 
         // Posts sit on the local X axis at +/-(gap/2 + postHalfWidth). Sprites are assumed authored at 1 unit, so the
@@ -73,44 +69,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             var postOffsetX = gapWidth * 0.5f + postSize.x * 0.5f;
             var postScale = new Vector3(postSize.x, postSize.y, 1f);
 
-            if (_leftPost != null)
-            {
-                _leftPost.localPosition = new Vector3(-postOffsetX, 0f, 0f);
-                _leftPost.localScale = postScale;
-            }
+            _leftPost.localPosition = new Vector3(-postOffsetX, 0f, 0f);
+            _leftPost.localScale = postScale;
 
-            if (_rightPost != null)
-            {
-                _rightPost.localPosition = new Vector3(postOffsetX, 0f, 0f);
-                _rightPost.localScale = postScale;
-            }
+            _rightPost.localPosition = new Vector3(postOffsetX, 0f, 0f);
+            _rightPost.localScale = postScale;
 
-            if (_passLine != null)
-            {
-                _baseLineScale = new Vector3(gapWidth, postSize.x * BEAM_THICKNESS_RELATIVE_TO_POST, 1f);
-                _passLine.localPosition = Vector3.zero;
-                _passLine.localScale = _baseLineScale;
-            }
+            _baseLineScale = new Vector3(gapWidth, postSize.x * BEAM_THICKNESS_RELATIVE_TO_POST, 1f);
+            _passLine.localPosition = Vector3.zero;
+            _passLine.localScale = _baseLineScale;
 
             StartIdleBreathing();
         }
 
         public void SetMultiplierText(string text)
         {
-            if (_multiplierText != null)
-            {
-                _multiplierText.text = text;
-            }
+            _multiplierText.text = text;
         }
 
         // Springy pop fired when the multiplier climbs, drawing the eye to the freshly raised "xN".
         public void PlayMultiplierPunch()
         {
-            if (_multiplierText == null)
-            {
-                return;
-            }
-
             _multiplierPunchTween?.Kill();
             var multiplierTransform = _multiplierText.transform;
             multiplierTransform.localScale = _multiplierBaseScale;
@@ -120,21 +99,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
 
         public void SetTeamColor(Color color)
         {
-            if (_tintableRenderers != null)
+            foreach (var tintableRenderer in _tintableRenderers)
             {
-                foreach (var tintableRenderer in _tintableRenderers)
-                {
-                    tintableRenderer.color = color;
-                }
+                tintableRenderer.color = color;
             }
 
             // The beam adopts the team tint but keeps its own authored transparency, and remembers it as the colour the
             // next pass flash eases back to.
-            color.a = _baseLineAlpha;
+            color.a = _neutralLineColor.a;
             _baseLineColor = color;
 
             // While a pass pluck is mid-flight it owns the colour, so only recolour immediately when it is idle.
-            if (_passLineRenderer != null && (_passSequence == null || !_passSequence.IsActive()))
+            var isPassPluckPlaying = _passSequence != null && _passSequence.IsActive();
+
+            if (!isPassPluckPlaying)
             {
                 _passLineRenderer.color = color;
             }
@@ -144,11 +122,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         // settles back to the beam's current (team) colour.
         public void PlayPassAnimation()
         {
-            if (_passLine == null || _passLineRenderer == null)
-            {
-                return;
-            }
-
             _idleBreathTween?.Kill();
             _passSequence?.Kill();
 
@@ -172,24 +145,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         {
             Transform = transform;
 
-            if (_passLineRenderer != null)
-            {
-                _neutralLineColor = _passLineRenderer.color;
-                _baseLineColor = _neutralLineColor;
-                _baseLineAlpha = _neutralLineColor.a;
-            }
+            _neutralLineColor = _passLineRenderer.color;
+            _baseLineColor = _neutralLineColor;
 
-            if (_multiplierText != null)
-            {
-                _multiplierBaseScale = _multiplierText.transform.localScale;
-                _multiplierWorldRotation = _multiplierText.transform.localRotation;
-            }
+            var multiplierTransform = _multiplierText.transform;
+            _multiplierBaseScale = multiplierTransform.localScale;
+            _multiplierWorldRotation = multiplierTransform.localRotation; // the pool parent is unrotated, so local is world here
         }
 
         public void OnSpawned()
         {
             gameObject.SetActive(true);
-            ResetBeamToNeutral();
+            _baseLineColor = _neutralLineColor;
+            _passLineRenderer.color = _neutralLineColor;
         }
 
         public void OnDespawned()
@@ -201,40 +169,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _passSequence = null;
             _multiplierPunchTween = null;
 
-            if (_multiplierText != null)
-            {
-                _multiplierText.transform.localScale = _multiplierBaseScale;
-            }
+            _multiplierText.transform.localScale = _multiplierBaseScale;
 
             gameObject.SetActive(false);
         }
 
-        private void ResetBeamToNeutral()
-        {
-            _baseLineColor = _neutralLineColor;
-            _baseLineAlpha = _neutralLineColor.a;
-
-            if (_passLineRenderer != null)
-            {
-                _passLineRenderer.color = _neutralLineColor;
-            }
-        }
-
         private void StartIdleBreathing()
         {
-            if (_passLineRenderer == null)
-            {
-                return;
-            }
-
             _idleBreathTween?.Kill();
 
+            var restingAlpha = _neutralLineColor.a;
             var restingColor = _baseLineColor;
-            restingColor.a = _baseLineAlpha;
+            restingColor.a = restingAlpha;
             _passLineRenderer.color = restingColor;
 
-            _idleBreathTween = _passLineRenderer.DOFade(_baseLineAlpha, IDLE_BREATH_DURATION_IN_SECONDS)
-                .From(_baseLineAlpha * IDLE_BREATH_MIN_ALPHA_RATIO)
+            _idleBreathTween = _passLineRenderer.DOFade(restingAlpha, IDLE_BREATH_DURATION_IN_SECONDS)
+                .From(restingAlpha * IDLE_BREATH_MIN_ALPHA_RATIO)
                 .SetEase(Ease.InOutSine)
                 .SetLoops(-1, LoopType.Yoyo);
         }

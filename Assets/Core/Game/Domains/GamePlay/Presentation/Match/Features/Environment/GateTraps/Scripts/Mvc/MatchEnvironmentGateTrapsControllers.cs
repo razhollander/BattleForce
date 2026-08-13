@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 
@@ -10,15 +9,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
     {
         private const string PARENT_GAME_OBJECT_NAME = "EnvironmentGateTrapsParent";
 
-        private readonly IMatchDataService _matchDataService;
-        private readonly EnvironmentWallView _wallViewPrefab;
+        private readonly GateTrapView _wallViewPrefab;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
         private readonly List<MatchEnvironmentGateTrapController> _gateTrapControllers = new();
         private GameObject _gateTrapsParent;
 
-        public MatchEnvironmentGateTrapsControllers(IMatchDataService matchDataService, EnvironmentWallView wallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public MatchEnvironmentGateTrapsControllers(GateTrapView wallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
         {
-            _matchDataService = matchDataService;
             _wallViewPrefab = wallViewPrefab;
             _gamePlayConfig = gamePlayConfig;
         }
@@ -28,15 +25,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
             _gateTrapsParent = new GameObject(PARENT_GAME_OBJECT_NAME);
         }
 
-        public void CreateGateTrap(ushort gateTrapId)
+        public void CreateGateTrap(MatchEnvironmentGateTrapModel gateTrapModel)
         {
-            var gateTrapModel = _matchDataService.GetGateTrap(gateTrapId);
-
-            if (gateTrapModel == null)
-            {
-                return;
-            }
-
             var gateTrapController = new MatchEnvironmentGateTrapController(gateTrapModel, _gamePlayConfig.ExponentialDecay);
             gateTrapController.CreateWallView(_wallViewPrefab, _gateTrapsParent.transform);
             _gateTrapControllers.Add(gateTrapController);

@@ -312,7 +312,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             {
                 foreach (var wall in walls)
                 {
-                    if (wall != null && !usedWallIds.Add(wall.Id)) errorBuilder.AppendLine($"Layout {index} Wall ID {wall.Id} is used more than once");
+                    if (wall != null && !usedWallIds.Add(wall.Id))
+                    {
+                        errorBuilder.AppendLine($"Layout {index} Wall ID {wall.Id} is used more than once");
+                    }
                 }
             }
 
@@ -325,7 +328,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
 
                     foreach (var wheelWall in wheel.Walls)
                     {
-                        if (wheelWall != null && !usedWallIds.Add(wheelWall.Id)) errorBuilder.AppendLine($"Layout {index} RotatingWheel {wheel.Id} Wall ID {wheelWall.Id} is used more than once");
+                        if (wheelWall != null && !usedWallIds.Add(wheelWall.Id))
+                        {
+                            errorBuilder.AppendLine($"Layout {index} RotatingWheel {wheel.Id} Wall ID {wheelWall.Id} is used more than once");
+                        }
                     }
                 }
             }
@@ -335,7 +341,10 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             {
                 foreach (var gateTrap in gateTraps)
                 {
-                    if (gateTrap != null && !usedWallIds.Add(gateTrap.WallId)) errorBuilder.AppendLine($"Layout {index} GateTrap {gateTrap.Id} WallId {gateTrap.WallId} is already used by another wall");
+                    if (gateTrap != null && !usedWallIds.Add(gateTrap.WallId))
+                    {
+                        errorBuilder.AppendLine($"Layout {index} GateTrap {gateTrap.Id} WallId {gateTrap.WallId} is already used by another wall");
+                    }
                 }
             }
         }

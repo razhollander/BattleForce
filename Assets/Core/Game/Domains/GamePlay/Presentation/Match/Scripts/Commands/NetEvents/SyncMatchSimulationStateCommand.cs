@@ -189,7 +189,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _lockOnTargetEffectController.DestroyAll();
             _moleControllers.DestroyAll();
             _preparationPhaseCountdownController.StopCountdown();
-            _matchTimerCountdownController.HideCountdown();
+            _matchTimerCountdownController.Hide();
         }
 
         private void CreateAll()
@@ -229,14 +229,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             CreateScoreGates(mapSizeMultiplier);
             CreateChickenEggs();
             CreateGalacticPullStars();
-            SetupWhacAMoleHud();
+            SetupBonusStageHud();
         }
 
         // Bonus-stage players cannot be damaged, so their health bars are meaningless and the bonus score takes over.
-        private void SetupWhacAMoleHud()
+        // Each bonus stage type has its own styled score slot on the team board, so only its own slot is turned on.
+        private void SetupBonusStageHud()
         {
             var isBonusStage = _simulationState.StageType.IsBonusStage();
-            _teamsBoardUIController.SetIsMolesHitShown(isBonusStage);
+            _teamsBoardUIController.SetIsMolesHitShown(_simulationState.StageType == StageType.WhacAMole);
+            _teamsBoardUIController.SetIsGatePassScoreShown(_simulationState.StageType == StageType.GatePass);
 
             if (!isBonusStage)
             {
@@ -667,8 +669,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var gateTrapModel = BuildGateTrapModel(gateTrapConfig, mapSizeMultiplier, ticksPerSecond);
                 ApplyGateTrapStateFromSnapshot(gateTrapModel);
                 _matchDataService.AddGateTrap(gateTrapModel);
-                gateTrapModel.StepToTick(_stateOccouredOnTick, wheelCalculationTick, deltaTime, GetRotatingWheelOfGateTrap(gateTrapModel));
-                _environmentGateTrapsControllers.CreateGateTrap(gateTrapModel.Id);
+                gateTrapModel.StepToTick(_stateOccouredOnTick, wheelCalculationTick, deltaTime, _matchDataService.GetRotatingWheelOfGateTrap(gateTrapModel));
+                _environmentGateTrapsControllers.CreateGateTrap(gateTrapModel);
             }
         }
 
@@ -713,24 +715,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 gateTrapModel.StateEndTick = gateTrapState.StateEndTick;
                 return;
             }
-        }
-
-        private MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrapModel)
-        {
-            if (!gateTrapModel.IsAttachedToRotationWheel)
-            {
-                return null;
-            }
-
-            foreach (var wheelModel in _matchDataService.RotatingWheels)
-            {
-                if (wheelModel.Id == gateTrapModel.AttachedToRotationWheelId)
-                {
-                    return wheelModel;
-                }
-            }
-
-            return null;
         }
 
         private void CreateSwapField()

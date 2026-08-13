@@ -13,7 +13,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private ScoreGateView _view;
         private byte _lastScoreMultiplier;
 
-        public ushort ScoreGateId => _scoreGateId;
         public Vector2 Position => _view.Transform.position;
 
         public ScoreGateController(ushort scoreGateId, ScoreGatePool pool, Transform parent)

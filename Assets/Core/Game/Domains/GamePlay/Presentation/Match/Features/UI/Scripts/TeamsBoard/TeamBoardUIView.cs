@@ -13,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         [SerializeField] private Image _backgroundImage;
         [SerializeField] private GameObject _molesHitContainer;
         [SerializeField] private TextMeshProUGUI _molesHitCountText;
+        [SerializeField] private GameObject _gatePassScoreContainer;
 
         public void Setup(Color teamColor, int teamGems, int teamBolts)
         {
@@ -24,6 +25,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         public void SetIsMolesHitShown(bool isShown)
         {
             _molesHitContainer.SetActive(isShown);
+        }
+
+        public void SetIsGatePassScoreShown(bool isShown)
+        {
+            _gatePassScoreContainer.SetActive(isShown);
         }
 
         public void UpdateMolesHit(int molesHit)

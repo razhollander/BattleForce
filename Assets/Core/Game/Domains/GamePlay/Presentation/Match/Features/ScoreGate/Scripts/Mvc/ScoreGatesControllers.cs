@@ -41,11 +41,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _parentTransform = null;
         }
 
-        public bool HasScoreGate(ushort id)
-        {
-            return _controllers.ContainsKey(id);
-        }
-
         public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, byte scoreMultiplier, float mapSizeMultiplier)
         {
             if (_controllers.ContainsKey(id))
@@ -118,22 +113,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _controllers.Clear();
         }
 
-        // teamId 0 means the gate has not been scored on yet, so it has no team colour.
-        public bool TryGetTeamColor(ushort teamId, out Color color)
-        {
-            if (teamId != 0 && _gamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out color))
-            {
-                return true;
-            }
-
-            color = default;
-            return false;
-        }
-
         // teamId 0 means the gate has not been scored on yet, so it keeps the prefab's neutral colour.
         private void ApplyTeamColor(ScoreGateController controller, ushort teamId)
         {
-            if (TryGetTeamColor(teamId, out var color))
+            if (teamId != 0 && _gamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))
             {
                 controller.SetTeamColor(color);
             }

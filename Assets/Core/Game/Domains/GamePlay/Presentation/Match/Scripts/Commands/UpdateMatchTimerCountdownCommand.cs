@@ -36,9 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
             if (!shouldShowCountdown)
             {
-                _matchTimerCountdownController.HideCountdown();
+                _matchTimerCountdownController.Hide();
                 return;
             }
+
+            _matchTimerCountdownController.Show();
 
             var ticksLeft = Mathf.Max(0, _matchDataService.WhacAMoleEndTick - _tick);
             var secondsLeft = Mathf.CeilToInt(ticksLeft * _networkConfig.DeltaTime);

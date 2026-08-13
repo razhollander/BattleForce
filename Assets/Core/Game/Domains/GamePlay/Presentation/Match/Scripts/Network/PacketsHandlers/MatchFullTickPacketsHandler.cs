@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
@@ -1101,12 +1100,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var gateTrap in _matchDataService.GateTraps)
             {
-                gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, GetRotatingWheelOfGateTrap(gateTrap));
+                gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, _matchDataService.GetRotatingWheelOfGateTrap(gateTrap));
             }
         }
 
-        // The closing event is unreliable and short lived, so the authoritative state rides every tick too. Adopting it
-        // only when it actually differs keeps the common case free and repairs a client that never saw the event.
+        // The closing event is unreliable and short lived, so the authoritative state rides every tick too and simply
+        // overwrites the local one - that repairs a client which never saw the event and is a no-op for everyone else.
         private void ReconcileGateTrapsFromState(MatchSimulationStateS2C simulationState)
         {
             foreach (var gateTrapState in simulationState.GateTraps.AsSpan())
@@ -1116,34 +1115,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                     continue;
                 }
 
-                var isAlreadyInSync = gateTrapModel.State == gateTrapState.State && gateTrapModel.StateEndTick == gateTrapState.StateEndTick;
-
-                if (isAlreadyInSync)
-                {
-                    continue;
-                }
-
                 gateTrapModel.State = gateTrapState.State;
                 gateTrapModel.StateEndTick = gateTrapState.StateEndTick;
             }
-        }
-
-        private MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap)
-        {
-            if (!gateTrap.IsAttachedToRotationWheel)
-            {
-                return null;
-            }
-
-            foreach (var wheelModel in _matchDataService.RotatingWheels)
-            {
-                if (wheelModel.Id == gateTrap.AttachedToRotationWheelId)
-                {
-                    return wheelModel;
-                }
-            }
-
-            return null;
         }
 
         private void UpdatePowerUpBallsTransform(MatchSimulationStateS2C simulationState)

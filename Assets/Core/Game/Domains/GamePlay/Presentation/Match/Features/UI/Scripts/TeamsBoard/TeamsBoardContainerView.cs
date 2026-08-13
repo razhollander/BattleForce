@@ -41,6 +41,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             }
         }
 
+        public void SetIsGatePassScoreShown(bool isShown)
+        {
+            foreach (var boardUIView in _boardViewsPerTeam)
+            {
+                boardUIView.Value.SetIsGatePassScoreShown(isShown);
+            }
+        }
+
         public void DestroyAll()
         {
             foreach (var boardUIView in _boardViewsPerTeam)

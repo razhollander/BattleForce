@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.M
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         private ITeamsBoardUIController _teamsBoardUIController;
         private IMatchPlayerUIControllers _playerUIControllers;
         private IAudioService _audioService;
+        private PresentationGamePlayConfig _gamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -30,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _playerUIControllers = _diContainer.Resolve<IMatchPlayerUIControllers>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _gamePlayConfig = _diContainer.Resolve<PresentationGamePlayConfig>();
         }
 
         public void Execute()
@@ -45,7 +48,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 if (_scoreGatesControllers.TryGetScoreGatePosition(scoreGatePassedNetEvent.ScoreGateId, out var gatePosition))
                 {
-                    Color? outlineAndUnderlineColor = _scoreGatesControllers.TryGetTeamColor(scoreGatePassedNetEvent.ByTeamId, out var teamColor)
+                    Color? outlineAndUnderlineColor = _gamePlayConfig.ColorPerTeamId.TryGetValue(scoreGatePassedNetEvent.ByTeamId, out var teamColor)
                         ? teamColor
                         : null;
                     _scoreGainedEffectController.PlayEffect(scoreGatePassedNetEvent.ScoreGained, gatePosition, outlineAndUnderlineColor);

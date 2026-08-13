@@ -223,21 +223,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return gateTrap;
         }
 
-        public MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId)
-        {
-            for (int i = 0; i < GateTraps.Count; i++)
-            {
-                if (GateTraps[i].Id == gateTrapId)
-                {
-                    return GateTraps[i];
-                }
-            }
-
-            LogService.LogError($"Couldn't find gate trap with id {gateTrapId}");
-            return null;
-        }
-
-        // The reconcile path runs on packets that can arrive before the traps are built, so a miss here is expected and quiet.
+        // Gate trap packets can arrive before the traps are built, so every lookup goes through Try and a miss is quiet.
         public bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap)
         {
             for (int i = 0; i < GateTraps.Count; i++)
@@ -251,6 +237,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
 
             gateTrap = null;
             return false;
+        }
+
+        // A trap that rides a wheel is placed in the wheel's local space, so both the full sync and the per-tick step
+        // need the wheel it belongs to. A free-standing trap has none.
+        public MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap)
+        {
+            if (!gateTrap.IsAttachedToRotationWheel)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < RotatingWheels.Count; i++)
+            {
+                if (RotatingWheels[i].Id == gateTrap.AttachedToRotationWheelId)
+                {
+                    return RotatingWheels[i];
+                }
+            }
+
+            return null;
         }
 
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
@@ -561,20 +567,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return model;
         }
 
-        public MatchScoreGateModel GetScoreGate(ushort id)
-        {
-            for (int i = 0; i < ScoreGates.Count; i++)
-            {
-                if (ScoreGates[i].Id == id)
-                {
-                    return ScoreGates[i];
-                }
-            }
-
-            LogService.LogError($"Couldn't find score gate with id {id}");
-            return null;
-        }
-
+        // Score gate packets can arrive before the gates are built, so every lookup goes through Try and a miss is quiet.
         public bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate)
         {
             for (int i = 0; i < ScoreGates.Count; i++)
@@ -603,18 +596,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             if (TryGetScoreGate(id, out var scoreGate))
             {
                 scoreGate.ScoreMultiplier = scoreMultiplier;
-            }
-        }
-
-        public void RemoveScoreGate(ushort id)
-        {
-            for (int i = 0; i < ScoreGates.Count; i++)
-            {
-                if (ScoreGates[i].Id == id)
-                {
-                    ScoreGates.RemoveAt(i);
-                    return;
-                }
             }
         }
 

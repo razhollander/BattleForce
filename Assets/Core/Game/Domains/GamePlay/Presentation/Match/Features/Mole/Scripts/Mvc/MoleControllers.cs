@@ -13,16 +13,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
     /// </summary>
     public class MoleControllers : IMoleControllers
     {
-        private readonly MolePool _pool;
+        private readonly MoleViewPool _molesViewPool;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IAudioService _audioService;
-        private readonly List<MoleController> _controllers = new List<MoleController>();
+        private readonly List<MoleController> _moleControllers = new List<MoleController>();
         private readonly Dictionary<ushort, MoleController> _controllerPerActiveMoleId = new Dictionary<ushort, MoleController>();
         private Transform _parent;
 
         public MoleControllers(MoleView moleViewPrefab, DiContainer diContainer, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
-            _pool = new MolePool(moleViewPrefab, diContainer);
+            _molesViewPool = new MoleViewPool(moleViewPrefab, diContainer);
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _audioService = audioService;
         }
@@ -30,14 +30,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         public void InitEntryPoint()
         {
             _parent = (new GameObject("MolesParent")).transform;
-            _pool.InitPool();
+            _molesViewPool.InitPool();
         }
 
         public void CreateMoleAtSpawnPoint(Vector2 spawnPointPosition)
         {
-            var controller = new MoleController(spawnPointPosition, _pool, _parent, _stageCancellationTokenProvider, _audioService);
+            var controller = new MoleController(spawnPointPosition, _molesViewPool, _parent, _stageCancellationTokenProvider, _audioService);
             controller.CreateView();
-            _controllers.Add(controller);
+            _moleControllers.Add(controller);
         }
 
         public void SetMoleEmergingFromHole(ushort moleId, Vector2 position, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives)
@@ -128,12 +128,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void DestroyAll()
         {
-            foreach (var controller in _controllers)
+            foreach (var controller in _moleControllers)
             {
                 controller.DestroyView();
             }
 
-            _controllers.Clear();
+            _moleControllers.Clear();
             _controllerPerActiveMoleId.Clear();
         }
 
@@ -157,7 +157,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             MoleController nearestController = null;
             var nearestDistanceSquared = float.MaxValue;
 
-            foreach (var controller in _controllers)
+            foreach (var controller in _moleControllers)
             {
                 var distanceSquared = (controller.SpawnPointPosition - position).sqrMagnitude;
 

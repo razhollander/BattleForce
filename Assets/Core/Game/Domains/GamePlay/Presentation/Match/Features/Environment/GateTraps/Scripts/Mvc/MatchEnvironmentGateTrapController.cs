@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Core.Game.Domains.GamePlay.Presentation.Features.Environment.Walls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Utils;
@@ -24,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
         private readonly MatchEnvironmentGateTrapModel _gateTrapModel;
         private readonly float _exponentialDecay;
 
-        private EnvironmentWallView _wallView;
+        private GateTrapView _wallView;
         private Transform _wallViewTransform;
         private bool _isShownAsOnCooldown;
 
@@ -35,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
             GateTrapId = gateTrapModel.Id;
         }
 
-        public void CreateWallView(EnvironmentWallView wallViewPrefab, Transform parent)
+        public void CreateWallView(GateTrapView wallViewPrefab, Transform parent)
         {
             _wallView = Object.Instantiate(wallViewPrefab, parent);
             _wallView.name = "EnvironmentGateTrapWall_" + GateTrapId;

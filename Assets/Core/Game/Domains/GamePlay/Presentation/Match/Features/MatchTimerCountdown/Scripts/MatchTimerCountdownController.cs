@@ -21,14 +21,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCount
         }
 
         // The command below runs every frame, so the text is only rebuilt when the whole second actually changes.
+        // Showing the countdown is Show()'s job alone - claiming it here would leave the flag on while the view stays
+        // hidden, and every later Show() would then early-out on it.
         public void SetSecondsLeft(int secondsLeft)
         {
-            if (_isCountdownShown && _currentlyShownSecondsLeft == secondsLeft)
+            if (_currentlyShownSecondsLeft == secondsLeft)
             {
                 return;
             }
 
-            _isCountdownShown = true;
             _currentlyShownSecondsLeft = secondsLeft;
             _view.SetSecondsLeftText(TimeSpan.FromSeconds(secondsLeft).ToString(TimersConsts.MINUTES_SECONDS_FORMAT));
 
@@ -39,7 +40,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCount
             }
         }
 
-        public void HideCountdown()
+        public void Show()
+        {
+            if (_isCountdownShown)
+            {
+                return;
+            }
+
+            _isCountdownShown = true;
+            _view.Show();
+        }
+
+        public void Hide()
         {
             if (!_isCountdownShown)
             {

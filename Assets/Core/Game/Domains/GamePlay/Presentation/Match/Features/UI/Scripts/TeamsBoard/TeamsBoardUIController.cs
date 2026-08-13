@@ -41,6 +41,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.SetIsMolesHitShown(isShown);
         }
 
+        public void SetIsGatePassScoreShown(bool isShown)
+        {
+            _view.SetIsGatePassScoreShown(isShown);
+        }
+
         public void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts)
         {
             if (_presentationGamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))

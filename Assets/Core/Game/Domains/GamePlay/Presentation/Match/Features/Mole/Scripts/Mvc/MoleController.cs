@@ -5,10 +5,6 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc
 {
-    /// <summary>
-    /// Owns the single mole that lives at one spawn point for the whole stage. The mole is never created or
-    /// destroyed per server spawn, it only moves between its states.
-    /// </summary>
     public class MoleController
     {
         private const ushort NO_ACTIVE_MOLE_ID = ushort.MaxValue; // a mole id travels as a byte on the wire, so this can never collide with a real one
@@ -16,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly IAudioService _audioService;
         
-        private readonly MolePool _molePool;
+        private readonly MoleViewPool _moleViewPool;
         private readonly Transform _parent;
         private MoleView _moleView;
         private MoleStateType _stateType;
@@ -28,10 +24,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         // The mole this spawn point currently belongs to. Net events of any older mole must not touch it anymore.
         public ushort ActiveMoleId { get; private set; } = NO_ACTIVE_MOLE_ID;
 
-        public MoleController(Vector2 spawnPointPosition, MolePool molePool, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
+        public MoleController(Vector2 spawnPointPosition, MoleViewPool moleViewPool, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             SpawnPointPosition = spawnPointPosition;
-            _molePool = molePool;
+            _moleViewPool = moleViewPool;
             _parent = parent;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _audioService = audioService;
@@ -39,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void CreateView()
         {
-            _moleView = _molePool.Spawn();
+            _moleView = _moleViewPool.Spawn();
             _moleView.transform.SetParent(_parent);
             _moleView.SetPosition(SpawnPointPosition);
             _stateType = MoleStateType.InHole;

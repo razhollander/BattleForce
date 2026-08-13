@@ -1,6 +1,6 @@
 ---
-name: code-review
-description: code-review conventions and architecture rules.
+name: coding-guidlines
+description: code-review conventions and architecture rules by Raz.
 ---
 ## **ENTRY POINTS**
 

@@ -70,18 +70,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         
         public void ShowMolesHitScore(int molesHitScore)
         {
-            HideHealthBar();
-            _molesHitScoreContainer.SetActive(true);
-            _activeScoreText = _molesHitScoreText;
-            UpdateMolesHitScore(molesHitScore);
+            ShowBonusScore(_molesHitScoreContainer, _molesHitScoreText, molesHitScore);
         }
 
         public void ShowGatePassScore(int gatePassScore)
         {
+            ShowBonusScore(_gatePassScoreContainer, _gatePassScoreText, gatePassScore);
+        }
+
+        // Each bonus stage type owns its own styled container, and a view outlives the stage it was created for, so the
+        // other container is always turned off - otherwise a GatePass stage would still show the previous stage's moles slot.
+        private void ShowBonusScore(GameObject scoreContainer, TextMeshProUGUI scoreText, int score)
+        {
             HideHealthBar();
-            _gatePassScoreContainer.SetActive(true);
-            _activeScoreText = _gatePassScoreText;
-            UpdateMolesHitScore(gatePassScore);
+            _molesHitScoreContainer.SetActive(scoreContainer == _molesHitScoreContainer);
+            _gatePassScoreContainer.SetActive(scoreContainer == _gatePassScoreContainer);
+            _activeScoreText = scoreText;
+            UpdateMolesHitScore(score);
         }
 
         public void UpdateMolesHitScore(int score)

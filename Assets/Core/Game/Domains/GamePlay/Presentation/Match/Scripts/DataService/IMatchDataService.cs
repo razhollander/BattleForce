@@ -67,8 +67,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
         MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap);
-        MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId);
         bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap);
+        MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap);
         MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
@@ -97,11 +97,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void RemoveFrigidBlock(ushort id);
         List<MatchScoreGateModel> ScoreGates { get; }
         MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, byte scoreMultiplier);
-        MatchScoreGateModel GetScoreGate(ushort id);
         bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate);
         void SetScoreGateLastScoredTeam(ushort id, ushort teamId);
         void SetScoreGateMultiplier(ushort id, byte scoreMultiplier);
-        void RemoveScoreGate(ushort id);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
         MatchChickenEggModel GetChickenEgg(ushort id);

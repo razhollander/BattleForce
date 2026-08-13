@@ -20,9 +20,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCount
         private Vector3 _defaultTextScale;
         private bool _hasCachedDefaultScale;
 
-        public void SetSecondsLeftText(string secondsLeftText)
+        public void Show()
         {
             _canvas.enabled = true;
+        }
+
+        public void SetSecondsLeftText(string secondsLeftText)
+        {
             _secondsLeftText.text = secondsLeftText;
         }
 

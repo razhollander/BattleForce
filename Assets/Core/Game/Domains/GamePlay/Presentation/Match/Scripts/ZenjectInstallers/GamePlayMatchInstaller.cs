@@ -67,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
+        [SerializeField] private GateTrapView _gateTrapViewPrefab;
         [SerializeField] private EnvironmentSpringView _environmentSpringViewPrefab;
         [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.EnvironmentSpikeView _environmentSpikeViewPrefab;
         [SerializeField] private EnvironmentTeleportGateView _environmentTeleportGateViewPrefab;
@@ -132,7 +133,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
             Container.BindInterfacesTo<GalacticPullStarEffectControllers>().AsSingle().WithArguments(_galacticPullStarEffectViewPrefab, _galacticStarsVisualData).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
-            Container.BindInterfacesTo<MatchEnvironmentGateTrapsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy(); // a trap's wall is drawn with the same view as any other wall
+            Container.BindInterfacesTo<MatchEnvironmentGateTrapsControllers>().AsSingle().WithArguments(_gateTrapViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpikeControllers>().AsSingle().WithArguments(_environmentSpikeViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
