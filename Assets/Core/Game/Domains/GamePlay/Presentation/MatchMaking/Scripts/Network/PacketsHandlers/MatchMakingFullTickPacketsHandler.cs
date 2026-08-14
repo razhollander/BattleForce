@@ -86,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestTickReceivedFromServer = GetLatestTickReceivedFromServer();
             var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
 
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
@@ -117,6 +117,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
 
             _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private int GetLatestTickReceivedFromServer()
+        {
+            var latestTick = int.MinValue;
+
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                if (kvp.Key > latestTick)
+                {
+                    latestTick = kvp.Key;
+                }
+            }
+
+            return latestTick;
         }
 
         private void ProcessLogicOfPacket(MatchMakingFullTickPacketS2C latestFullTickPacket, int ignoreEventsNotAboveTick)
@@ -338,11 +353,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             OnFullTickReceived(newPacket);
         }
 
+        // UDP can deliver the same tick twice, and an already buffered tick has nothing new to tell us,
+        // so the duplicate goes straight back to the pool instead of throwing out of PollEvents.
         private void OnFullTickReceived(MatchMakingFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
+
+            if (!_fullTickPacketsUnprocessedByLogic.TryAdd(tick, fullTickPacket))
+            {
+                _fullTickPacketsPool.Return(fullTickPacket);
+            }
         }
 
         public void InitExitPoint()

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
@@ -239,7 +238,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestTickReceivedFromServer = GetLatestTickReceivedFromServer();
             var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
             var ignoreEventsNotAboveTick = Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
@@ -268,6 +267,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
 
             _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private int GetLatestTickReceivedFromServer()
+        {
+            var latestTick = int.MinValue;
+
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                if (kvp.Key > latestTick)
+                {
+                    latestTick = kvp.Key;
+                }
+            }
+
+            return latestTick;
         }
 
         private void ProcessLogicOfPacket(MatchFullTickPacketS2C latestFullTickPacket, int latestTickReceivedFromServer, int ignoreEventsNotAboveTick)
@@ -1864,11 +1878,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPacketsUnprocessedByView.Clear();
         }
         
+        // UDP can deliver the same tick twice, and an already buffered tick has nothing new to tell us,
+        // so the duplicate goes straight back to the pool instead of throwing out of PollEvents.
         private void OnFullTickReceived(MatchFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
+
+            if (!_fullTickPacketsUnprocessedByLogic.TryAdd(tick, fullTickPacket))
+            {
+                _fullTickPacketsPool.Return(fullTickPacket);
+            }
         }
 
         public void InitExitPoint()
