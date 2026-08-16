@@ -7,6 +7,7 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Object = UnityEngine.Object;
 using Vector2 = System.Numerics.Vector2;
 
@@ -16,14 +17,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
     {
         private EnvironmentLavaWallView _lavaWallView;
         private readonly IMatchDataService _matchDataService;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         public readonly ushort LavaWallId;
         private Transform _lavaWallViewTransform;
 
-        public EnvironmentLavaWallController(ushort lavaWallId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentLavaWallController(ushort lavaWallId, IMatchDataService matchDataService, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             LavaWallId = lavaWallId;
         }
         
@@ -49,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
             var direction = rotationDegrees.ToRadians().AngleToVector();
             var targetRotation = direction.ToQuaternion();
             var deltaTime = Time.deltaTime;
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
             
             var interpulatedRotation = MathUtils.ExpDecay(
                 _lavaWallViewTransform.rotation, 

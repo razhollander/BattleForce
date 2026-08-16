@@ -3,7 +3,6 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
@@ -22,6 +21,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers
 {
@@ -32,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IMatchDataService _matchDataService;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
+        private readonly IInterpolationDecayService _interpolationDecayService;
 
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
@@ -131,13 +132,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService, ILastFullSyncTickDataService lastFullSyncTickDataService)
+            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService, ILastFullSyncTickDataService lastFullSyncTickDataService,
+            IInterpolationDecayService interpolationDecayService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _updateSubscriptionService = updateSubscriptionService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
+            _interpolationDecayService = interpolationDecayService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPacketsUnprocessedByLogic = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _fullTickPacketsUnprocessedByView = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -250,8 +253,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             ProcessLogicOfPacket(latestFullTickPacket, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
 
+            _interpolationDecayService.UpdateDecayBasedOnTicks(latestTickReceivedFromServer - LastProcessedTickFromServer);
             LastProcessedTickFromServer = latestTickReceivedFromServer;
-            
+
             foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
             {
                 var packetTick = kvp.Key;
@@ -1942,6 +1946,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             InitStyles();
             GUILayout.Box($"Ping: {_networkManager.Ping}, Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
+            GUILayout.Box($"Interpolation decay: {_interpolationDecayService.CurrentDecay:0.0} (drops below the configured value while state packets arrive in bursts)", _highVisStyle);
         }
         
         private void InitStyles()

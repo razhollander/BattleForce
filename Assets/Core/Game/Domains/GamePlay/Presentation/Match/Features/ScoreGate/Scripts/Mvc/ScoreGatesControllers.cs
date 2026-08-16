@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc
 {
@@ -10,14 +11,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private const string PARENT_GAME_OBJECT_NAME = "ScoreGatesParent";
 
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly ScoreGatePool _pool;
         private readonly Dictionary<ushort, ScoreGateController> _controllers = new Dictionary<ushort, ScoreGateController>();
         private Transform _parentTransform;
 
-        public ScoreGatesControllers(ScoreGateView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public ScoreGatesControllers(ScoreGateView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _pool = new ScoreGatePool(prefab, diContainer);
         }
@@ -63,7 +66,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         {
             if (_controllers.TryGetValue(id, out var controller))
             {
-                controller.InterpolateTransform(position, rotation, _gamePlayConfig.ExponentialDecay);
+                controller.InterpolateTransform(position, rotation, _interpolationDecayService.CurrentDecay);
             }
         }
 

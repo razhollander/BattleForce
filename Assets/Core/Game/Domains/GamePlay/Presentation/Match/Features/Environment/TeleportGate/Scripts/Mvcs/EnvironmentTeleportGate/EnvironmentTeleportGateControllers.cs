@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate
 {
@@ -14,17 +15,19 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         private readonly EnvironmentTeleportGateView _prefab;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly DiContainer _container;
         private Transform _parent;
         private readonly List<EnvironmentTeleportGatePairController> _controllers = new List<EnvironmentTeleportGatePairController>();
 
         public EnvironmentTeleportGateControllers(IMatchDataService matchDataService, EnvironmentTeleportGateView teleportGateViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider,
-            PresentationGamePlayConfig gamePlayConfig)
+            PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _prefab = teleportGateViewPrefab;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
             _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -34,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Tel
         
         public EnvironmentTeleportGatePairController CreateGatePair(ushort pairId)
         {
-            var controller = new EnvironmentTeleportGatePairController(pairId, _matchDataService, _gamePlayConfig);
+            var controller = new EnvironmentTeleportGatePairController(pairId, _matchDataService, _gamePlayConfig, _interpolationDecayService);
             controller.CreateGateViews(_prefab, _parent);
             _controllers.Add(controller);
             return controller;

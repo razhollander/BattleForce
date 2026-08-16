@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Scripts.Mvc
@@ -14,14 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
         private readonly IMatchMakingDataService _matchDataService;
         private readonly PlayerViewPool _playerPool;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly List<MatchMakingPlayerController> _playerControllers = new ();
         private Transform _playersParent;
 
-        public MatchMakingPlayerControllers(IMatchMakingDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public MatchMakingPlayerControllers(IMatchMakingDataService matchDataService, PlayerView playerViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _playerPool = new PlayerViewPool(playerViewPrefab, diContainer);
             _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -32,7 +35,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.Player.Sc
 
         public void AddPlayer(ushort playerId)
         {
-            var playerController = new MatchMakingPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _playersParent.transform);
+            var playerController = new MatchMakingPlayerController(_playerPool, playerId, _matchDataService, _gamePlayConfig, _interpolationDecayService, _playersParent.transform);
             playerController.CreatePlayerView();
             _playerControllers.Add(playerController);
         }

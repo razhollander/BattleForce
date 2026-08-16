@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Object = UnityEngine.Object;
 using Vector2 = System.Numerics.Vector2;
 
@@ -21,16 +22,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
         public readonly ushort GateTrapId;
 
         private readonly MatchEnvironmentGateTrapModel _gateTrapModel;
-        private readonly float _exponentialDecay;
+        private readonly IInterpolationDecayService _interpolationDecayService;
 
         private GateTrapView _wallView;
         private Transform _wallViewTransform;
         private bool _isShownAsOnCooldown;
 
-        public MatchEnvironmentGateTrapController(MatchEnvironmentGateTrapModel gateTrapModel, float exponentialDecay)
+        public MatchEnvironmentGateTrapController(MatchEnvironmentGateTrapModel gateTrapModel, IInterpolationDecayService interpolationDecayService)
         {
             _gateTrapModel = gateTrapModel;
-            _exponentialDecay = exponentialDecay;
+            _interpolationDecayService = interpolationDecayService;
             GateTrapId = gateTrapModel.Id;
         }
 
@@ -67,8 +68,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
             var targetRotation = rotationDegrees.AngleToQuaternion();
             var deltaTime = Time.deltaTime;
 
-            var interpolatedRotation = MathUtils.ExpDecay(_wallViewTransform.rotation, targetRotation, _exponentialDecay, deltaTime);
-            var interpolatedPosition = MathUtils.ExpDecay(_wallViewTransform.position, position.ToUnityVector2(), _exponentialDecay, deltaTime);
+            var interpolatedRotation = MathUtils.ExpDecay(_wallViewTransform.rotation, targetRotation, _interpolationDecayService.CurrentDecay, deltaTime);
+            var interpolatedPosition = MathUtils.ExpDecay(_wallViewTransform.position, position.ToUnityVector2(), _interpolationDecayService.CurrentDecay, deltaTime);
             SetTransform(interpolatedPosition, interpolatedRotation);
         }
 

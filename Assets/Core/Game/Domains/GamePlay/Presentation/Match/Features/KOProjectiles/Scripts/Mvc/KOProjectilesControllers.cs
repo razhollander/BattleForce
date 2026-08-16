@@ -4,20 +4,21 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.Scripts.Mvc
 {
     public class KOProjectilesControllers : IKOProjectilesControllers
     {
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly IMatchDataService _matchDataService;
         private readonly KOProjectilePool _koProjectilePool;
         private readonly Dictionary<ushort, KOProjectileController> _controllers = new();
         private Transform _koProjectilesParent;
 
-        public KOProjectilesControllers(KOProjectileView koProjectileViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public KOProjectilesControllers(KOProjectileView koProjectileViewPrefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _koProjectilePool = new KOProjectilePool(koProjectileViewPrefab, diContainer);
         }
 
@@ -37,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.KOProjectiles.S
         public void InterpulateKOProjectileTransform(ushort koProjectileId, Vector2 position, Quaternion rotation, Vector2 coilSpringStartPosition)
         {
             var koProjectileController = GetKOProjectile(koProjectileId);
-            koProjectileController.InterpolateTransform(position, rotation, coilSpringStartPosition, _gamePlayConfig.ExponentialDecay);
+            koProjectileController.InterpolateTransform(position, rotation, coilSpringStartPosition, _interpolationDecayService.CurrentDecay);
         }
         
         public void DestroyKOProjectile(ushort koProjectileId)

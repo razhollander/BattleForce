@@ -16,6 +16,7 @@ using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.Logger.Base;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
     {
         private readonly IMatchDataService _matchDataService;
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly NetworkConfig _networkConfig;
         private readonly Transform _parent;
@@ -39,12 +41,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
         private bool _isLeaderFlagActive;
         private bool _isFishingRodStickActive;
 
-        public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig,
+        public MatchPlayerController(MatchPlayerViewPool playerPool, ushort playerId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService,
             SharedGamePlayConfig sharedGamePlayConfig, NetworkConfig networkConfig, Transform parent, IStageCancellationTokenProvider stageCancellationTokenProvider, IAudioService audioService)
         {
             _playerPool = playerPool;
             _matchDataService = matchDataService;
             _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _networkConfig = networkConfig;
             _parent = parent;
@@ -300,7 +303,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.
             var playerTransformState = playerModel.Spaceship.Transform;
             var playerPosition = playerTransformState.Position.ToUnityVector2();
             var playerRotation = playerTransformState.Direction.ToUnityVector2().ToQuaternion();
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
             var aimDirection = playerModel.Spaceship.AimDirection;
             _playerView.Base.InterpolateTransform(playerPosition, playerRotation, decay);
             UpdateAim(playerModel.Spaceship.AssistArrowType, aimDirection, decay);

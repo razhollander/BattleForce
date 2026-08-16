@@ -4,18 +4,19 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc
 {
     public class MatchEnvironmentSpringController
     {
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private EnvironmentSpringView _view;
         private Transform _viewTransform;
 
-        public MatchEnvironmentSpringController(PresentationGamePlayConfig gamePlayConfig)
+        public MatchEnvironmentSpringController(IInterpolationDecayService interpolationDecayService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void CreateView(EnvironmentSpringView viewPrefab, Transform parent, Vector2 position, float rotationDegrees)
@@ -30,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
             var direction = rotationDegrees.ToRadians().AngleToVector();
             var targetRotation = direction.ToQuaternion();
             var deltaTime = Time.deltaTime;
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
             
             var interpulatedRotation = MathUtils.ExpDecay(
                 _viewTransform.rotation, 

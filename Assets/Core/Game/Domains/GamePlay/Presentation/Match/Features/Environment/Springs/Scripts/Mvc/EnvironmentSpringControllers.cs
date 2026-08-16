@@ -6,6 +6,7 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc
 {
@@ -14,16 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentSpringView _environmentSpringViewPrefab;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly Dictionary<ushort, MatchEnvironmentSpringController> _springControllers = new Dictionary<ushort, MatchEnvironmentSpringController>();
         private GameObject _springsParent;
 
-        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentSpringControllers(IMatchDataService matchDataService, EnvironmentSpringView environmentSpringViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _environmentSpringViewPrefab = environmentSpringViewPrefab;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -33,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spr
 
         public void CreateSpring(ushort springId)
         {
-            var springController = new MatchEnvironmentSpringController(_gamePlayConfig);
+            var springController = new MatchEnvironmentSpringController(_interpolationDecayService);
             var springModel = _matchDataService.GetEnvironmentSpring(springId);
             springController.CreateView(_environmentSpringViewPrefab, _springsParent.transform, springModel.WorldPosition.ToUnityVector2(), springModel.WorldRotationAngle);
             _springControllers.Add(springId, springController);

@@ -5,20 +5,21 @@ using Core.Scripts.Services.AudioService;
 using UnityEngine;
 using Zenject;
 using Core.Scripts.Extensions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc
 {
     public class FishingRodTipControllers : IFishingRodTipControllers
     {
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly IAudioService _audioService;
         private readonly FishingRodTipPool _pool;
         private readonly Dictionary<ushort, FishingRodTipController> _controllers = new();
         private Transform _parentTransform;
 
-        public FishingRodTipControllers(FishingRodTipView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IAudioService audioService)
+        public FishingRodTipControllers(FishingRodTipView prefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService, IAudioService audioService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _audioService = audioService;
             _pool = new FishingRodTipPool(prefab, diContainer);
         }
@@ -48,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scri
         {
             if (_controllers.TryGetValue(tipId, out var controller))
             {
-                controller.InterpolateTransform(position, rotation, casterPosition, _gamePlayConfig.ExponentialDecay);
+                controller.InterpolateTransform(position, rotation, casterPosition, _interpolationDecayService.CurrentDecay);
             }
         }
 

@@ -4,22 +4,23 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Mvc.WorldCamera;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc
 {
     public class PowerUpBallControllers : IPowerUpBallControllers
     {
         private readonly PowerUpBallPool _pool;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly IMatchDataService _matchDataService;
         private readonly IWorldCameraController _worldCameraController;
         private readonly List<PowerUpBallController> _controllers = new List<PowerUpBallController>();
         private Transform _parent;
 
-        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IMatchDataService matchDataService, IWorldCameraController worldCameraController)
+        public PowerUpBallControllers(PowerUpBallView powerUpBallViewPrefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService, IMatchDataService matchDataService, IWorldCameraController worldCameraController)
         {
             _pool = new PowerUpBallPool(powerUpBallViewPrefab, diContainer);
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _matchDataService = matchDataService;
             _worldCameraController = worldCameraController;
         }
@@ -69,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Script
         {
             foreach (var controller in _controllers)
             {
-                controller.InterpolatePosition(_gamePlayConfig.ExponentialDecay);
+                controller.InterpolatePosition(_interpolationDecayService.CurrentDecay);
             }
         }
 

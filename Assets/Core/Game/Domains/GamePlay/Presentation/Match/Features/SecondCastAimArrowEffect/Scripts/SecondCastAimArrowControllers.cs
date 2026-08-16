@@ -4,6 +4,7 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimArrowEffect.Scripts
 {
@@ -15,14 +16,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimAr
     {
         private const string PARENT_GAME_OBJECT_NAME = "SecondCastArrowsParent";
 
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly SecondCastAimArrowPool _pool;
         private readonly Dictionary<ushort, SecondCastAimArrowView> _arrowViewPerId = new();
         private Transform _parentTransform;
 
-        public SecondCastAimArrowControllers(SecondCastAimArrowView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public SecondCastAimArrowControllers(SecondCastAimArrowView prefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _pool = new SecondCastAimArrowPool(prefab, diContainer);
         }
 
@@ -62,7 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.SecondCastAimAr
             }
 
             var rotation = direction.ToQuaternion();
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
             var lerpedPosition = MathUtils.ExpDecay(view.Position, position, decay, Time.deltaTime);
             var lerpedRotation = MathUtils.ExpDecay(view.Rotation, rotation, decay, Time.deltaTime);
             view.SetTransform(lerpedPosition, lerpedRotation);

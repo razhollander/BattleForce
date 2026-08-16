@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc
 {
@@ -10,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
     {
         private const string PARENT_GAME_OBJECT_NAME = "FrigidBlocksParent";
 
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly FrigidBlockPool _pool;
         private readonly Dictionary<ushort, FrigidBlockController> _controllers = new();
@@ -18,9 +19,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
         private Transform _parentTransform;
         private Mesh _blockMesh;
 
-        public FrigidBlocksControllers(FrigidBlockView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public FrigidBlocksControllers(FrigidBlockView prefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _pool = new FrigidBlockPool(prefab, diContainer);
         }
@@ -64,7 +65,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scr
         {
             if (_controllers.TryGetValue(blockId, out var controller))
             {
-                controller.InterpolateTransform(position, rotation, _gamePlayConfig.ExponentialDecay);
+                controller.InterpolateTransform(position, rotation, _interpolationDecayService.CurrentDecay);
             }
         }
 
