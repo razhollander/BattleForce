@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -37,16 +38,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
             switch (_matchDataService.StageType)
             {
-                case StageType.DeathMatch: // the health bar is shown by default
+                case StageType.DeathMatch:
                     break;
-                case StageType.WhacAMole: // the health bar slot shows the player's bonus score contribution instead
+                case StageType.WhacAMole:
                     newPlayerController.ShowMolesHitScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
+                    newPlayerController.HideHealthBar();
                     break;
-                case StageType.GatePass: // GatePass shows the gate-pass contribution in a gate-styled container instead
+                case StageType.GatePass:
                     newPlayerController.ShowGatePassScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
+                    newPlayerController.HideHealthBar();
                     break;
                 default:
-                    newPlayerController.HideHealthBar();
+                    LogService.LogError($"Not implemented stage type: {_matchDataService.StageType}");
                     break;
             }
 
@@ -68,6 +71,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void UpdatePlayerMolesHitScore(ushort playerId, int molesHitScore)
         {
             _playerControllers[playerId].UpdateMolesHitScore(molesHitScore);
+        }
+
+        public void UpdatePlayerGatePassScore(ushort playerId, int gatePassScore)
+        {
+            _playerControllers[playerId].UpdateGatePassScore(gatePassScore);
         }
 
         public void SwitchToPlayerDeadState(ushort playerId)

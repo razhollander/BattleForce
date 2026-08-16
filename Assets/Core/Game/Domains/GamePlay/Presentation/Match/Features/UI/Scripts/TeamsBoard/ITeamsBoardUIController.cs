@@ -5,6 +5,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         void UpdateTeamGems(ushort teamId, int gems);
         void UpdateTeamBolts(ushort teamId, int teamBolts);
         void UpdateTeamMolesHit(ushort teamId, int molesHit);
+        void UpdateTeamGatePassScore(ushort teamId, int gatePassScore);
         void SetIsMolesHitShown(bool isShown);
         void SetIsGatePassScoreShown(bool isShown);
         void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts);

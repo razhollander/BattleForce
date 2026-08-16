@@ -36,6 +36,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamMolesHit(teamId, molesHit);
         }
 
+        public void UpdateTeamGatePassScore(ushort teamId, int gatePassScore)
+        {
+            _view.UpdateTeamGatePassScore(teamId, gatePassScore);
+        }
+
         public void SetIsMolesHitShown(bool isShown)
         {
             _view.SetIsMolesHitShown(isShown);

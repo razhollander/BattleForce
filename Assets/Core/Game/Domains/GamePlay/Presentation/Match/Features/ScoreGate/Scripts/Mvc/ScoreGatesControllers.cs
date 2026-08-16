@@ -116,10 +116,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _controllers.Clear();
         }
 
-        // teamId 0 means the gate has not been scored on yet, so it keeps the prefab's neutral colour.
         private void ApplyTeamColor(ScoreGateController controller, ushort teamId)
         {
-            if (teamId != 0 && _gamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))
+            if (_gamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))
             {
                 controller.SetTeamColor(color);
             }

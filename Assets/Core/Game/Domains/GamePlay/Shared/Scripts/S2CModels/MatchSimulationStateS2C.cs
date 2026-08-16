@@ -112,8 +112,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 scoreGate.Serialize(writer);
             }
-
-            // Lets a rejoining client pick a trap's cycle up mid-swing; the same six bytes also ride the per-tick delta.
+            
             var gateTrapsCount = GateTraps.Count;
             writer.Put((byte)gateTrapsCount);
             foreach (var gateTrap in GateTraps.AsSpan())
@@ -764,15 +763,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 scoreGate.SerializeDelta(writer);
             }
-
-            // A trap only ever changes state on its closing event, but that event is unreliable and short lived, so its
-            // 6 bytes ride every tick as well - a client that missed the event snaps back in line on the next packet.
-            var gateTrapsCount = GateTraps.Count;
-            writer.Put((byte)gateTrapsCount);
-            foreach (var gateTrap in GateTraps.AsSpan())
-            {
-                gateTrap.Serialize(writer);
-            }
         }
 
         private void PutBulletTransformsBatched(NetDataWriter writer) // maybe one day this will be used
@@ -904,14 +894,6 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 ref var scoreGate = ref ScoreGates.AddAndGet();
                 scoreGate.DeserializeDelta(reader);
-            }
-
-            var gateTrapsCount = reader.GetByte();
-            GateTraps.Clear();
-            for (int i = 0; i < gateTrapsCount; i++)
-            {
-                ref var gateTrap = ref GateTraps.AddAndGet();
-                gateTrap.Deserialize(reader);
             }
         }
 

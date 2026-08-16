@@ -47,13 +47,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleHitNetEvent in moleHitNetEvents)
             {
-                // The final hit of a golden mole is still a hit, so it shows the damage indicator on the mole as well.
                 if (moleHitNetEvent.IsGolden && _moleControllers.TryGetMolePosition(moleHitNetEvent.MoleId, out var molePosition))
                 {
                     _hitDamageIndicatorEffectController.PlayEffect(GOLDEN_MOLE_DAMAGE_PER_HIT, molePosition);
                 }
-
-                // The score is awarded to the team of the player who landed the hit, so its popup shows on that player.
+                
                 var playerPosition = _playerControllers.GetPlayerPosition(moleHitNetEvent.ByPlayerId);
                 _scoreGainedEffectController.PlayEffect(moleHitNetEvent.ScoreGained, playerPosition);
 

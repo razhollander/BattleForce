@@ -148,6 +148,11 @@ Must follow strict MVC. No break rule.
 
 ---
 
+### **NETWORKING**
+
+* **NetEvents**  
+  * Net events can't be missed by the client since we send all the unprocessed net events every tick. Therefore, we ONLY DesirializeDelta object states which are changing constantly like the player's position, and send in a NetEvent things that happen once in a while. This way we save Network bandwidth.
+
 ## **C\# CODING STANDARDS**
 
 ### **1\. NAMING CONVENTIONS**
@@ -161,7 +166,7 @@ Must follow strict MVC. No break rule.
 
 ### **3\. PROGRAMMING RULES**
 
-* **Booleans:** Extract complex logic into local `var` or properties. Do not calculate inside the `if()` statement.  
+* **Booleans:** Extract any logic into local `var` or properties. Do not calculate or check a condition with '=='/'>''<' inside the `if()` statement.  
 * **If Statements:** Braces `{}` required unless it is a simple early return. Prefer early returns over nesting. Put expected logic in `if`, edge cases in `else`.  
 * **Constants:** No magic numbers. Ever.  
 * **Events & Delegates:** \* `Action` delegates must be `private` and injected via Setup/Constructors.  

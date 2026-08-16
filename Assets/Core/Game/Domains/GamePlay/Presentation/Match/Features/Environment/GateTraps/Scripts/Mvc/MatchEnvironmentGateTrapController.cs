@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
             _wallView = Object.Instantiate(wallViewPrefab, parent);
             _wallView.name = "EnvironmentGateTrapWall_" + GateTrapId;
             var pointsUnityVector2 = _gateTrapModel.WallPoints.Select(x => x.ToUnityVector2()).ToArray();
-            _wallView.SetMesh(MeshUtils.BuildMesh(pointsUnityVector2, 0));
+            _wallView.Init(MeshUtils.BuildMesh(pointsUnityVector2, 0));
             _wallViewTransform = _wallView.transform;
 
             SetTransform(_gateTrapModel.WorldPosition.ToUnityVector2(), _gateTrapModel.WorldRotationAngle.AngleToQuaternion());

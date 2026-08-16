@@ -218,8 +218,8 @@ MonoBehaviour:
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
     AreBonusStagesEnabled: 1
-    BonusStageEveryXStages: 4
-    EnabledBonusStageTypes: 0300000002000000
+    BonusStageEveryXStages: 1
+    EnabledBonusStageTypes: 03000000
     DefaultWhacAMoleEnvironmentId: 22
     DefaultGatePassEnvironmentId: 23
     WhacAMole:

@@ -375,7 +375,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
-            ReconcileGateTrapsFromState(simulationState); // before the step below, so a re-synced trap is stepped to now
             UpdateGateTraps(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
@@ -1119,22 +1118,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var gateTrap in _matchDataService.GateTraps)
             {
                 gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, _matchDataService.GetRotatingWheelOfGateTrap(gateTrap));
-            }
-        }
-
-        // The closing event is unreliable and short lived, so the authoritative state rides every tick too and simply
-        // overwrites the local one - that repairs a client which never saw the event and is a no-op for everyone else.
-        private void ReconcileGateTrapsFromState(MatchSimulationStateS2C simulationState)
-        {
-            foreach (var gateTrapState in simulationState.GateTraps.AsSpan())
-            {
-                if (!_matchDataService.TryGetGateTrap(gateTrapState.Id, out var gateTrapModel))
-                {
-                    continue;
-                }
-
-                gateTrapModel.State = gateTrapState.State;
-                gateTrapModel.StateEndTick = gateTrapState.StateEndTick;
             }
         }
 

@@ -33,6 +33,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boardViewsPerTeam[teamId].UpdateMolesHit(molesHit);
         }
 
+        public void UpdateTeamGatePassScore(ushort teamId, int gatePassScore)
+        {
+            _boardViewsPerTeam[teamId].UpdateGatePassScore(gatePassScore);
+        }
+
         public void SetIsMolesHitShown(bool isShown)
         {
             foreach (var boardUIView in _boardViewsPerTeam)

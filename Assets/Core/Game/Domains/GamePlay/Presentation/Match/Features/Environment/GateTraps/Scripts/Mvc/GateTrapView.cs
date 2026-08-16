@@ -12,18 +12,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Gat
 
         private MaterialPropertyBlock _materialPropertyBlock;
 
-        public void SetMesh(Mesh mesh)
+        public void Init(Mesh mesh)
         {
             _meshFilter.sharedMesh = mesh;
+            _materialPropertyBlock = new MaterialPropertyBlock();
         }
-
-        /// <summary>
-        /// The gate trap's wall greys out while it cools down, so the property block is created on the first tint.
-        /// </summary>
+        
         public void SetColor(Color color)
         {
-            _materialPropertyBlock ??= new MaterialPropertyBlock();
-
             _meshRenderer.GetPropertyBlock(_materialPropertyBlock);
             _materialPropertyBlock.SetColor(COLOR_PROPERTY_ID, color);
             _materialPropertyBlock.SetColor(BASE_COLOR_PROPERTY_ID, color);

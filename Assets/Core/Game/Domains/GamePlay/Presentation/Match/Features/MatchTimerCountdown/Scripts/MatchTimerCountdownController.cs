@@ -19,13 +19,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCount
             _view = view;
             _audioService = audioService;
         }
-
-        // The command below runs every frame, so the text is only rebuilt when the whole second actually changes.
-        // Showing the countdown is Show()'s job alone - claiming it here would leave the flag on while the view stays
-        // hidden, and every later Show() would then early-out on it.
+        
         public void SetSecondsLeft(int secondsLeft)
         {
-            if (_currentlyShownSecondsLeft == secondsLeft)
+            var isTheSameSecondsAsShown = _currentlyShownSecondsLeft == secondsLeft;
+            if (isTheSameSecondsAsShown)
             {
                 return;
             }
@@ -33,11 +31,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCount
             _currentlyShownSecondsLeft = secondsLeft;
             _view.SetSecondsLeftText(TimeSpan.FromSeconds(secondsLeft).ToString(TimersConsts.MINUTES_SECONDS_FORMAT));
 
-            if (secondsLeft > 0 && secondsLeft <= LAST_SECONDS_TICK_THRESHOLD)
+            var isInLastSecondsCountdown = secondsLeft is > 0 and <= LAST_SECONDS_TICK_THRESHOLD;
+            if (isInLastSecondsCountdown)
             {
-                _audioService.PlayAudio(AudioClipType.TimerTick);
-                _view.PlayLastSecondTickAnimation();
+                PlayLastSecondCountdownAnimation();
             }
+        }
+
+        private void PlayLastSecondCountdownAnimation()
+        {
+            _audioService.PlayAudio(AudioClipType.TimerTick);
+            _view.PlayLastSecondTickAnimation();
         }
 
         public void Show()

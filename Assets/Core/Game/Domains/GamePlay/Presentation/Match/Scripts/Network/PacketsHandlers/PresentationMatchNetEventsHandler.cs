@@ -318,9 +318,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _cachedPresentationEventsService.ScoreGatePassedNetEvents.Add(scoreGatePassedNetEvent);
             }
         }
-
-        // The trap's whole cycle is derived from this one event, so the model only needs the state it puts the trap in;
-        // UpdateGateTraps walks it from Closing all the way back to Open on its own.
+        
         public void ProcessGateTrapClosingEvents(CapacityList<GateTrapClosingNetEventS2C> gateTrapClosingNetEvents)
         {
             if (gateTrapClosingNetEvents.IsNullOrEmpty())
@@ -330,9 +328,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var gateTrapClosingNetEvent in gateTrapClosingNetEvents)
             {
-                // A closing event can land before the full sync has built the traps, so a miss here is expected and quiet.
                 if (!_matchDataService.TryGetGateTrap(gateTrapClosingNetEvent.GateTrapId, out var gateTrapModel))
                 {
+                    LogService.LogError($"No gate trap for id {gateTrapClosingNetEvent.GateTrapId}");
                     continue;
                 }
 

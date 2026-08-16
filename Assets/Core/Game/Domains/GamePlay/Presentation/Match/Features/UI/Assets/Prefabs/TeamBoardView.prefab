@@ -916,6 +916,7 @@ MonoBehaviour:
   _molesHitContainer: {fileID: 1606984956088522858}
   _molesHitCountText: {fileID: 6875879603246633776}
   _gatePassScoreContainer: {fileID: 5879339116163394125}
+  _gatePassScoreCountText: {fileID: 6225228098421634240}
 --- !u!114 &307606426804420270
 MonoBehaviour:
   m_ObjectHideFlags: 0

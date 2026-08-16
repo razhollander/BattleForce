@@ -20,8 +20,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private GameObject _gatePassScoreContainer;
         [SerializeField]private CanvasGroup _canvasGroup;
 
-        private TextMeshProUGUI _activeScoreText;
-
         [Header("Talents")]
         [SerializeField] private Transform _talentsContainer;
         [SerializeField] private MatchPlayerTalentUIView _talentViewPrefab;
@@ -68,30 +66,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _healthBarGameObject.SetActive(false);
         }
         
-        public void ShowMolesHitScore(int molesHitScore)
+        public void ShowMolesHitScore()
         {
-            ShowBonusScore(_molesHitScoreContainer, _molesHitScoreText, molesHitScore);
+            _molesHitScoreContainer.SetActive(true);
         }
 
-        public void ShowGatePassScore(int gatePassScore)
+        public void UpdateMolesHitScore(int molesHitScore)
         {
-            ShowBonusScore(_gatePassScoreContainer, _gatePassScoreText, gatePassScore);
+            _molesHitScoreText.text = molesHitScore.ToString();
         }
 
-        // Each bonus stage type owns its own styled container, and a view outlives the stage it was created for, so the
-        // other container is always turned off - otherwise a GatePass stage would still show the previous stage's moles slot.
-        private void ShowBonusScore(GameObject scoreContainer, TextMeshProUGUI scoreText, int score)
+        public void ShowGatePassScore()
         {
-            HideHealthBar();
-            _molesHitScoreContainer.SetActive(scoreContainer == _molesHitScoreContainer);
-            _gatePassScoreContainer.SetActive(scoreContainer == _gatePassScoreContainer);
-            _activeScoreText = scoreText;
-            UpdateMolesHitScore(score);
+            _gatePassScoreContainer.SetActive(true);
         }
 
-        public void UpdateMolesHitScore(int score)
+        public void UpdateGatePassScore(int gatePassScore)
         {
-            _activeScoreText.text = score.ToString();
+            _gatePassScoreText.text = gatePassScore.ToString();
         }
 
         public void UpdateTalents(TalentVisualData[] talents)

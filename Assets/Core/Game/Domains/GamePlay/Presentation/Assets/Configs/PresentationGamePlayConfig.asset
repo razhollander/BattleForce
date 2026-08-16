@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad4af88b350d49528f8c69ffeffb00f6, type: 3}
   m_Name: PresentationGamePlayConfig
   m_EditorClassIdentifier: 
-  ExponentialDecay: 20
+  ExponentialDecay: 40
   TalentCards: {fileID: 11400000, guid: bc656062d5cec4fdfa7c7c7784cfd7df, type: 2}
   PowerUps: {fileID: 11400000, guid: 0bf6f91347e23451b8e8625c8c7e6a42, type: 2}
   TalentsConfig: {fileID: 11400000, guid: 6ec0d3cd4397f466db4303980dd5ccca, type: 2}

@@ -189,7 +189,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _lockOnTargetEffectController.DestroyAll();
             _moleControllers.DestroyAll();
             _preparationPhaseCountdownController.StopCountdown();
-            _matchTimerCountdownController.Hide();
         }
 
         private void CreateAll()
@@ -232,23 +231,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             SetupBonusStageHud();
         }
 
-        // Bonus-stage players cannot be damaged, so their health bars are meaningless and the bonus score takes over.
-        // Each bonus stage type has its own styled score slot on the team board, so only its own slot is turned on.
         private void SetupBonusStageHud()
         {
             var isBonusStage = _simulationState.StageType.IsBonusStage();
-            _teamsBoardUIController.SetIsMolesHitShown(_simulationState.StageType == StageType.WhacAMole);
-            _teamsBoardUIController.SetIsGatePassScoreShown(_simulationState.StageType == StageType.GatePass);
-
-            if (!isBonusStage)
+            var isWhacAMoleStage = _simulationState.StageType == StageType.WhacAMole;
+            _teamsBoardUIController.SetIsMolesHitShown(isWhacAMoleStage);
+            bool isGatePassStage = _simulationState.StageType == StageType.GatePass;
+            _teamsBoardUIController.SetIsGatePassScoreShown(isGatePassStage);
+            
+            if (isWhacAMoleStage || isGatePassStage)
             {
-                return;
+                _matchTimerCountdownController.Show();
+            }
+            else
+            {
+                _matchTimerCountdownController.Hide();
             }
 
-            // MatchPlayerUIView health bars are hidden centrally in MatchPlayerUIControllers.AddPlayer for every non-DeathMatch stage.
-            foreach (var player in _simulationState.Players.AsSpan())
+            if (isBonusStage)
             {
-                _playerControllers.HidePlayerHealthBar(player.Id);
+                foreach (var player in _simulationState.Players.AsSpan())
+                {
+                    _playerControllers.HidePlayerHealthBar(player.Id);
+                }
             }
         }
 
@@ -337,7 +342,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var teamGems = _matchDataService.GemsPerTeam[teamId];
                 var teamBolts = _matchDataService.BoltsPerTeam[teamId];
                 _teamsBoardUIController.CreateTeamBoard(teamId, teamGems, teamBolts);
-                _teamsBoardUIController.UpdateTeamMolesHit(teamId, _matchDataService.MolesHitPerTeam[teamId]);
+
+                switch (_simulationState.StageType)
+                {
+                    case StageType.WhacAMole:
+                        _teamsBoardUIController.UpdateTeamMolesHit(teamId, _matchDataService.MolesHitPerTeam[teamId]);
+                        break;
+                    case StageType.GatePass:
+                        _teamsBoardUIController.UpdateTeamGatePassScore(teamId, _matchDataService.MolesHitPerTeam[teamId]);
+                        break;
+                }
             }
         }
 

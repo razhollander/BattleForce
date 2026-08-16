@@ -57,8 +57,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _scoreGatesControllers.SetTeamColor(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
                 _scoreGatesControllers.PlayScoreGatePassedAnimation(scoreGatePassedNetEvent.ScoreGateId);
                 _scoreGatesControllers.SetScoreMultiplier(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.NewScoreMultiplier);
-                _teamsBoardUIController.UpdateTeamMolesHit(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
-                _playerUIControllers.UpdatePlayerMolesHitScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
+                _teamsBoardUIController.UpdateTeamGatePassScore(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
+                _playerUIControllers.UpdatePlayerGatePassScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
             }
 
             _audioService.PlayAudio(AudioClipType.ScoreGatePassed);

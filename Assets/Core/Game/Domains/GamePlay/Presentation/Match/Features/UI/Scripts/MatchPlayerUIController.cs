@@ -50,17 +50,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void ShowMolesHitScore(int molesHitScore)
         {
-            _view.ShowMolesHitScore(molesHitScore);
-        }
-
-        public void ShowGatePassScore(int gatePassScore)
-        {
-            _view.ShowGatePassScore(gatePassScore);
+            _view.ShowMolesHitScore();
+            UpdateMolesHitScore(molesHitScore);
         }
 
         public void UpdateMolesHitScore(int molesHitScore)
         {
             _view.UpdateMolesHitScore(molesHitScore);
+        }
+
+        public void ShowGatePassScore(int gatePassScore)
+        {
+            _view.ShowGatePassScore();
+            UpdateGatePassScore(gatePassScore);
+        }
+
+        public void UpdateGatePassScore(int gatePassScore)
+        {
+            _view.UpdateGatePassScore(gatePassScore);
         }
 
         public void SwitchToPlayerDeadState()
