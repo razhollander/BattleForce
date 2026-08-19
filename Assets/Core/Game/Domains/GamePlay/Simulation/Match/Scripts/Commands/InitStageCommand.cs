@@ -16,6 +16,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
@@ -42,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
+        private IMolesSpawnCooldownService _molesSpawnCooldownService;
+        private IGoldenMoleSpawnedTrackerService _goldenMoleSpawnedTrackerService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
@@ -70,6 +73,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
+            _molesSpawnCooldownService = _diContainer.Resolve<IMolesSpawnCooldownService>();
+            _goldenMoleSpawnedTrackerService = _diContainer.Resolve<IGoldenMoleSpawnedTrackerService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
@@ -139,7 +144,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var environmentLayoutId = GenerateNextStageEnvironmentLayoutId(stageType);
             _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
-            
+            _molesSpawnCooldownService.ClearAllCooldowns();
+            _goldenMoleSpawnedTrackerService.ResetGoldenMoleSpawnCounter();
+
             CreateWalls(mapSizeMultiplier);
             CreateScoreGates(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);

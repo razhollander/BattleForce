@@ -9,12 +9,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 {
     public class HandleGoldenMoleDamagedNetEventsCommand : BaseCommand, ICommandVoid
     {
-        private const ushort GOLDEN_MOLE_DAMAGE_PER_HIT = 1; // a golden mole loses one life per hit, shown on its damage indicator
-
         private ICachedPresentationEventsService _cachedPresentationEventsService;
         private IMoleControllers _moleControllers;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
         private IAudioService _audioService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
 
         public override void ResolveDependencies()
         {
@@ -22,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
             _audioService = _diContainer.Resolve<IAudioService>();
+            _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public void Execute()
@@ -35,13 +35,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var goldenMoleDamagedNetEvent in goldenMoleDamagedNetEvents)
             {
-                if (_moleControllers.TryGetMolePosition(goldenMoleDamagedNetEvent.MoleId, out var molePosition))
+                if (_moleControllers.TryGetMoleHolePosition(goldenMoleDamagedNetEvent.MoleHoleId, out var molePosition))
                 {
-                    _hitDamageIndicatorEffectController.PlayEffect(GOLDEN_MOLE_DAMAGE_PER_HIT, molePosition);
+                    _hitDamageIndicatorEffectController.PlayEffect(_sharedGamePlayConfig.GoldenMoleDamagePerHit, molePosition);
                 }
 
-                _moleControllers.SetGoldenMoleDamaged(goldenMoleDamagedNetEvent.MoleId, goldenMoleDamagedNetEvent.RemainingLives,
-                    goldenMoleDamagedNetEvent.MaxLives);
+                _moleControllers.SetGoldenMoleDamaged(goldenMoleDamagedNetEvent.MoleId, goldenMoleDamagedNetEvent.MoleHoleId,
+                    goldenMoleDamagedNetEvent.RemainingLives, goldenMoleDamagedNetEvent.MaxLives);
             }
 
             _audioService.PlayAudio(AudioClipType.MoleHit);

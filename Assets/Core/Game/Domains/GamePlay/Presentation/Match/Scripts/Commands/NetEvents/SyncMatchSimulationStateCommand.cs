@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
     public class SyncMatchSimulationStateCommand : BaseCommand, ICommandVoid
     {
         private const float CAMERA_ORTHOGRAPHIC_SIZE_TO_MAP_SIZE_RATIO = 0.8666666667f; //1.3f / 1.5f;
-        
+
         private IMatchDataService _matchDataService;
         private IMatchBulletControllers _bulletControllers;
         private IMatchChickenEggsControllers _chickenEggsControllers;
@@ -97,13 +97,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _simulationState = simulationState;
             return this;
         }
-        
+
         public SyncMatchSimulationStateCommand SetOccuredOnTick(int stateOccouredOnTick)
         {
             _stateOccouredOnTick = stateOccouredOnTick;
             return this;
         }
-        
+
         public override void ResolveDependencies()
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
@@ -158,7 +158,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             DestroyAll();
             CreateAll();
         }
-        
+
         private void DestroyAll()
         {
             _worldCameraController.ClearTargets();
@@ -238,7 +238,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             _teamsBoardUIController.SetIsMolesHitShown(isWhacAMoleStage);
             bool isGatePassStage = _simulationState.StageType == StageType.GatePass;
             _teamsBoardUIController.SetIsGatePassScoreShown(isGatePassStage);
-            
+
             if (isWhacAMoleStage || isGatePassStage)
             {
                 _matchTimerCountdownController.Show();
@@ -257,8 +257,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
 
-        // Every authored spawn point gets its own mole up front, all hiding in their holes. Server spawns only pop
-        // the matching one out, so a rejoining client just has to replay whatever shake time each spawned mole has left.
         private void CreateMoles(float mapSizeMultiplier)
         {
             if (_simulationState.StageType != StageType.WhacAMole)
@@ -276,22 +274,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var spawnPoint in spawnPoints)
             {
-                _moleControllers.CreateMoleAtSpawnPoint((spawnPoint.Position * mapSizeMultiplier).ToUnityVector2());
+                _moleControllers.CreateMoleAtSpawnPoint(spawnPoint.MoleHoleId, (spawnPoint.Position * mapSizeMultiplier).ToUnityVector2());
             }
 
             foreach (var mole in _simulationState.Moles.AsSpan())
             {
-                var position = mole.Position.ToUnityVector2();
                 var remainingShakeTicks = mole.EmergeOnTick - _stateOccouredOnTick;
-                _matchDataService.AddMole(mole.Id, position, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
-                _moleControllers.SetMoleEmergingFromHole(mole.Id, position, remainingShakeTicks * _networkConfig.DeltaTime, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
+                _matchDataService.AddMole(mole.Id, mole.MoleHoleId, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
+                _moleControllers.SetMoleEmergingFromHole(mole.Id, mole.MoleHoleId, remainingShakeTicks * _networkConfig.DeltaTime, mole.IsGolden, mole.RemainingLives, mole.MaxLives);
 
                 if (mole.IsShakingBeforeHiding)
                 {
                     var remainingHideShakeTicks = mole.HideOnTick - _stateOccouredOnTick;
                     if (remainingHideShakeTicks > 0)
                     {
-                        _moleControllers.SetMoleExpiring(mole.Id, remainingHideShakeTicks * _networkConfig.DeltaTime);
+                        _moleControllers.SetMoleExpiring(mole.Id, mole.MoleHoleId, remainingHideShakeTicks * _networkConfig.DeltaTime);
                     }
                 }
             }
@@ -318,7 +315,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            
+
             var barrierConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetFieldBarriers();
             if (barrierConfigs.IsNullOrEmpty())
             {
@@ -362,7 +359,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            
+
             foreach (var spring in springs)
             {
                 _matchDataService.AddSpring(spring.Id, Vector2.Zero, spring.Position * mapSizeMultiplier, 0, spring.RotationAngle);
@@ -384,11 +381,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _environmentSpikeControllers.CreateSpike(spike.Id);
             }
         }
-        
+
         private Dictionary<ushort, List<RotatingTeleportGate>> CreateTeleportGates(float mapSizeMultiplier)
         {
             var teleportGatesPerWheelId = new Dictionary<ushort, List<RotatingTeleportGate>>();
-            
+
             var layout = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId);
             var teleportGatePairConfigs = layout.GetTeleportGates();
             if (teleportGatePairConfigs.IsNullOrEmpty())
@@ -411,14 +408,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var scaledGateSize = gateSize.ToNumericsVector2() * mapSizeMultiplier;
 
                 _matchDataService.AddTeleportPair(
-                    pairConfig.Id, 
-                    pairConfig.GateAId, scaledGateAPos, pairConfig.GateA.NormalRotation, 
-                    pairConfig.GateBId, scaledGateBPos, pairConfig.GateB.NormalRotation, 
-                    worldPosA, worldRotA, 
-                    worldPosB, worldRotB, 
+                    pairConfig.Id,
+                    pairConfig.GateAId, scaledGateAPos, pairConfig.GateA.NormalRotation,
+                    pairConfig.GateBId, scaledGateBPos, pairConfig.GateB.NormalRotation,
+                    worldPosA, worldRotA,
+                    worldPosB, worldRotB,
                     scaledGateSize
                 );
-                
+
                 _teleportGateControllers.CreateGatePair(pairConfig.Id);
             }
 
@@ -429,7 +426,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             var wheelsDict = new Dictionary<ushort, EnvironmentRotatingWheelConfig>();
             var rotatingWheelsConfigs = layout.GetRotatingWheels();
-            
+
             if (!rotatingWheelsConfigs.IsNullOrEmpty())
             {
                 foreach (var wheel in rotatingWheelsConfigs)
@@ -468,13 +465,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             if (gateConfig.IsAttachedToRotationWheel && wheelsDict.TryGetValue(gateConfig.AttachToRotationWheelId, out var wheel))
             {
                 EnvironmentRotatingWheelUtils.CalculateChildTransform(
-                    calculationTick, 
-                    wheel.RotationSpeed, 
-                    deltaTime, 
-                    wheel.CenterPosition * mapSizeMultiplier, 
-                    scaledPosition, 
-                    gateConfig.NormalRotation, 
-                    out worldPosition, 
+                    calculationTick,
+                    wheel.RotationSpeed,
+                    deltaTime,
+                    wheel.CenterPosition * mapSizeMultiplier,
+                    scaledPosition,
+                    gateConfig.NormalRotation,
+                    out worldPosition,
                     out worldRotation
                 );
 
@@ -486,7 +483,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 gateList.Add(new RotatingTeleportGate(gatePairId, isGateA));
             }
         }
-        
+
         private void CreatePowerUpBalls()
         {
             foreach (var powerUpBall in _simulationState.PowerUpBalls.AsSpan())
@@ -496,7 +493,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _createPowerUpBallCommand.SetPowerUpBallId(powerUpBall.Id).SetPosition(position).Execute();
             }
         }
-        
+
         private void CreateTalentCards()
         {
             foreach (var talentCard in _simulationState.TalentCards.AsSpan())
@@ -531,7 +528,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            
+
             foreach (var wall in walls)
             {
                 var points = new Vector2[wall.Points.Length];
@@ -543,7 +540,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _environmentWallsControllers.CreateWall(wallModel.Id);
             }
         }
-        
+
         private void CreateLavaWalls(float mapSizeMultiplier)
         {
             var lavaWalls = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetLavaWalls();
@@ -551,7 +548,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             {
                 return;
             }
-            
+
             foreach (var lavaWall in lavaWalls)
             {
                 var points = new Vector2[lavaWall.Points.Length];
@@ -581,7 +578,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var lavaWallIds = wheelConfig.LavaWalls.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.LavaWalls.Select(x => x.Id).ToList();
                 var springIds = wheelConfig.Springs.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Springs.Select(x => x.Id).ToList();
                 var spikeIds = wheelConfig.Spikes.IsNullOrEmpty() ? new List<ushort>() : wheelConfig.Spikes.Select(x => x.Id).ToList();
-                
+
                 var teleportGatePairIds = new List<RotatingTeleportGate>();
                 if (teleportGatesPerWheelId != null && teleportGatesPerWheelId.TryGetValue(wheelConfig.Id, out var gates)) {
                     teleportGatePairIds = gates;
@@ -589,7 +586,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
                 var wheelModel = _matchDataService.AddEnvironmentRotatingWheel(wheelConfig.Id, wheelCenter, wheelConfig.RotationSpeed, wallIds, lavaWallIds, springIds, spikeIds, teleportGatePairIds);
                 var rotationSpeed = wheelModel.RotationSpeed;
-                
+
                 if (wheelConfig.Walls != null)
                 {
                     foreach (var wallConfig in wheelConfig.Walls)
@@ -599,7 +596,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
-                        
+
                         var points = new Vector2[wallConfig.Points.Length];
                         for (int i = 0; i < points.Length; i++)
                         {
@@ -619,7 +616,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                             calculationTick, rotationSpeed, deltaTime, wheelCenter, scaledPosition, 0,
                             out var worldPosition, out var worldRotation
                         );
-                        
+
                         var points = new Vector2[lavaWallConfig.Points.Length];
                         for (int i = 0; i < points.Length; i++)
                         {
@@ -664,8 +661,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
             }
         }
         
-        // Gate traps come straight from the layout, exactly like the server reads them; only the live state comes over
-        // the wire, so a client that joins mid-cycle picks the swing up where the server has it.
         private void CreateGateTraps(float mapSizeMultiplier)
         {
             var gateTrapConfigs = _sharedGamePlayConfig.Environment.GetEnvironmentLayout(_simulationState.EnvironmentLayoutId).GetGateTraps();
@@ -738,7 +733,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var casterId = swapField.PlayerCasterId;
                 var casterState = _simulationState.GetPlayerById(casterId);
                 var position = casterState.Spaceship.Transform.Position.ToUnityVector2();
-                
+
                 _matchDataService.AddSwapField(swapField.Id, casterId, swapField.CreatedOnTick, swapField.EndTick, swapField.Radius);
                 _swapFieldControllers.CreateSwapField(swapField.Id, swapField.Radius, position);
             }
@@ -753,7 +748,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var position = koProjectile.Position.ToUnityVector2();
                 var rotation = koProjectile.Rotation.ToUnityVector2();
                 var casterPosition = casterState.Spaceship.Transform.Position.ToUnityVector2();
-                
+
                 _matchDataService.AddKOProjectile(koProjectile.Id, casterId, koProjectile.CreatedOnTick, koProjectile.Size);
                 _kOProjectilesControllers.CreateKOProjectile(koProjectile.Id, position, rotation, casterPosition, koProjectile.Size);
             }
@@ -767,9 +762,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _frigidBlocksControllers.CreateFrigidBlock(frigidBlock.Id, frigidBlock.Position.ToUnityVector2(), frigidBlock.Rotation.ToUnityVector2());
             }
         }
-
-        // Score gates come straight from the layout (no spawn event), so the full-state sync is where the client builds
-        // both the model and the view. A gate that was already scored on keeps its team tint through the rejoin.
+        
         private void CreateScoreGates(float mapSizeMultiplier)
         {
             foreach (var scoreGate in _simulationState.ScoreGates.AsSpan())

@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleHitNetEvent in moleHitNetEvents)
             {
-                if (moleHitNetEvent.IsGolden && _moleControllers.TryGetMolePosition(moleHitNetEvent.MoleId, out var molePosition))
+                if (moleHitNetEvent.IsGolden && _moleControllers.TryGetMoleHolePosition(moleHitNetEvent.MoleHoleId, out var molePosition))
                 {
                     _hitDamageIndicatorEffectController.PlayEffect(GOLDEN_MOLE_DAMAGE_PER_HIT, molePosition);
                 }
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 var playerPosition = _playerControllers.GetPlayerPosition(moleHitNetEvent.ByPlayerId);
                 _scoreGainedEffectController.PlayEffect(moleHitNetEvent.ScoreGained, playerPosition);
 
-                _moleControllers.SetMoleHit(moleHitNetEvent.MoleId);
+                _moleControllers.SetMoleHit(moleHitNetEvent.MoleId, moleHitNetEvent.MoleHoleId);
                 _teamsBoardUIController.UpdateTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
                 _playerUIControllers.UpdatePlayerMolesHitScore(moleHitNetEvent.ByPlayerId, moleHitNetEvent.ByPlayerMolesHitScoreTotal);
             }

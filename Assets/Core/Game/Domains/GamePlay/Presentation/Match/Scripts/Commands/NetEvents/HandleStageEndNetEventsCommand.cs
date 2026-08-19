@@ -72,42 +72,29 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _worldCameraController.ShakeCamera(10f,0.5f);
             }
             
-            if (_matchDataService.StageType.IsBonusStage())
+            if (_matchDataService.TryGetKingedPlayers(out var kingedPlayers) && !kingedPlayers.IsNullOrEmpty())
             {
-                // In bonus stages the camera locks onto the winning-team player who contributed the most score.
-                foreach (var stageEndEvent in stageEndEvents)
-                {
-                    var isThereOnlyOneTeam = stageEndEvent.WinningTeamId == 0;
-
-                    if (isThereOnlyOneTeam)
-                    {
-                        continue;
-                    }
-
-                    ZoomCameraOnPlayer(stageEndEvent.PlayerIdToFocusOn);
-                }
+                SetPlayersKinged(kingedPlayers);
             }
-            else if (_matchDataService.TryGetKingedPlayers(out var kingedPlayers) && !kingedPlayers.IsNullOrEmpty())
+
+            // The camera locks onto the player the server picked - the one doing the winning blow, or in bonus stages
+            // the winning-team player who contributed the most score.
+            foreach (var stageEndEvent in stageEndEvents)
             {
-                foreach (var stageEndEvent in stageEndEvents)
+                var isThereOnlyOneTeam = stageEndEvent.WinningTeamId == 0;
+
+                if (isThereOnlyOneTeam)
                 {
-                    var winningTeamId = stageEndEvent.WinningTeamId;
-                    var isThereOnlyOneTeam = winningTeamId == 0;
-
-                    if (isThereOnlyOneTeam)
-                    {
-                        continue;
-                    }
-
-                    SetPlayersInTeamKinged(kingedPlayers);
-                    ZoomCameraOnPlayer(stageEndEvent.PlayerIdToFocusOn);
+                    continue;
                 }
+
+                ZoomCameraOnPlayer(stageEndEvent.PlayerIdToFocusOn);
             }
 
             stageEndEvents.Clear();
         }
 
-        private void SetPlayersInTeamKinged(List<MatchPlayerModel> kingedPlayers)
+        private void SetPlayersKinged(List<MatchPlayerModel> kingedPlayers)
         {
             foreach (var playerModel in kingedPlayers)
             {

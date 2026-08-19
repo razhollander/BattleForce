@@ -119,16 +119,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             return powerUpBall;
         }
 
-        public MoleStateS2C AddMole(Vector2 position, int emergeOnTick, int disappearOnTick, bool isGolden, byte lives)
+        public MoleStateS2C AddMole(ushort moleHoleId, Vector2 position, int emergeOnTick, int disappearOnTick, bool isGolden, byte lives)
         {
             ref var mole = ref _simulationState.Moles.AddAndGet();
             var moleId = (ushort)(++_lastMoleCreatedId % byte.MaxValue);
             mole.Id = moleId;
+            mole.MoleHoleId = moleHoleId;
             mole.Position = position;
             mole.EmergeOnTick = emergeOnTick;
             mole.IsEmerged = false;
             mole.DisappearOnTick = disappearOnTick;
-            mole.HideOnTick = 0;
+            mole.HideOnTick = MoleStateS2C.NOT_HIDING_TICK;
             mole.IsGolden = isGolden;
             mole.RemainingLives = lives;
             mole.MaxLives = lives;

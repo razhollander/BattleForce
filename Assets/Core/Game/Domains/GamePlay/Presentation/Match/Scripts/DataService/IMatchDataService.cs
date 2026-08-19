@@ -58,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
         void RemovePowerUpBall(ushort powerUpBallId);
         MatchMoleModel GetMole(ushort moleId);
-        MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position, bool isGolden, byte remainingLives, byte maxLives);
+        MatchMoleModel AddMole(ushort moleId, ushort moleHoleId, bool isGolden, byte remainingLives, byte maxLives);
         void RemoveMole(ushort moleId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);

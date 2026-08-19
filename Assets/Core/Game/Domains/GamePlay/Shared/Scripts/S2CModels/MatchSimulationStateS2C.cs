@@ -40,7 +40,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsInShowoffWinners;
         public ushort CurrentStageWinnerTeamId;
         public float MapSizeMultiplier;
-        
+
         public MatchSimulationStateS2C(int maxPlayers, int maxBullets, int maxTalentsPerPlayer, int maxTalentCards, int maxPowerUpBalls, int maxTeams, int maxChickenEggs, int maxGalacticForceFields, int maxFrigidBlocks,
             int maxMoles, int maxScoreGates, int maxGateTraps)
         {
@@ -77,14 +77,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 player.Serialize(writer);
             }
-        
+
             var bulletsCount = Bullets.Count;
             writer.Put((byte)bulletsCount);
             foreach (var bullet in Bullets.AsSpan())
             {
                 bullet.Serialize(writer);
             }
-            
+
             var talentCardsCount = TalentCards.Count;
             writer.Put((byte)talentCardsCount);
             foreach (var talentCard in TalentCards.AsSpan())
@@ -112,7 +112,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             {
                 scoreGate.Serialize(writer);
             }
-            
+
             var gateTrapsCount = GateTraps.Count;
             writer.Put((byte)gateTrapsCount);
             foreach (var gateTrap in GateTraps.AsSpan())
@@ -209,11 +209,11 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)CurrentStageWinnerTeamId);
             writer.PutFloat16(MapSizeMultiplier);
         }
-        
+
         public void Deserialize(NetDataReader reader)
         {
             var amountOfTeams = reader.GetByte();
-            
+
             var playersCount = reader.GetByte();
             Players.Clear();
             for (var i = 0; i < playersCount; i++)
@@ -221,7 +221,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 var player = Players.AddAndGet();
                 player.Deserialize(reader);;
             }
-          
+
             var bulletsCount = reader.GetByte();
             Bullets.Clear();
             for (var i = 0; i < bulletsCount; i++)
@@ -245,7 +245,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var powerUp = ref PowerUpBalls.AddAndGet();
                 powerUp.Deserialize(reader);
             }
-            
+
             var molesCount = reader.GetByte();
             Moles.Clear();
             for (var i = 0; i < molesCount; i++)
@@ -301,7 +301,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 ref var swapField = ref SwapFields.AddAndGet();
                 swapField.Deserialize(reader);
             }
-            
+
             var koProjectilesCount = reader.GetByte();
             KOProjectiles.Clear();
             for (var i = 0; i < koProjectilesCount; i++)
@@ -383,12 +383,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 if (Players[i].Id == playerId)
                 {
                     return Players.GetByIndex(i);
-                } 
+                }
             }
 
             throw new System.Exception($"No player for id {playerId}!");
         }
-        
+
         public PlayerStateS2C GetPlayerByName(string playerName) // one day this will be replaced with device Unique Id. Until then- players must have different names
         {
             for (int i = 0; i < Players.Count; i++)
@@ -396,7 +396,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 if (Players[i].Name == playerName)
                 {
                     return Players.GetByIndex(i);
-                } 
+                }
             }
 
             throw new System.Exception($"No player for name {playerName}!");
@@ -415,9 +415,9 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 {
                     Bullets.RemoveAt(i);
                     return;
-                } 
+                }
             }
-            
+
             throw new System.Exception($"No bullet for id {bulletId}!");
         }
 
@@ -460,7 +460,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         {
             GetPlayerById(playerId).Spaceship.TalentsState.TrySetIsTalentAiming(talentType, isActive);
         }
-        
+
         public ref PlayerBulletS2C GetBulletById(ushort bulletId)
         {
             for (int i = 0; i < Bullets.Count; i++)
@@ -468,12 +468,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 if (Bullets[i].Id == bulletId)
                 {
                     return ref Bullets.Get(i);
-                } 
+                }
             }
-            
+
             throw new System.Exception($"No bullet for id {bulletId}!");
         }
-        
+
         public bool TryGetBulletById(ushort bulletId, out PlayerBulletS2C bulletState)
         {
             for (int i = 0; i < Bullets.Count; i++)
@@ -482,13 +482,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 if (bulletState.Id == bulletId)
                 {
                     return true;
-                } 
+                }
             }
 
             bulletState = default;
             return false;
         }
-        
+
         public bool TryGetBulletIndexById(ushort bulletId, out int  index)
         {
             for (int i = 0; i < Bullets.Count; i++)
@@ -497,13 +497,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 {
                     index = i;
                     return true;
-                } 
+                }
             }
 
             index = -1;
             return false;
         }
-        
+
         public ref PlayerBulletS2C GetBulletByIndex(int index)
         {
             return ref Bullets.Get(index);
@@ -522,7 +522,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No talent card for id {cardId}!");
         }
-        
+
         public ref TalentCardS2C GetTalentCardById(ushort cardId)
         {
             for (int i = 0; i < TalentCards.Count; i++)
@@ -535,7 +535,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No talent card for id {cardId}!");
         }
-        
+
         public ref TalentSwapFieldS2C GetSwapFieldById(ushort swapFieldId)
         {
             for (int i = 0; i < SwapFields.Count; i++)
@@ -548,7 +548,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No swap field for id {swapFieldId}!");
         }
-        
+
         public bool TryGetSwapFieldById(ushort swapFieldId, out TalentSwapFieldS2C swapField)
         {
             for (int i = 0; i < SwapFields.Count; i++)
@@ -578,7 +578,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             koProjectile = default;
             return false;
         }
-        
+
         public ref TalentKOProjectileS2C GetKOProjectileById(ushort koProjectileId)
         {
             for (int i = 0; i < KOProjectiles.Count; i++)
@@ -690,7 +690,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             talentCard = default;
             return false;
         }
-        
+
         public bool TryGetTalentCardIndexById(ushort cardId, out int index)
         {
             for (int i = 0; i < TalentCards.Count; i++)
@@ -705,7 +705,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             index = -1;
             return false;
         }
-        
+
         public void SerializeDeltas(NetDataWriter writer)
         {
             var playerCount = Players.Count;
@@ -774,7 +774,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 return;
             }
 
-            ushort prevBulletId = 0; 
+            ushort prevBulletId = 0;
             var isFirstBullet = true;
             foreach (var bullet in Bullets.AsSpan())
             {
@@ -794,7 +794,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 }
             }
         }
-        
+
         private void GetBulletTransformsBatched(NetDataReader reader)
         {
             var bulletsCount = reader.GetByte();
@@ -822,14 +822,14 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 {
                     byte idDelta = reader.GetByte();
                     ushort currentId = (ushort)(prevBulletId + idDelta);
-            
+
                     bullet.Id = currentId;
                     bullet.Position = reader.GetVector2Quantized();
-                    prevBulletId = currentId; 
+                    prevBulletId = currentId;
                 }
             }
         }
-        
+
         public void DeserializeTransforms(NetDataReader reader)
         {
             var playersCount = reader.GetByte();
@@ -909,7 +909,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No power ball for id {powerUpBallId}!");
         }
-        
+
         public bool TryGetPowerUpBallIndexById(ushort powerUpBallId, out int powerUpBallIndex)
         {
             powerUpBallIndex = default;
@@ -938,7 +938,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
             throw new System.Exception($"No power up for id {powerUpBallId}!");
         }
-        
+
         public void RemoveSwapFieldById(ushort swapFieldId)
         {
             for (int i = 0; i < SwapFields.Count; i++)
@@ -1097,7 +1097,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 {
                     playerState = Players.GetByIndex(i);
                     return true;
-                } 
+                }
             }
 
             playerState = default;
@@ -1137,6 +1137,21 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             for (int i = 0; i < Moles.Count; i++)
             {
                 if (Moles[i].Id == moleId)
+                {
+                    mole = Moles.GetByIndex(i);
+                    return true;
+                }
+            }
+
+            mole = default;
+            return false;
+        }
+
+        public bool TryGetMoleByHoleId(ushort moleHoleId, out MoleStateS2C mole)
+        {
+            for (int i = 0; i < Moles.Count; i++)
+            {
+                if (Moles[i].MoleHoleId == moleHoleId)
                 {
                     mole = Moles.GetByIndex(i);
                     return true;

@@ -4,25 +4,23 @@ using LiteNetLib.Utils;
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
 {
     [Serializable]
-    public struct ScoreGatePassedNetEventS2C : INetSerializable, IComparable<ScoreGatePassedNetEventS2C>
+    public struct PlayerPassedScoreGateNetEventS2C : INetSerializable, IComparable<PlayerPassedScoreGateNetEventS2C>
     {
         public int OccuredOnTick;
         public ushort ScoreGateId;
         public ushort ByPlayerId;
-        public ushort ByTeamId;
         public byte ScoreGained;
-        public byte NewScoreMultiplier; // multiplier the gate's NEXT pass will award after this one, drives the x2/x3 indicator
-        public int TeamBonusScoreTotal;
-        public int ByPlayerBonusScoreTotal;
+        public byte NextScoreMultiplier;
+        public ushort TeamBonusScoreTotal;
+        public ushort ByPlayerBonusScoreTotal;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)ScoreGateId);
             writer.Put((byte)ByPlayerId);
-            writer.Put((byte)ByTeamId);
             writer.Put(ScoreGained);
-            writer.Put(NewScoreMultiplier);
+            writer.Put(NextScoreMultiplier);
             writer.Put(TeamBonusScoreTotal);
             writer.Put(ByPlayerBonusScoreTotal);
         }
@@ -32,14 +30,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             ScoreGateId = reader.GetByte();
             ByPlayerId = reader.GetByte();
-            ByTeamId = reader.GetByte();
             ScoreGained = reader.GetByte();
-            NewScoreMultiplier = reader.GetByte();
-            TeamBonusScoreTotal = reader.GetInt();
-            ByPlayerBonusScoreTotal = reader.GetInt();
+            NextScoreMultiplier = reader.GetByte();
+            TeamBonusScoreTotal = reader.GetUShort();
+            ByPlayerBonusScoreTotal = reader.GetUShort();
         }
 
-        public int CompareTo(ScoreGatePassedNetEventS2C other)
+        public int CompareTo(PlayerPassedScoreGateNetEventS2C other)
         {
             return OccuredOnTick.CompareTo(other.OccuredOnTick);
         }

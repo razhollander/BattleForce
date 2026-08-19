@@ -95,7 +95,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<MoleHitNetEventS2C> MoleHitNetEvents;
         public FixedUnorderedList<MoleExpiredNetEventS2C> MoleExpiredNetEvents;
         public FixedUnorderedList<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents;
-        public FixedUnorderedList<ScoreGatePassedNetEventS2C> ScoreGatePassedNetEvents;
+        public FixedUnorderedList<PlayerPassedScoreGateNetEventS2C> PlayerPassedScoreGateNetEvents;
         public FixedUnorderedList<GateTrapClosingNetEventS2C> GateTrapClosingNetEvents;
 
         public MatchFullTickPacketS2C()
@@ -197,7 +197,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             MoleHitNetEvents = new FixedUnorderedList<MoleHitNetEventS2C>(maxCap.MoleHitNetEvents);
             MoleExpiredNetEvents = new FixedUnorderedList<MoleExpiredNetEventS2C>(maxCap.MoleExpiredNetEvents);
             GoldenMoleDamagedNetEvents = new FixedUnorderedList<GoldenMoleDamagedNetEventS2C>(maxCap.GoldenMoleDamagedNetEvents);
-            ScoreGatePassedNetEvents = new FixedUnorderedList<ScoreGatePassedNetEventS2C>(maxCap.ScoreGatePassedNetEvents);
+            PlayerPassedScoreGateNetEvents = new FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>(maxCap.PlayerPassedScoreGateNetEvents);
             GateTrapClosingNetEvents = new FixedUnorderedList<GateTrapClosingNetEventS2C>(maxCap.GateTrapClosingNetEvents);
         }
 
@@ -290,7 +290,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 9)) != 0) SerializedMoleHitNetEvents(writer);
             if ((eventMask2 & (1UL << 10)) != 0) SerializedMoleExpiredNetEvents(writer);
             if ((eventMask2 & (1UL << 11)) != 0) SerializedGoldenMoleDamagedNetEvents(writer);
-            if ((eventMask2 & (1UL << 12)) != 0) SerializedScoreGatePassedNetEvents(writer);
+            if ((eventMask2 & (1UL << 12)) != 0) SerializedPlayerPassedScoreGateNetEvents(writer);
             if ((eventMask2 & (1UL << 13)) != 0) SerializedGateTrapClosingNetEvents(writer);
             if ((eventMask2 & (1UL << 14)) != 0) SerializedPerformBarrelDashNetEvents(writer);
         }
@@ -310,7 +310,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (MoleHitNetEvents.Count > 0) eventMask2 |= 1UL << 9;
             if (MoleExpiredNetEvents.Count > 0) eventMask2 |= 1UL << 10;
             if (GoldenMoleDamagedNetEvents.Count > 0) eventMask2 |= 1UL << 11;
-            if (ScoreGatePassedNetEvents.Count > 0) eventMask2 |= 1UL << 12;
+            if (PlayerPassedScoreGateNetEvents.Count > 0) eventMask2 |= 1UL << 12;
             if (GateTrapClosingNetEvents.Count > 0) eventMask2 |= 1UL << 13;
             if (PerformBarrelDashNetEvents.Count > 0) eventMask2 |= 1UL << 14;
             return eventMask2;
@@ -635,8 +635,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 11)) != 0) DeserializedGoldenMoleDamagedNetEvents(reader);
             else GoldenMoleDamagedNetEvents.Clear();
 
-            if ((eventMask2 & (1UL << 12)) != 0) DeserializedScoreGatePassedNetEvents(reader);
-            else ScoreGatePassedNetEvents.Clear();
+            if ((eventMask2 & (1UL << 12)) != 0) DeserializedPlayerPassedScoreGateNetEvents(reader);
+            else PlayerPassedScoreGateNetEvents.Clear();
 
             if ((eventMask2 & (1UL << 13)) != 0) DeserializedGateTrapClosingNetEvents(reader);
             else GateTrapClosingNetEvents.Clear();
@@ -2133,20 +2133,20 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             }
         }
 
-        private void SerializedScoreGatePassedNetEvents(NetDataWriter writer)
+        private void SerializedPlayerPassedScoreGateNetEvents(NetDataWriter writer)
         {
-            writer.Put((byte)ScoreGatePassedNetEvents.Count);
-            foreach (var netEvent in ScoreGatePassedNetEvents.AsSpan())
+            writer.Put((byte)PlayerPassedScoreGateNetEvents.Count);
+            foreach (var netEvent in PlayerPassedScoreGateNetEvents.AsSpan())
                 netEvent.Serialize(writer);
         }
 
-        private void DeserializedScoreGatePassedNetEvents(NetDataReader reader)
+        private void DeserializedPlayerPassedScoreGateNetEvents(NetDataReader reader)
         {
-            ScoreGatePassedNetEvents.Clear();
+            PlayerPassedScoreGateNetEvents.Clear();
             var count = reader.GetByte();
             for (int i = 0; i < count; i++)
             {
-                ref var netEvent = ref ScoreGatePassedNetEvents.AddAndGet();
+                ref var netEvent = ref PlayerPassedScoreGateNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

@@ -278,7 +278,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
-                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.Position.ToUnityVector2(),
+                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.MoleHoleId,
                     moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
                 _cachedPresentationEventsService.MoleSpawnedNetEvents.Add(moleSpawnedNetEvent);
             }
@@ -302,20 +302,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         // Bonus-score storage is shared with Whac-A-Mole (SetTeamMolesHit / SetPlayerMolesHitScore), so a GatePass pass
         // updates the same team board and per-player UI. The gate tint uses the client gate model, updated here too.
-        public void ProcessScoreGatePassedEvents(CapacityList<ScoreGatePassedNetEventS2C> scoreGatePassedNetEvents)
+        public void ProcessPlayerPassedScoreGateEvents(CapacityList<PlayerPassedScoreGateNetEventS2C> playerPassedScoreGateNetEvents)
         {
-            if (scoreGatePassedNetEvents.IsNullOrEmpty())
+            if (playerPassedScoreGateNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var scoreGatePassedNetEvent in scoreGatePassedNetEvents)
+            foreach (var playerPassedScoreGateNetEvent in playerPassedScoreGateNetEvents)
             {
-                _matchDataService.SetTeamMolesHit(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
-                _matchDataService.SetPlayerMolesHitScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
-                _matchDataService.SetScoreGateLastScoredTeam(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
-                _matchDataService.SetScoreGateMultiplier(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.NewScoreMultiplier);
-                _cachedPresentationEventsService.ScoreGatePassedNetEvents.Add(scoreGatePassedNetEvent);
+                var byTeamId = _matchDataService.GetPlayerTeamId(playerPassedScoreGateNetEvent.ByPlayerId);
+                _matchDataService.SetTeamMolesHit(byTeamId, playerPassedScoreGateNetEvent.TeamBonusScoreTotal);
+                _matchDataService.SetPlayerMolesHitScore(playerPassedScoreGateNetEvent.ByPlayerId, playerPassedScoreGateNetEvent.ByPlayerBonusScoreTotal);
+                _matchDataService.SetScoreGateLastScoredTeam(playerPassedScoreGateNetEvent.ScoreGateId, byTeamId);
+                _matchDataService.SetScoreGateMultiplier(playerPassedScoreGateNetEvent.ScoreGateId, playerPassedScoreGateNetEvent.NextScoreMultiplier);
+                _cachedPresentationEventsService.PlayerPassedScoreGateNetEvents.Add(playerPassedScoreGateNetEvent);
             }
         }
         

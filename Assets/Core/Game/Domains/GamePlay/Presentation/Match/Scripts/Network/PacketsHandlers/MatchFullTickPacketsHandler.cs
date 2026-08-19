@@ -33,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
         private readonly IInterpolationDecayService _interpolationDecayService;
+        private readonly INetworkDiagnosticsService _networkDiagnosticsService;
 
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
@@ -55,7 +56,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<MoleHitNetEventS2C> _cachedUnprocessedMoleHitEvents;
         private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
         private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
-        private readonly CapacityList<ScoreGatePassedNetEventS2C> _cachedUnprocessedScoreGatePassedEvents;
+        private readonly CapacityList<PlayerPassedScoreGateNetEventS2C> _cachedUnprocessedPlayerPassedScoreGateEvents;
         private readonly CapacityList<GateTrapClosingNetEventS2C> _cachedUnprocessedGateTrapClosingEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
@@ -133,7 +134,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
             IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService, ILastFullSyncTickDataService lastFullSyncTickDataService,
-            IInterpolationDecayService interpolationDecayService)
+            IInterpolationDecayService interpolationDecayService, INetworkDiagnosticsService networkDiagnosticsService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
@@ -141,6 +142,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _updateSubscriptionService = updateSubscriptionService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
             _interpolationDecayService = interpolationDecayService;
+            _networkDiagnosticsService = networkDiagnosticsService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPacketsUnprocessedByLogic = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _fullTickPacketsUnprocessedByView = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -162,7 +164,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedMoleHitEvents = new CapacityList<MoleHitNetEventS2C>(networkConfig.MaxCap.MoleHitNetEvents);
             _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
             _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
-            _cachedUnprocessedScoreGatePassedEvents = new CapacityList<ScoreGatePassedNetEventS2C>(networkConfig.MaxCap.ScoreGatePassedNetEvents);
+            _cachedUnprocessedPlayerPassedScoreGateEvents = new CapacityList<PlayerPassedScoreGateNetEventS2C>(networkConfig.MaxCap.PlayerPassedScoreGateNetEvents);
             _cachedUnprocessedGateTrapClosingEvents = new CapacityList<GateTrapClosingNetEventS2C>(networkConfig.MaxCap.GateTrapClosingNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -253,7 +255,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             ProcessLogicOfPacket(latestFullTickPacket, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
 
-            _interpolationDecayService.UpdateDecayBasedOnTicks(latestTickReceivedFromServer - LastProcessedTickFromServer);
+            var ticksAdvancedSinceLastProcessedState = latestTickReceivedFromServer - LastProcessedTickFromServer;
+            _interpolationDecayService.UpdateDecayBasedOnTicks(ticksAdvancedSinceLastProcessedState);
+            _networkDiagnosticsService.OnStateProcessed(ticksAdvancedSinceLastProcessedState);
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
             foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
@@ -308,7 +312,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessMoleHitEvents(latestFullTickPacket.MoleHitNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
             ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
-            ProcessScoreGatePassedEvents(latestFullTickPacket.ScoreGatePassedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerPassedScoreGateEvents(latestFullTickPacket.PlayerPassedScoreGateNetEvents, ignoreEventsNotAboveTick);
             ProcessGateTrapClosingEvents(latestFullTickPacket.GateTrapClosingNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
@@ -1435,22 +1439,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessScoreGatePassedEvents(FixedUnorderedList<ScoreGatePassedNetEventS2C> scoreGatePassedNetEvents, int ignoreEventsNotAboveTick)
+        private void ProcessPlayerPassedScoreGateEvents(FixedUnorderedList<PlayerPassedScoreGateNetEventS2C> playerPassedScoreGateNetEvents, int ignoreEventsNotAboveTick)
         {
-            _cachedUnprocessedScoreGatePassedEvents.Clear();
+            _cachedUnprocessedPlayerPassedScoreGateEvents.Clear();
 
-            foreach (var netEvent in scoreGatePassedNetEvents.AsSpan())
+            foreach (var netEvent in playerPassedScoreGateNetEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
                 {
-                    _cachedUnprocessedScoreGatePassedEvents.Add(netEvent);
+                    _cachedUnprocessedPlayerPassedScoreGateEvents.Add(netEvent);
                 }
             }
 
-            if (!_cachedUnprocessedScoreGatePassedEvents.IsNullOrEmpty())
+            if (!_cachedUnprocessedPlayerPassedScoreGateEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedScoreGatePassedEvents.Sort();
-                _presentationNetEventsHandler.ProcessScoreGatePassedEvents(_cachedUnprocessedScoreGatePassedEvents);
+                _cachedUnprocessedPlayerPassedScoreGateEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerPassedScoreGateEvents(_cachedUnprocessedPlayerPassedScoreGateEvents);
             }
         }
 
@@ -1850,6 +1854,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _largestPacketSizeInLast5Seconds = packetSize;
             }
 
+            _networkDiagnosticsService.OnFullTickPacketReceived();
+
             var newPacket = _fullTickPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnFullTickReceived(newPacket);
@@ -1930,6 +1936,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             InitStyles();
             GUILayout.Box($"Ping: {_networkManager.Ping}, Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
             GUILayout.Box($"Interpolation decay: {_interpolationDecayService.CurrentDecay:0.0} (drops below the configured value while state packets arrive in bursts)", _highVisStyle);
+            GUILayout.Box(_networkDiagnosticsService.LastReportText, _highVisStyle);
         }
         
         private void InitStyles()

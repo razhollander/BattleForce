@@ -143,12 +143,13 @@ namespace Core.Scripts.Network
         public int ActivateFrozenTalentNetEvents = 128;
         public int DeactivateFrozenTalentNetEvents = 128;
         public int ConcurrentMoles = 32;
+        public int MoleHoles = 64;
         public int MoleSpawnedNetEvents = 64;
         public int MoleHitNetEvents = 64;
         public int MoleExpiredNetEvents = 64;
         public int GoldenMoleDamagedNetEvents = 64;
         public int ConcurrentScoreGates = 4;
-        public int ScoreGatePassedNetEvents = 64;
+        public int PlayerPassedScoreGateNetEvents = 64;
         public int ConcurrentEnvironmentGateTraps = 16;
         public int GateTrapClosingNetEvents = 32;
 

@@ -1,6 +1,4 @@
 using System;
-using System.Numerics;
-using Core.Game.Domains.GamePlay.Shared.Extensions;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
@@ -10,8 +8,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort MoleId;
-        public Vector2 Position;
-        public int EmergeOnTick; // the tick the hole finishes shaking and the mole climbs out, so the client shakes only until then
+        public ushort MoleHoleId;
+        public int EmergeOnTick;
         public bool IsGolden;
         public byte MaxLives;
 
@@ -19,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
-            writer.PutVector2Quantized(Position);
+            writer.Put((byte)MoleHoleId);
             writer.Put(EmergeOnTick);
             writer.Put(IsGolden);
             writer.Put(MaxLives);
@@ -29,7 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
-            Position = reader.GetVector2Quantized();
+            MoleHoleId = reader.GetByte();
             EmergeOnTick = reader.GetInt();
             IsGolden = reader.GetBool();
             MaxLives = reader.GetByte();

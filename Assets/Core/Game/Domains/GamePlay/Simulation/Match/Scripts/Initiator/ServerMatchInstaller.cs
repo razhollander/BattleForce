@@ -47,7 +47,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersTouchingSpikesTrackerService>().To<PlayersTouchingSpikesTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IOverrideableNetEventsService>().To<OverrideableNetEventsService>().AsSingle().NonLazy();
             _diContainer.Bind<IPowerUpsSpawnerService>().To<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
-            _diContainer.Bind<IMolesSpawnerService>().To<MolesSpawnTimerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IMolesSpawnTimerService>().To<MolesSpawnTimerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IGoldenMoleSpawnedTrackerService>().To<GoldenMoleSpawnedTrackerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IMolesSpawnCooldownService>().To<MolesSpawnCooldownService>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerJoinPacketsHandler>().To<MatchPlayerJoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerInputsPacketsHandler>().To<MatchPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();

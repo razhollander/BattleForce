@@ -8,11 +8,6 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc
 {
-    /// <summary>
-    /// The hole is always drawn behind the mole and the bottom dirt is always drawn in front of it, so the body only has
-    /// to slide up and down between them. A sprite mask cuts the body off at the dirt line, which lets it travel deep
-    /// enough to be completely out of sight without ever poking out below the hole.
-    /// </summary>
     public class MoleView : MonoBehaviour, IPoolable
     {
         private const float OUTSIDE_HOLE_BODY_LOCAL_POSITION_Y = 0f;
@@ -56,8 +51,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
         private Tween _shakeTween;
         private Vector3 _positionBeforeShake;
         private bool _isGolden;
-        
-        
+
+
         public Action Despawn { get; set; }
 
         public void SetPosition(Vector2 position)
@@ -65,7 +60,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             transform.position = position;
         }
 
-        // A golden mole reuses the same view as a normal mole, it only swaps its sprite set.
         public void SetIsGolden(bool isGolden)
         {
             _isGolden = isGolden;
@@ -118,14 +112,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             await PlayShakeAsync(shakeDurationSeconds, cancellationToken);
         }
 
-        // The shake tween is tracked so a hit landing mid shake can kill it and snap the mole back to its resting position.
         private async Awaitable PlayShakeAsync(float shakeDurationSeconds, CancellationToken cancellationToken)
         {
             KillShakeTween();
             _positionBeforeShake = transform.position;
             _shakeTween = transform.DOShakePosition(shakeDurationSeconds, _holeShakeStrength, _holeShakeVibrato, _holeShakeRandomness, fadeOut: false);
-            await _shakeTween.WithCancellationSafe(cancellationToken);
-            transform.position = _positionBeforeShake;
+
+            try
+            {
+                await _shakeTween.WithCancellationSafe(cancellationToken);
+            }
+            finally
+            {
+                transform.position = _positionBeforeShake;
+            }
         }
 
         // The hands are only shown once the body has reached the top, they are the only part that is drawn over the dirt.
@@ -164,7 +164,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
 
         public void OnCreated()
         {
-         
+
         }
 
         public void OnSpawned()

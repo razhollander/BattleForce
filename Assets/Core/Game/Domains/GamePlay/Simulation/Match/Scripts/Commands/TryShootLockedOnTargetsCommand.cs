@@ -88,11 +88,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _netEventsDataService.AddPlayerLockedOnTargetHitNetEvent(_processedTick, _casterPlayerId, targetId);
         }
 
-        private void ShootMoleTarget(ushort moleId)
+        private void ShootMoleTarget(ushort moleHoleId)
         {
+            if (!_matchDataService.SimulationState.TryGetMoleByHoleId(moleHoleId, out var mole))
+            {
+                return;
+            }
+
             var casterTeamId = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId).TeamId;
             _tryHitMoleCommand
-                .SetMoleId(moleId)
+                .SetMoleId(mole.Id)
                 .SetByPlayerId(_casterPlayerId)
                 .SetByTeamId(casterTeamId)
                 .SetProcessedTick(_processedTick)

@@ -145,9 +145,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return Moles.Find(x => x.Id == moleId);
         }
 
-        public MatchMoleModel AddMole(ushort moleId, UnityEngine.Vector2 position, bool isGolden, byte remainingLives, byte maxLives)
+        public MatchMoleModel AddMole(ushort moleId, ushort moleHoleId, bool isGolden, byte remainingLives, byte maxLives)
         {
-            var newMole = new MatchMoleModel(moleId, position, isGolden, remainingLives, maxLives);
+            var newMole = new MatchMoleModel(moleId, moleHoleId, isGolden, remainingLives, maxLives);
             Moles.Add(newMole);
             return newMole;
         }
@@ -667,8 +667,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 return false;
             }
 
+            // In bonus stages only the winning-team player who contributed the most score is kinged.
+            if (StageType.IsBonusStage())
+            {
+                kingedPlayers = new List<MatchPlayerModel>(1);
+                var topScoringPlayerInWinningTeam = GetTopScoringPlayerInWinningTeam();
+
+                if (topScoringPlayerInWinningTeam != null)
+                {
+                    kingedPlayers.Add(topScoringPlayerInWinningTeam);
+                }
+
+                return true;
+            }
+
             kingedPlayers = Players.FindAll(x => x.TeamId == CurrentStageWinnerTeamId);
             return true;
+        }
+
+        private MatchPlayerModel GetTopScoringPlayerInWinningTeam()
+        {
+            MatchPlayerModel topScoringPlayer = null;
+
+            foreach (var player in Players)
+            {
+                if (player.TeamId != CurrentStageWinnerTeamId)
+                {
+                    continue;
+                }
+
+                // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
+                if (topScoringPlayer == null || player.MolesHitScore > topScoringPlayer.MolesHitScore ||
+                    (player.MolesHitScore == topScoringPlayer.MolesHitScore && player.PlayerId < topScoringPlayer.PlayerId))
+                {
+                    topScoringPlayer = player;
+                }
+            }
+
+            return topScoringPlayer;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly NetworkConfig _networkConfig;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private readonly TryBreakLaidChickenEggOnMolesCommand _tryBreakLaidChickenEggOnMolesCommand;
 
         private ushort _casterPlayerId;
         private int _countdownEndTick;
@@ -37,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
             _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryBreakLaidChickenEggOnMolesCommand = commandFactory.CreateCommandVoid<TryBreakLaidChickenEggOnMolesCommand>();
         }
 
         public void SetCasterId(ushort id) { _casterPlayerId = id; }
@@ -79,6 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var egg = _matchDataService.AddChickenEgg(_casterPlayerId, casterPlayerState.Spaceship.Transform.Position);
             _physicsSimulator.AddChickenEgg(egg.Id, casterPlayerState.TeamId, egg.Position, casterPlayerState.Spaceship.Transform.Radius);
             _netEventsDataService.AddLayChickenEggNetEventS2C(tick, _casterPlayerId, egg.Id, egg.Position);
+            _tryBreakLaidChickenEggOnMolesCommand.SetEggId(egg.Id).SetProcessedTick(tick).Execute(); // an egg laid right on top of an emerged mole whacks it and breaks at once
             
             _countdownEndTick = TickUtils.GetTickPassedAfterDuration(tick, config.CountdownDuration, _networkConfig.DeltaTime);
         }

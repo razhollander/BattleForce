@@ -126,7 +126,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var cooldownTicks = (int)MathF.Ceiling(gatePassConfig.PassScoreCooldownSeconds * _networkConfig.TicksPerSeconds);
             _scoreGatePassTrackerService.StartPassScoreCooldown(player.Id, scoreGateId, _processedTick + cooldownTicks);
 
-            _netEventsDataService.AddScoreGatePassedNetEvent(_processedTick, scoreGateId, player.Id, player.TeamId, (byte)score, nextMultiplier, teamBonusScoreTotal, byPlayerBonusScoreTotal);
+            _netEventsDataService.AddPlayerPassedScoreGateNetEvent(_processedTick, scoreGateId, player.Id, (byte)score, nextMultiplier, (ushort)teamBonusScoreTotal, (ushort)byPlayerBonusScoreTotal);
         }
     }
 }

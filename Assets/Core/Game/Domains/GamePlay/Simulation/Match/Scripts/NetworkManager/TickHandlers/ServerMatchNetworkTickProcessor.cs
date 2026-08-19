@@ -44,8 +44,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TryDamagePlayersTouchingSpikesCommand _tryDamagePlayersTouchingSpikesCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private TryHideExpiredMolesCommand _tryHideExpiredMolesCommand;
+        private TryEmergeMolesCommand _tryEmergeMolesCommand;
         private TrySpawnMolesCommand _trySpawnMolesCommand;
-        private TryBreakChickenEggsOnMolesCommand _tryBreakChickenEggsOnMolesCommand;
         private TryEndWhacAMoleStageCommand _tryEndWhacAMoleStageCommand;
         private TryScoreGatePassesCommand _tryScoreGatePassesCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
@@ -58,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
         private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
         private TrySendPlayersLockOnTargetChangedCommand _trySendPlayersLockOnTargetChangedCommand;
-        
+
         private readonly MatchFullTickPacketS2C _fullTickPacket;
         private readonly StartMatchPacketS2C _cachedStartMatchPacket;
         private readonly StartStagePacketS2C _startStagePacket;
@@ -93,8 +94,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _tryDamagePlayersTouchingSpikesCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersTouchingSpikesCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
+            _tryHideExpiredMolesCommand = _commandFactory.CreateCommandVoid<TryHideExpiredMolesCommand>();
+            _tryEmergeMolesCommand = _commandFactory.CreateCommandVoid<TryEmergeMolesCommand>();
             _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
-            _tryBreakChickenEggsOnMolesCommand = _commandFactory.CreateCommandVoid<TryBreakChickenEggsOnMolesCommand>();
             _tryEndWhacAMoleStageCommand = _commandFactory.CreateCommandVoid<TryEndWhacAMoleStageCommand>();
             _tryScoreGatePassesCommand = _commandFactory.CreateCommandVoid<TryScoreGatePassesCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
@@ -113,7 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             _tickService.UnregisterObserver(this);
         }
-        
+
         public void OnTick(int currentTick)
         {
             try
@@ -125,15 +127,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 {
                     return;
                 }
-                
+
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _playersPowerUpsManager.OnTick(currentTick);
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
+                _tryHideExpiredMolesCommand.SetProcessedTick(currentTick).Execute();
+                _tryEmergeMolesCommand.SetProcessedTick(currentTick).Execute();
                 _trySpawnMolesCommand.SetProcessedTick(currentTick).Execute();
-                _tryBreakChickenEggsOnMolesCommand.SetProcessedTick(currentTick).Execute(); // right after the spawner, so both eggs laid this tick and moles that just emerged are covered
                 _tryEndWhacAMoleStageCommand.SetProcessedTick(currentTick).Execute();
                 _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
                 _applyGalacticPullForcesCommand.Execute();
@@ -190,14 +193,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 SendStartStagePacketToClient(clientId, processedTick, DeliveryMethod.ReliableUnordered); // we don't send in a net event cause it can fill quickly our packet buffer
             }
         }
-        
+
         private void SendStartStagePacketToClient(long clientId, int processedTick, DeliveryMethod deliveryMethod)
         {
             _startStagePacket.InitialState = _matchDataService.SimulationState;
             _startStagePacket.OccuredOnTick = processedTick;
             _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.StartStage, _startStagePacket, deliveryMethod);
         }
-        
+
         private void SendStartMatchToNotAcknowledgedClients(int processedTick)
         {
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
@@ -248,7 +251,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             var currentSimulationState = _matchDataService.SimulationState;
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
-            
+
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
                 if (!kvp.Value.IsConnected)
@@ -334,7 +337,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.MoleHitNetEvents = _netEventsDataService.MoleHitNetEventsPerClient[clientId];
                 _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
                 _fullTickPacket.GoldenMoleDamagedNetEvents = _netEventsDataService.GoldenMoleDamagedNetEventsPerClient[clientId];
-                _fullTickPacket.ScoreGatePassedNetEvents = _netEventsDataService.ScoreGatePassedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerPassedScoreGateNetEvents = _netEventsDataService.PlayerPassedScoreGateNetEventsPerClient[clientId];
                 _fullTickPacket.GateTrapClosingNetEvents = _netEventsDataService.GateTrapClosingNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);

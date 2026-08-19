@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; }
         List<MoleSpawnedNetEventS2C> MoleSpawnedNetEvents { get; }
         List<MoleHitNetEventS2C> MoleHitNetEvents { get; }
-        List<ScoreGatePassedNetEventS2C> ScoreGatePassedNetEvents { get; }
+        List<PlayerPassedScoreGateNetEventS2C> PlayerPassedScoreGateNetEvents { get; }
         List<MoleExpiredNetEventS2C> MoleExpiredNetEvents { get; }
         List<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents { get; }
         List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; }

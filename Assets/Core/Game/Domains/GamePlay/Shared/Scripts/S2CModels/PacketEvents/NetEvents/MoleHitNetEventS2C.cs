@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort MoleId;
+        public ushort MoleHoleId;
         public ushort ByPlayerId;
         public ushort ByTeamId;
         public byte ScoreGained;
@@ -19,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
+            writer.Put((byte)MoleHoleId);
             writer.Put((byte)ByPlayerId);
             writer.Put((byte)ByTeamId);
             writer.Put(ScoreGained);
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
+            MoleHoleId = reader.GetByte();
             ByPlayerId = reader.GetByte();
             ByTeamId = reader.GetByte();
             ScoreGained = reader.GetByte();

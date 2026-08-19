@@ -68,7 +68,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleHitNetEventS2C>> MoleHitNetEventsPerClient { get; }
-        CapacityDict<long, FixedUnorderedList<ScoreGatePassedNetEventS2C>> ScoreGatePassedNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>> PlayerPassedScoreGateNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<GateTrapClosingNetEventS2C>> GateTrapClosingNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> GoldenMoleDamagedNetEventsPerClient { get; }
@@ -155,12 +155,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
-        void AddMoleSpawnedNetEvent(int onTick, ushort moleId, System.Numerics.Vector2 position, int emergeOnTick, bool isGolden, byte maxLives);
-        void AddMoleHitNetEvent(int onTick, ushort moleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, int byPlayerMolesHitScoreTotal, bool isGolden);
-        void AddScoreGatePassedNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, ushort byTeamId, byte scoreGained, byte newScoreMultiplier, int teamBonusScoreTotal, int byPlayerBonusScoreTotal);
+        void AddMoleSpawnedNetEvent(int onTick, ushort moleId, ushort moleHoleId, int emergeOnTick, bool isGolden, byte maxLives);
+        void AddMoleHitNetEvent(int onTick, ushort moleId, ushort moleHoleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, int byPlayerMolesHitScoreTotal, bool isGolden);
+        void AddPlayerPassedScoreGateNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, byte scoreGained, byte newScoreMultiplier, ushort teamBonusScoreTotal, ushort byPlayerBonusScoreTotal);
         void AddGateTrapClosingNetEvent(int onTick, ushort gateTrapId, int closedOnTick);
-        void AddMoleExpiredNetEvent(int onTick, ushort moleId, int hideOnTick);
-        void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, byte remainingLives, byte maxLives);
+        void AddMoleExpiredNetEvent(int onTick, ushort moleId, ushort moleHoleId, int hideOnTick);
+        void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, ushort moleHoleId, byte remainingLives, byte maxLives);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId);

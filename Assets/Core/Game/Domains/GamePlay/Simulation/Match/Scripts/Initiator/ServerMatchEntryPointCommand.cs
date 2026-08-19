@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
@@ -39,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private IBonusStageRotationService _bonusStageRotationService;
         private ISimulationInputService _simulationInputService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
+        private IMolesSpawnCooldownService _molesSpawnCooldownService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private IClientsNetworkDataService _clientsNetworkDataService;
         
@@ -67,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _molesSpawnCooldownService = _diContainer.Resolve<IMolesSpawnCooldownService>();
             _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
             _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
@@ -81,6 +84,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             InitPlayers(_simulationMatchEnterData);
             _playerInputsPacketsHandler.InitEntryPoint();
             _stageDataService.InitEntryPoint();
+            _molesSpawnCooldownService.InitEntryPoint();
             _bonusStageRotationService.ResetData(); // the bonus-stage rotation restarts fresh for each match
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();

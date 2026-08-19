@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private IMatchDataService _matchDataService;
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
-        private IMolesSpawnerService _molesSpawnerService;
+        private IMolesSpawnTimerService _molesSpawnTimerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTouchingSpikesTrackerService _playersTouchingSpikesTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
-            _molesSpawnerService = _diContainer.Resolve<IMolesSpawnerService>();
+            _molesSpawnTimerService = _diContainer.Resolve<IMolesSpawnTimerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTouchingSpikesTrackerService = _diContainer.Resolve<IPlayersTouchingSpikesTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             StepPlayersShootCooldown(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
-            _molesSpawnerService.StepTimer(_deltaTime);
+            _molesSpawnTimerService.StepTimer(_deltaTime);
             StepPlayersInHazardsTimers(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);

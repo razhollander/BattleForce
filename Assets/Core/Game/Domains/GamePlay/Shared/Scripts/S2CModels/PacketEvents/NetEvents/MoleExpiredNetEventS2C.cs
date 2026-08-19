@@ -8,12 +8,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort MoleId;
-        public int HideOnTick; // the tick the mole finishes its pre-hide shake and goes back into its hole, so the client shakes only until then
+        public ushort MoleHoleId;
+        public int HideOnTick;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
+            writer.Put((byte)MoleHoleId);
             writer.Put(HideOnTick);
         }
 
@@ -21,6 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
+            MoleHoleId = reader.GetByte();
             HideOnTick = reader.GetInt();
         }
 

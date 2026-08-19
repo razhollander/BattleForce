@@ -5,14 +5,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
     public interface IMoleControllers
     {
         void InitEntryPoint();
-        void CreateMoleAtSpawnPoint(Vector2 spawnPointPosition);
-        void SetMoleEmergingFromHole(ushort moleId, Vector2 position, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives);
-        void SetGoldenMoleDamaged(ushort moleId, byte remainingLives, byte maxLives);
-        void SetMoleHit(ushort moleId);
-        void SetMoleExpiring(ushort moleId, float shakeDurationSeconds);
-        void SetMoleInHole(ushort moleId);
+        void CreateMoleAtSpawnPoint(ushort moleHoleId, Vector2 spawnPointPosition);
+        void SetMoleEmergingFromHole(ushort moleId, ushort moleHoleId, float shakeDurationSeconds, bool isGolden, byte remainingLives, byte maxLives);
+        void SetGoldenMoleDamaged(ushort moleId, ushort moleHoleId, byte remainingLives, byte maxLives);
+        void SetMoleHit(ushort moleId, ushort moleHoleId);
+        void SetMoleExpiring(ushort moleId, ushort moleHoleId, float shakeDurationSeconds);
         void SetAllMolesInHole();
-        bool TryGetMolePosition(ushort moleId, out Vector2 position);
+        bool TryGetMoleHolePosition(ushort moleHoleId, out Vector2 position);
         void DestroyAll();
     }
 }

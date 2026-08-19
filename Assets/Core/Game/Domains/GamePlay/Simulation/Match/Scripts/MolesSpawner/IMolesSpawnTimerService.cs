@@ -1,11 +1,9 @@
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner
 {
-    public interface IMolesSpawnerService
+    public interface IMolesSpawnTimerService
     {
         void StepTimer(float deltaTime);
         void RestartSpawnTimer();
         bool IsSpawnTimerEnded();
-        bool ShouldSpawnGoldenMole();
-        void RegisterMoleSpawned(bool isGolden);
     }
 }

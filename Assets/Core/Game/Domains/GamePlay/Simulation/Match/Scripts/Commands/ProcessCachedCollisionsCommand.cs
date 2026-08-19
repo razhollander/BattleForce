@@ -46,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private CollidePlayerWithEnvironmentSpikeCommand _collidePlayerWithEnvironmentSpikeCommand;
         private TryHitMoleCommand _tryHitMoleCommand;
         private PushScoreGateCommand _pushScoreGateCommand;
+        private BreakEggCommand _breakEggCommand;
         private IScoreGatePassTrackerService _scoreGatePassTrackerService;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
@@ -68,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _collidePlayerWithEnvironmentSpikeCommand = _commandFactory.CreateCommandVoid<CollidePlayerWithEnvironmentSpikeCommand>();
             _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
             _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
+            _breakEggCommand = _commandFactory.CreateCommandVoid<BreakEggCommand>();
             _scoreGatePassTrackerService = _diContainer.Resolve<IScoreGatePassTrackerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
@@ -397,9 +399,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .SetExtraSpinImpulse(spinSign * gatePassConfig.ChickenEggSpinImpulse)
                 .Execute();
 
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
-            _physicsSimulator.RemoveChickenEgg(egg.Id);
-            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
         }
 
         private void HandleBulletMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
@@ -649,9 +649,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
             
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
-            _physicsSimulator.RemoveChickenEgg(egg.Id);
-            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
         }
 
         // The grappling hook attaches to walls, frigid blocks, and players that are currently in Rock state.
@@ -872,9 +870,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
             _trySpinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
-            _physicsSimulator.RemoveChickenEgg(egg.Id);
-            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)

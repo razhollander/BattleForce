@@ -12,6 +12,8 @@ using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IMatchPlayerUIControllers _matchPlayerUIControllers;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IWorldCameraController _worldCameraController;
+        private readonly INetworkDiagnosticsService _networkDiagnosticsService;
 
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
@@ -113,11 +116,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
         private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
         private readonly HandleGoldenMoleDamagedNetEventsCommand _handleGoldenMoleDamagedNetEventsCommand;
-        private readonly HandleScoreGatePassedNetEventsCommand _handleScoreGatePassedNetEventsCommand;
+        private readonly HandlePlayerPassedScoreGateNetEventsCommand _handlePlayerPassedScoreGateNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler,
+            INetworkDiagnosticsService networkDiagnosticsService)
         {
+            _networkDiagnosticsService = networkDiagnosticsService;
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
@@ -212,7 +217,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
             _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
             _handleGoldenMoleDamagedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGoldenMoleDamagedNetEventsCommand>();
-            _handleScoreGatePassedNetEventsCommand = commandFactory.CreateCommandVoid<HandleScoreGatePassedNetEventsCommand>();
+            _handlePlayerPassedScoreGateNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPassedScoreGateNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -262,7 +267,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleGoldenMoleDamagedNetEventsCommand.Execute();
             _handleMoleHitNetEventsCommand.Execute();
-            _handleScoreGatePassedNetEventsCommand.Execute();
+            _handlePlayerPassedScoreGateNetEventsCommand.Execute();
             _handleMoleExpiredNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
@@ -325,6 +330,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEndPowerUpGrantingPhaseNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
             _fullTickPacketsHandler.ClearUnprocessedPacketsByView();
+            _networkDiagnosticsService.OnFrameRendered(Time.unscaledDeltaTime);
         }
     }
 }

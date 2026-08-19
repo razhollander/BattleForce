@@ -36,7 +36,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         }
 
         // Per-tick transform update (the gate is physics-driven, so only its moving transform changes each tick).
-        // LastScoredTeamId is not sent here - the tint is driven by the ScoreGatePassed net event and the rejoin snapshot.
+        // LastScoredTeamId is not sent here - the tint is driven by the PlayerPassedScoreGate net event and the rejoin snapshot.
         public void SerializeDelta(NetDataWriter writer)
         {
             writer.Put((byte)Id);

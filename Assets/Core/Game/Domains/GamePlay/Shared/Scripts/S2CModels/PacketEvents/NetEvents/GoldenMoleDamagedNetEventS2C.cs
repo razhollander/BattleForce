@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort MoleId;
+        public ushort MoleHoleId; // the hole the damaged mole popped out of, the client redraws that exact hole
         public byte RemainingLives;
         public byte MaxLives;
 
@@ -15,6 +16,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
+            writer.Put((byte)MoleHoleId);
             writer.Put(RemainingLives);
             writer.Put(MaxLives);
         }
@@ -23,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         {
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
+            MoleHoleId = reader.GetByte();
             RemainingLives = reader.GetByte();
             MaxLives = reader.GetByte();
         }

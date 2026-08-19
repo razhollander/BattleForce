@@ -1,19 +1,17 @@
-using UnityEngine;
-
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
 {
     public class MatchMoleModel
     {
-        public ushort Id;
-        public Vector2 Position;
-        public bool IsGolden;
+        public readonly ushort Id;
+        public readonly ushort MoleHoleId;
+        public readonly bool IsGolden;
+        public readonly byte MaxLives;
         public byte RemainingLives;
-        public byte MaxLives;
 
-        public MatchMoleModel(ushort id, Vector2 position, bool isGolden, byte remainingLives, byte maxLives)
+        public MatchMoleModel(ushort id, ushort moleHoleId, bool isGolden, byte remainingLives, byte maxLives)
         {
             Id = id;
-            Position = position;
+            MoleHoleId = moleHoleId;
             IsGolden = isGolden;
             RemainingLives = remainingLives;
             MaxLives = maxLives;

@@ -19,7 +19,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         //void CopySimulationStateIntoPrevious();
         TalentCardS2C AddTalentCard(ushort talentCardId, Vector2 position, TalentType talentType, ushort health);
         PowerUpBallS2C AddPowerUpBall(Vector2 position, Vector2 velocity, PowerUpType powerUpType);
-        MoleStateS2C AddMole(Vector2 position, int emergeOnTick, int disappearOnTick, bool isGolden, byte lives);
+        MoleStateS2C AddMole(ushort moleHoleId, Vector2 position, int emergeOnTick, int disappearOnTick, bool isGolden, byte lives);
         ScoreGateStateS2C AddScoreGate(ushort id, Vector2 position, float rotationDegrees);
         TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick);
         TalentKOProjectileS2C AddKOProjectile(int tick, ushort casterPlayerId, Vector2 transformPosition, Vector2 rotation, Vector2 velocity, float koConfigProjectileSize);

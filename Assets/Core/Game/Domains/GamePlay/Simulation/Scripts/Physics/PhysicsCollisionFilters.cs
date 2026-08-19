@@ -139,7 +139,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.Wall);
                     break;
                 // A mole is a sensor that only needs to notice the things that can whack it: bullets, spaceships carrying a talent that spins whatever it touches, and the projectiles of such talents.
-                // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnMolesCommand resolves that overlap instead.
+                // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnEmergedMoleCommand and TryBreakLaidChickenEggOnMolesCommand resolve that overlap instead, each at the moment one of the two is created.
                 case PhysicsBodyType.Mole:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)

@@ -40,6 +40,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ZenjectInstallers
         {
             Container.Bind<ILastFullSyncTickDataService>().To<LastFullSyncTickDataService>().AsSingle().NonLazy();
             Container.Bind<IInterpolationDecayService>().To<InterpolationDecayService>().AsSingle().NonLazy();
+            Container.Bind<INetworkDiagnosticsService>().To<NetworkDiagnosticsService>().AsSingle().NonLazy();
             Container.Bind<IGamePlayInitiator>().To<GamePlayInitiator>().AsSingle().NonLazy();
             Container.Bind<IClientNetworkManager>().To<ClientNetworkManager>().AsSingle().NonLazy();
             Container.Bind<ICachedPresentationEventsService>().To<CachedPresentationEventsService>().AsSingle().NonLazy();

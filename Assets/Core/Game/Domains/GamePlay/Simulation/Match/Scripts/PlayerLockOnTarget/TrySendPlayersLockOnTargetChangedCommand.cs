@@ -195,14 +195,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     continue;
                 }
 
-                AddLockedOnTarget(outputTargetedObjects, casterPlayerState.Id, mole.Id, LockOnTargetType.Mole);
+                AddLockedOnTarget(outputTargetedObjects, casterPlayerState.Id, mole.MoleHoleId, LockOnTargetType.Mole);
             }
         }
 
-        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, System.Numerics.Vector2 rayOriginPosition, System.Numerics.Vector2 targetPosition)
+        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, Vector2 rayOriginPosition, Vector2 targetPosition)
         {
             var maxRange = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
-            var rayOriginToTargetDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, targetPosition);
+            var rayOriginToTargetDistanceSquared = Vector2.DistanceSquared(rayOriginPosition, targetPosition);
             var isTargetInRange = rayOriginToTargetDistanceSquared <= maxRange * maxRange;
 
             if (!isTargetInRange)

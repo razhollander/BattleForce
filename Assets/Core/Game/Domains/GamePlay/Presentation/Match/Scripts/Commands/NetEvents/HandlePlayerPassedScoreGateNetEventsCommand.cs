@@ -2,6 +2,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
@@ -11,12 +12,10 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    // GatePass counterpart of HandleMoleHitNetEventsCommand: pops the "+1" from the gate, tints the gate to the scoring
-    // team's colour, and updates the top-middle team board and the scoring player's UI. Score model mutations already
-    // happened in PresentationMatchNetEventsHandler.
-    public class HandleScoreGatePassedNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandlePlayerPassedScoreGateNetEventsCommand : BaseCommand, ICommandVoid
     {
         private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IMatchDataService _matchDataService;
         private IScoreGatesControllers _scoreGatesControllers;
         private IScoreGainedEffectController _scoreGainedEffectController;
         private ITeamsBoardUIController _teamsBoardUIController;
@@ -27,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _scoreGatesControllers = _diContainer.Resolve<IScoreGatesControllers>();
             _scoreGainedEffectController = _diContainer.Resolve<IScoreGainedEffectController>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
@@ -37,32 +37,34 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var scoreGatePassedNetEvents = _cachedPresentationEventsService.ScoreGatePassedNetEvents;
+            var playerPassedScoreGateNetEvents = _cachedPresentationEventsService.PlayerPassedScoreGateNetEvents;
 
-            if (scoreGatePassedNetEvents.IsNullOrEmpty())
+            if (playerPassedScoreGateNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var scoreGatePassedNetEvent in scoreGatePassedNetEvents)
+            foreach (var playerPassedScoreGateNetEvent in playerPassedScoreGateNetEvents)
             {
-                if (_scoreGatesControllers.TryGetScoreGatePosition(scoreGatePassedNetEvent.ScoreGateId, out var gatePosition))
+                var byTeamId = _matchDataService.GetPlayerTeamId(playerPassedScoreGateNetEvent.ByPlayerId);
+
+                if (_scoreGatesControllers.TryGetScoreGatePosition(playerPassedScoreGateNetEvent.ScoreGateId, out var gatePosition))
                 {
-                    Color? outlineAndUnderlineColor = _gamePlayConfig.ColorPerTeamId.TryGetValue(scoreGatePassedNetEvent.ByTeamId, out var teamColor)
+                    Color? outlineAndUnderlineColor = _gamePlayConfig.ColorPerTeamId.TryGetValue(byTeamId, out var teamColor)
                         ? teamColor
                         : null;
-                    _scoreGainedEffectController.PlayEffect(scoreGatePassedNetEvent.ScoreGained, gatePosition, outlineAndUnderlineColor);
+                    _scoreGainedEffectController.PlayEffect(playerPassedScoreGateNetEvent.ScoreGained, gatePosition, outlineAndUnderlineColor);
                 }
 
-                _scoreGatesControllers.SetTeamColor(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.ByTeamId);
-                _scoreGatesControllers.PlayScoreGatePassedAnimation(scoreGatePassedNetEvent.ScoreGateId);
-                _scoreGatesControllers.SetScoreMultiplier(scoreGatePassedNetEvent.ScoreGateId, scoreGatePassedNetEvent.NewScoreMultiplier);
-                _teamsBoardUIController.UpdateTeamGatePassScore(scoreGatePassedNetEvent.ByTeamId, scoreGatePassedNetEvent.TeamBonusScoreTotal);
-                _playerUIControllers.UpdatePlayerGatePassScore(scoreGatePassedNetEvent.ByPlayerId, scoreGatePassedNetEvent.ByPlayerBonusScoreTotal);
+                _scoreGatesControllers.SetTeamColor(playerPassedScoreGateNetEvent.ScoreGateId, byTeamId);
+                _scoreGatesControllers.PlayScoreGatePassedAnimation(playerPassedScoreGateNetEvent.ScoreGateId);
+                _scoreGatesControllers.SetScoreMultiplier(playerPassedScoreGateNetEvent.ScoreGateId, playerPassedScoreGateNetEvent.NextScoreMultiplier);
+                _teamsBoardUIController.UpdateTeamGatePassScore(byTeamId, playerPassedScoreGateNetEvent.TeamBonusScoreTotal);
+                _playerUIControllers.UpdatePlayerGatePassScore(playerPassedScoreGateNetEvent.ByPlayerId, playerPassedScoreGateNetEvent.ByPlayerBonusScoreTotal);
             }
 
             _audioService.PlayAudio(AudioClipType.ScoreGatePassed);
-            scoreGatePassedNetEvents.Clear();
+            playerPassedScoreGateNetEvents.Clear();
         }
     }
 }

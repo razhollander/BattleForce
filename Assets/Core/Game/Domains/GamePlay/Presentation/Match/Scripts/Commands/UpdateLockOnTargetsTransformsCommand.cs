@@ -45,8 +45,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
             }
         }
 
-        // A whacked mole is dropped from the controllers before the server stops sending it as a target, so an unknown
-        // mole is skipped instead of dragging the lock on line to the world origin.
         private bool TryGetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy, out Vector2 targetPosition)
         {
             switch (targetedEnemy.TargetType)
@@ -55,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                     targetPosition = _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
                     return true;
                 case LockOnTargetType.Mole:
-                    return _moleControllers.TryGetMolePosition(targetedEnemy.TargetId, out targetPosition);
+                    return _moleControllers.TryGetMoleHolePosition(targetedEnemy.TargetId, out targetPosition);
                 default:
                     targetPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
                     return true;

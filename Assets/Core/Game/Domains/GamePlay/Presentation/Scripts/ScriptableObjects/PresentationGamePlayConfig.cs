@@ -11,6 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects
     {
         //public float InterpolationFactor = 0.85f;
         public float ExponentialDecay = 15; // usefull range 1-25, 1=slow, 25=fast
+        public bool IsNetworkDiagnosticsLoggingEnabled = true; // writes a [NetDiag] line to the player log every 5 seconds
         [EditableRef] public TalentIconsConfig TalentCards; // change to icons
         [EditableRef] public PowerUpsConfig PowerUps;
         [EditableRef] public TalentsConfig TalentsConfig;

@@ -12,6 +12,8 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 {
     public class EnvironmentGenerator : MonoBehaviour
     {
+        private const int FIRST_MOLE_HOLE_ID = 1; // zero is kept free so it can mean "no mole hole"
+
         [SerializeField] private EnvironmentConfig _environmentConfig;
         [SerializeField] private List<PolygonPath2D> _walls;
         [SerializeField] private List<LavaWall> _lavaWalls;
@@ -43,7 +45,7 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 
             for (int i = 0; i < _moleSpawnPoints.Count; i++)
             {
-                moleSpawnPointConfigs[i] = new MoleSpawnPointConfig(_moleSpawnPoints[i].transform.position.ToVector2XY().ToNumericsVector2());
+                moleSpawnPointConfigs[i] = new MoleSpawnPointConfig((ushort)(i + FIRST_MOLE_HOLE_ID), _moleSpawnPoints[i].transform.position.ToVector2XY().ToNumericsVector2());
             }
 
             _environmentConfig.SetMoleSpawnPoints(moleSpawnPointConfigs, index);
