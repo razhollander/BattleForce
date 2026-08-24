@@ -44,6 +44,7 @@ description: code-guidlines conventions and architecture rules by Raz.
 * **Statics Bad:** Static classes hide dependencies. Avoid.  
 * **Validate at Gate:** Public APIs and Entry Points must check for null/bad input.  
 * **Trust Inside:** Once past the gate, internal code does zero validation. Trust data.
+* **A branch that should be structurally unreachable logs an error before its early return, never returns silently.** Bonus-stage players have no health, so nothing should ever call the damage path on one - if something does, `LogService.LogError(...)` before the `return` is what surfaces the upstream bug; a silent early-return just hides it until the same mistake causes a harder one to debug.
 
 ---
 
@@ -69,7 +70,8 @@ description: code-guidlines conventions and architecture rules by Raz.
   * **Actions:** PopupsAnalyticsService, PopupsAssetDownloader, PopupsViewFactory.  
   * **Control:** PopupController, PopupsManager, PopupViewController.  
   * **UI Views:** PopupHeaderPanelView, PopupItemsPanelView, PopupItemView.
-* **Split the moment a second concern lands, not later.** Adding a feature to an existing service is the moment to ask whether it is the same job. A spawn timer that also tracks hole cooldowns and golden mole cadence is three services - split it in the same change that grew it, do not wait to be asked.
+* **Split the moment a second concern lands, not later.** Adding a feature to an existing service is the moment to ask whether it is the same job. A spawn timer that also tracks hole cooldowns and golden mole cadence is three services - split it in the same change that grew it, do not wait to be asked.  
+* **Generalize a feature-specific name the moment a second feature reuses its data.** A field like `MolesHitScore` staying that name after a second stage type starts writing its own score into it means every one of that second stage's call sites reads as if it were about moles. Rename to the general concept (`StageScore`) in the same change that adds the second user, do not wait for a third.
 * **The interface splits with the class.** Each new service gets its own `I...` beside it, and every consumer takes only the interface it actually calls. A consumer that calls one method out of six is the proof the interface holds two jobs.
 * **The interface name and the class name must agree.** `IMolesSpawnerService` on a `MolesSpawnTimerService` means one of the two names is lying about the job - rename the pair to what the class actually does.
 
@@ -98,7 +100,8 @@ description: code-guidlines conventions and architecture rules by Raz.
 * **A private helper method is only good for one class.** As soon as another class needs the same steps, do not copy the helper and do not make it `public`/`static` \- turn it into a `Command` and delete every copy.  
 * **Extract the whole sequence, not part of it.** Every step that must happen together lives inside `Execute()`, so no caller can ever perform three of the four steps.  
 * **Take ids, not models.** `SetXId(id)` over passing a state object, so the Command owns the lookup and every caller does the same thing.  
-* **Clean up after extracting** \- dependencies that only the extracted code used (services, usings, fields) are now dead in the caller. Delete them (see *Finishing a Change*).
+* **Clean up after extracting** \- dependencies that only the extracted code used (services, usings, fields) are now dead in the caller. Delete them (see *Finishing a Change*).  
+* **Every setter a Command exposes must be called by every caller, or it should not exist.** An optional setter that gates core logic inside `Execute()` silently keeps its default value forever when a caller forgets it, and the comparison it feeds never matches - the feature it enables quietly never runs. A setter with no caller anywhere is not dead code to leave for later, it is proof the logic behind it is already broken; delete both the setter and the logic it gated, or wire up the missing call, in the same change.
 
 ### **3\. Extensions**
 
@@ -174,6 +177,8 @@ Must follow strict MVC. No break rule.
 #### **Net event naming**
 
 * **Name a net event for who did what, subject first, in active voice:** `PlayerPassedScoreGateNetEventS2C`, not `ScoreGatePassedNetEventS2C`. The actor leads, the thing it acted on follows.
+* **Name the event for what actually happened, not for the action that triggered it.** An event that only ever fires once its target is destroyed should say so (`MoleKilledNetEvent`), even if the code path that raises it is a "hit" - a hit the target survives is a different event (`GoldenMoleDamagedNetEvent`) with a different name, so the name of the first one should not be a generic word that also covers the second.
+* **A tick or duration field name states which edge of the transition it marks.** `EmergeOnTick` reads as when the emerge starts; if the field actually holds when the emerge animation finishes, name it `FinishEmergingOnTick`. Do the same for every "on tick" field describing a wind-up, a close or a hide - name it for the edge it is, so it cannot be misread as the other edge of the same transition.
 * **A rename carries the whole family in the same change** - the struct and its file (`git mv` the `.meta` too), the `MatchFullTickPacketS2C` list field, the `NetworkConfig.MaxCap` entry, the per-client queues, `Add*NetEvent`, `Process*Events`, `Serialized/Deserialized*`, the `Handle*NetEventsCommand` and its file, and every local. Names that are not about the event itself (an `AudioClipType`, a `Play*Animation` method) stay as they are.
 
 ## **C\# CODING STANDARDS**
@@ -200,6 +205,7 @@ Must follow strict MVC. No break rule.
 ### **3\. PROGRAMMING RULES**
 
 * **Booleans:** Extract any logic into local `var` or properties. Do not calculate or check a condition with '=='/'>''<' inside the `if()` statement.  
+* **Branch on the flag that actually distinguishes the cases, never on two numbers that happen to coincide.** A comparison like `remainingLives > damagePerHit` can look correct only because one entity type's life count happens to equal the damage constant - tune either number, or add a third case, and the coincidence breaks silently. Check the explicit flag (`IsGolden`) first, and only compare the numbers once inside the branch where they are actually meaningful.  
 * **If Statements:** Braces `{}` required unless it is a simple early return. Prefer early returns over nesting. Put expected logic in `if`, edge cases in `else`.  
 * **Constants:** No magic numbers. Ever.  
 * **Events & Delegates:** \* `Action` delegates must be `private` and injected via Setup/Constructors.  
@@ -310,6 +316,7 @@ Whenever one thing is handed from one occupant to the next - a spawn point taken
 * **Pre-allocate buffers at the entry point**, cleared on reuse. Never allocate them per tick, per stage or per round - a buffer that is re-`new`ed whenever the data outgrows it is still a per-stage allocation.
 * **Size every buffer from a `NetworkConfig.MaxCap` entry.** If no cap fits, add one in the same change instead of measuring the runtime data - the cap is the contract, the amount that happens to be loaded is not.
 * **Cap what the array is indexed by, not what it holds.** An array keyed by hole id is sized by the highest authored hole id, not by how many moles are alive at once; picking the wrong one silently drops every write past the end. Ids start at 1, so the length is cap + 1.
+* **Never mutate a dictionary while enumerating it, not even values-only.** Collect the keys into a pre-sized buffer (`stackalloc` in the simulation domain) in one pass, then apply the mutation over that buffer in a second pass. Relying on `foreach (var key in dict.Keys) dict[key] = ...` being safe today ties correctness to framework internals nobody should have to reason about at the call site.
 
 ---
 
@@ -321,6 +328,7 @@ Whenever one thing is handed from one occupant to the next - a spawn point taken
 * **Only poll what genuinely changes every tick** - anything driven by physics or continuous movement. Everything static after creation is event driven.
 * **The check itself is one Command per trigger**, holding the trigger's id (see *Commands*), so each creation site stays one line.
 * **Removing inside the loop the check triggers?** Iterate backwards (see *Copy out of a `ref` before removing*), and stop early once the thing being checked against is gone.
+* **A one-shot effect belongs in the method that starts it, not in `OnTick`.** An effect that should happen once, at the moment something activates, is a single call at that activation site - the same call left inside `OnTick` instead fires every tick for the whole duration, so a discrete "hit" turns into 60 hits a second and any incremental-damage or survives-N-hits mechanic on the receiving end is bypassed entirely.
 
 ---
 
