@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
-        private readonly IScoreGatePassTrackerService _scoreGatePassTrackerService;
+        private readonly IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
 
         public TalentType TalentType => TalentType.Swap;
 
@@ -39,14 +39,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private ushort _currentActiveSwapFieldId;
 
-        public SwapTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IScoreGatePassTrackerService scoreGatePassTrackerService)
+        public SwapTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IPlayersPassedScoreGateTrackerService playersPassedScoreGateTrackerService)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
-            _scoreGatePassTrackerService = scoreGatePassTrackerService;
+            _playersPassedScoreGateTrackerService = playersPassedScoreGateTrackerService;
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -170,8 +170,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 (closetPlayerToCaster.Spaceship.Transform.AngularVelocity, casterPlayerState.Spaceship.Transform.AngularVelocity);
 
             // Both players jumped, so neither swapped position may be read as a gate pass this tick.
-            _scoreGatePassTrackerService.InvalidatePreviousPosition(casterPlayerState.Id);
-            _scoreGatePassTrackerService.InvalidatePreviousPosition(closetPlayerToCaster.Id);
+            _playersPassedScoreGateTrackerService.InvalidatePreviousPosition(casterPlayerState.Id);
+            _playersPassedScoreGateTrackerService.InvalidatePreviousPosition(closetPlayerToCaster.Id);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private IStageDataService _stageDataService;
         private IBonusStageRotationService _bonusStageRotationService;
-        private IScoreGatePassTrackerService _scoreGatePassTrackerService;
+        private IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
             _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
-            _scoreGatePassTrackerService = _diContainer.Resolve<IScoreGatePassTrackerService>();
+            _playersPassedScoreGateTrackerService = _diContainer.Resolve<IPlayersPassedScoreGateTrackerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
@@ -228,7 +228,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersTouchingWallDataService.ClearAllData();
             _playersTouchingSpikesTrackerService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();
-            _scoreGatePassTrackerService.ClearAllData(); // stale previous positions across a stage boundary would score phantom passes
+            _playersPassedScoreGateTrackerService.ClearAllData(); // stale previous positions across a stage boundary would score phantom passes
             _stageDataService.ClearData();
         }
 

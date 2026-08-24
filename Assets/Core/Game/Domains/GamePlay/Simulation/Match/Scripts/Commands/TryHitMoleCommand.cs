@@ -1,3 +1,4 @@
+using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -77,15 +78,31 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            var goldenMoleDamagePerHit = _sharedGamePlayConfig.GoldenMoleDamagePerHit;
-
-            if (mole.RemainingLives > goldenMoleDamagePerHit) // only a golden mole can survive a hit, its remaining life is shown on its health bar
+            if (mole.IsGolden)
             {
-                mole.RemainingLives -= goldenMoleDamagePerHit;
-                _netEventsDataService.AddGoldenMoleDamagedNetEvent(_processedTick, _moleId, mole.MoleHoleId, mole.RemainingLives, mole.MaxLives);
-                return;
+                var goldenMoleDamagePerHit = _sharedGamePlayConfig.GoldenMoleDamagePerHit;
+                var isGoldenMoleAliveAfterHit = mole.RemainingLives > goldenMoleDamagePerHit;
+
+                if (isGoldenMoleAliveAfterHit)
+                {
+                    DamageMole(mole, goldenMoleDamagePerHit);
+
+                    return;
+                }
             }
 
+            KillMole(mole);
+        }
+
+        private void DamageMole(MoleStateS2C mole, byte damageAmount)
+        {
+            mole.RemainingLives -= damageAmount;
+            _netEventsDataService.AddGoldenMoleDamagedNetEvent(_processedTick, _moleId, mole.MoleHoleId, mole.RemainingLives, mole.MaxLives);
+        }
+
+        private void KillMole(MoleStateS2C mole)
+        {
+            var simulationState = _matchDataService.SimulationState;
             var whacAMoleConfig = _gamePlayConfigService.GamePlayConfig.WhacAMole;
             var isGolden = mole.IsGolden;
             var moleHoleId = mole.MoleHoleId;

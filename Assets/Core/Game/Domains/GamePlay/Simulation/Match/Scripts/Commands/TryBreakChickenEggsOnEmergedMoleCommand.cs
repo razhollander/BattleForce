@@ -37,8 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var simulationState = _matchDataService.SimulationState;
-
-            if (simulationState.ChickenEggs.Count == 0)
+            if (simulationState.ChickenEggs.IsEmpty)
             {
                 return;
             }
@@ -51,8 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 var egg = simulationState.ChickenEggs[eggIndex];
                 var casterPlayerState = simulationState.GetPlayerById(egg.PlayerCasterId);
                 var breakDistance = casterPlayerState.Spaceship.Transform.Radius + moleRadius;
-
-                if ((molePosition - egg.Position).LengthSquared() > breakDistance * breakDistance)
+                var isIntersecting = (molePosition - egg.Position).LengthSquared() <= breakDistance * breakDistance;
+                if (!isIntersecting)
                 {
                     continue;
                 }
@@ -66,7 +65,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 _breakEggCommand.SetEggId(egg.Id).SetProcessedTick(_processedTick).Execute();
 
-                if (!simulationState.TryGetMoleIndexById(_moleId, out _)) // the mole was whacked, the remaining eggs have nothing left to break on
+                var didKillMole = !simulationState.TryGetMoleIndexById(_moleId, out _);
+                if (didKillMole)
                 {
                     return;
                 }

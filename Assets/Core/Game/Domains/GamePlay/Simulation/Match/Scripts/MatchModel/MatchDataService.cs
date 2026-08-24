@@ -136,8 +136,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             mole.MaxLives = lives;
             return mole;
         }
-
-        // A score gate uses its authored layout id (not an auto-incremented one), so the same gate keeps its id across rejoins.
+        
         public ScoreGateStateS2C AddScoreGate(ushort id, Vector2 position, float rotationDegrees)
         {
             ref var scoreGate = ref _simulationState.ScoreGates.AddAndGet();

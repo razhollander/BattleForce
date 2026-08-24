@@ -47,7 +47,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TryHitMoleCommand _tryHitMoleCommand;
         private PushScoreGateCommand _pushScoreGateCommand;
         private BreakEggCommand _breakEggCommand;
-        private IScoreGatePassTrackerService _scoreGatePassTrackerService;
+        private IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -70,7 +70,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
             _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
             _breakEggCommand = _commandFactory.CreateCommandVoid<BreakEggCommand>();
-            _scoreGatePassTrackerService = _diContainer.Resolve<IScoreGatePassTrackerService>();
+            _playersPassedScoreGateTrackerService = _diContainer.Resolve<IPlayersPassedScoreGateTrackerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
@@ -1002,7 +1002,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var exitGateNormal = exitGateRotation.ToRadians().AngleToVector();
             var exitPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(enterPoint, enterGatePosition, enterGateNormal, exitGatePosition, exitGateNormal);
             playerState.Spaceship.Transform.Position = exitPoint;
-            _scoreGatePassTrackerService.InvalidatePreviousPosition(playerId); // the jump must not be read as a gate pass
+            _playersPassedScoreGateTrackerService.InvalidatePreviousPosition(playerId); // the jump must not be read as a gate pass
             var newDirection = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Direction, enterGateNormal, exitGateNormal);
             playerState.Spaceship.Transform.Direction = newDirection;
             var newVelocity = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Velocity, enterGateNormal, exitGateNormal);

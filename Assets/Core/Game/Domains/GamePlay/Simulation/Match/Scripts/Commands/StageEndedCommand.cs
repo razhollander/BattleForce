@@ -19,14 +19,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IStageDataService _stageDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         
-        private ushort _playerIdDoingWinningBlow;
-
-        public StageEndedCommand PlayerIdDoingWinningBlow(ushort playerId)
-        {
-            _playerIdDoingWinningBlow = playerId;
-            return this;
-        }
-        
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
             _winningTeamId = winningTeamId;
@@ -60,8 +52,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private PlayerStateS2C GetPlayerToFocusOn()
         {
-            // In bonus stages the winner is the winning-team player who contributed the most score, not the one who
-            // landed a winning blow (there is no elimination in bonus stages).
             if (_matchDataService.SimulationState.StageType.IsBonusStage())
             {
                 return GetTopScoringPlayerInWinningTeam();
@@ -69,7 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId && _playerIdDoingWinningBlow == player.Id)
+                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId)
                 {
                     return player;
                 }
@@ -107,9 +97,17 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                     continue;
                 }
 
-                // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
-                if (topScoringPlayer == null || stageScorePerPlayerId[player.Id] > stageScorePerPlayerId[topScoringPlayer.Id] ||
-                    (stageScorePerPlayerId[player.Id] == stageScorePerPlayerId[topScoringPlayer.Id] && player.Id < topScoringPlayer.Id))
+                if (topScoringPlayer == null)
+                {
+                    topScoringPlayer = player;
+                    continue;
+                }
+                
+                
+                ushort scoreOfPlayer = stageScorePerPlayerId[player.Id];
+                ushort scoreOfTopScoringPlayer = stageScorePerPlayerId[topScoringPlayer.Id];
+
+                if (scoreOfPlayer > scoreOfTopScoringPlayer || (scoreOfPlayer == scoreOfTopScoringPlayer && player.Id < topScoringPlayer.Id)) // Deterministic tie-break: keep the lowest player id when scores are equal
                 {
                     topScoringPlayer = player;
                 }

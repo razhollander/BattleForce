@@ -8,11 +8,6 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    /// <summary>
-    /// Runs every gate trap's cycle: it arms while open, snaps shut on the first player caught inside its area, waits,
-    /// opens again and cools down. Only the moment it starts closing is sent to the clients - they replay the rest of
-    /// the cycle from the same authored durations.
-    /// </summary>
     public class StepGateTrapsCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
@@ -65,6 +60,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private void UpdateWallTransform(MatchEnvironmentGateTrapModel gateTrap, GateTrapState state, int stateEndTick)
         {
+            var isGatePositionIdle = state is GateTrapState.Closed or GateTrapState.Open;
+            if (isGatePositionIdle)
+            {
+                return;
+            }
+
             var closedProgress = EnvironmentGateTrapUtils.CalculateClosedProgress(state, stateEndTick, _tick, gateTrap.TransitionDurationInTicks);
             EnvironmentGateTrapUtils.CalculateWallTransform(gateTrap.OpenPosition, gateTrap.ClosedPosition, gateTrap.OpenRotationDegrees, gateTrap.ClosedRotationDegrees,
                 gateTrap.LocalRotationPivot, closedProgress, out var localPosition, out var localRotationDegrees);

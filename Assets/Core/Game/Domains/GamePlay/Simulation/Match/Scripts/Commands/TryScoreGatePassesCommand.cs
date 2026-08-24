@@ -12,14 +12,11 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    // Detects, each tick, every GatePass player who crossed a gate's gap since last tick and scores a point for his
-    // team. The crossing is a geometric segment test (movement segment vs gap segment), so a fast player cannot tunnel
-    // through the gap unnoticed, and a per player-gate cooldown stops score farming from jitter inside the gap.
     public class TryScoreGatePassesCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
         private IStageDataService _stageDataService;
-        private IScoreGatePassTrackerService _scoreGatePassTrackerService;
+        private IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
         private INetEventsDataService _netEventsDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -37,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
-            _scoreGatePassTrackerService = _diContainer.Resolve<IScoreGatePassTrackerService>();
+            _playersPassedScoreGateTrackerService = _diContainer.Resolve<IPlayersPassedScoreGateTrackerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
@@ -51,9 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-
-            // Previous positions are refreshed even during preparation so the first live tick has a sane baseline,
-            // but a crossing only scores once the stage is live.
+            
             var canScoreInStagePhase = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
             var gapHalfWidth = _sharedGamePlayConfig.ScoreGateGapWidth * simulationState.MapSizeMultiplier * 0.5f;
 
@@ -61,12 +56,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var currentPosition = player.Spaceship.Transform.Position;
 
-                if (canScoreInStagePhase && _scoreGatePassTrackerService.TryGetPreviousPosition(player.Id, out var previousPosition))
+                if (canScoreInStagePhase && _playersPassedScoreGateTrackerService.TryGetPlayerPreviousPosition(player.Id, out var previousPosition))
                 {
                     TryScorePlayerAgainstAllGates(player, previousPosition, currentPosition, gapHalfWidth);
                 }
 
-                _scoreGatePassTrackerService.SetPreviousPosition(player.Id, currentPosition);
+                _playersPassedScoreGateTrackerService.SetPlayerPreviousPosition(player.Id, currentPosition);
             }
         }
 
@@ -86,7 +81,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 var scoreGate = scoreGates[i];
 
-                if (_scoreGatePassTrackerService.IsPassScoreOnCooldown(player.Id, scoreGate.Id, _processedTick))
+                if (_playersPassedScoreGateTrackerService.IsPlayerPassScoreOnCooldown(player.Id, scoreGate.Id, _processedTick))
                 {
                     continue;
                 }
@@ -122,7 +117,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             scoreGate.ScoreMultiplier = nextMultiplier;
 
             var cooldownTicks = (int)MathF.Ceiling(gatePassConfig.PassScoreCooldownSeconds * _networkConfig.TicksPerSeconds);
-            _scoreGatePassTrackerService.StartPassScoreCooldown(player.Id, scoreGateId, _processedTick + cooldownTicks);
+            _playersPassedScoreGateTrackerService.StartPlayerPassScoreCooldown(player.Id, scoreGateId, _processedTick + cooldownTicks);
 
             _netEventsDataService.AddPlayerPassedScoreGateNetEvent(_processedTick, scoreGateId, player.Id, (byte)score, nextMultiplier, (ushort)teamBonusScoreTotal, (ushort)byPlayerBonusScoreTotal);
         }

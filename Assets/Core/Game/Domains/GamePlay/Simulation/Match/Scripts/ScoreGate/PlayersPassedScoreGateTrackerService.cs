@@ -4,14 +4,14 @@ using Core.Scripts.Utils.CustomCollections;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate
 {
-    public class ScoreGatePassTrackerService : IScoreGatePassTrackerService
+    public class PlayersPassedScoreGateTrackerService : IPlayersPassedScoreGateTrackerService
     {
         private const int PLAYER_ID_KEY_SHIFT = 16; // packs (playerId, scoreGateId) into one int cooldown key
 
         private readonly CapacityDict<ushort, Vector2> _previousPositionPerPlayerId;
         private readonly CapacityDict<int, int> _cooldownEndTickPerPlayerGate;
 
-        public ScoreGatePassTrackerService(NetworkConfig networkConfig)
+        public PlayersPassedScoreGateTrackerService(NetworkConfig networkConfig)
         {
             var maxPlayers = networkConfig.MaxCap.ConcurrentPlayers;
             var maxScoreGates = networkConfig.MaxCap.ConcurrentScoreGates;
@@ -30,23 +30,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate
             _previousPositionPerPlayerId.Remove(playerId);
         }
 
-        public bool TryGetPreviousPosition(ushort playerId, out Vector2 previousPosition)
+        public bool TryGetPlayerPreviousPosition(ushort playerId, out Vector2 previousPosition)
         {
             return _previousPositionPerPlayerId.TryGetValue(playerId, out previousPosition);
         }
 
-        public void SetPreviousPosition(ushort playerId, Vector2 position)
+        public void SetPlayerPreviousPosition(ushort playerId, Vector2 position)
         {
             _previousPositionPerPlayerId[playerId] = position;
         }
 
-        public bool IsPassScoreOnCooldown(ushort playerId, ushort scoreGateId, int currentTick)
+        public bool IsPlayerPassScoreOnCooldown(ushort playerId, ushort scoreGateId, int currentTick)
         {
             var key = BuildPlayIdAndScoreGateIdKey(playerId, scoreGateId);
             return _cooldownEndTickPerPlayerGate.TryGetValue(key, out var cooldownEndTick) && currentTick < cooldownEndTick;
         }
 
-        public void StartPassScoreCooldown(ushort playerId, ushort scoreGateId, int cooldownEndTick)
+        public void StartPlayerPassScoreCooldown(ushort playerId, ushort scoreGateId, int cooldownEndTick)
         {
             _cooldownEndTickPerPlayerGate[BuildPlayIdAndScoreGateIdKey(playerId, scoreGateId)] = cooldownEndTick;
         }

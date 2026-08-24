@@ -3,20 +3,20 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    public class StepFrigidBlocksCommand : BaseCommand, ICommandVoid
+    public class DestroyIdleFrigidBlocksCommand : BaseCommand, ICommandVoid
     {
         private IFrigidBlocksController _frigidBlocksController;
 
         private int _tick;
         private float _deltaTime;
 
-        public StepFrigidBlocksCommand SetTick(int tick)
+        public DestroyIdleFrigidBlocksCommand SetTick(int tick)
         {
             _tick = tick;
             return this;
         }
 
-        public StepFrigidBlocksCommand SetDeltaTime(float deltaTime)
+        public DestroyIdleFrigidBlocksCommand SetDeltaTime(float deltaTime)
         {
             _deltaTime = deltaTime;
             return this;
@@ -29,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
-            _frigidBlocksController.OnTick(_tick, _deltaTime);
+            _frigidBlocksController.DestroyIdleBlocks(_tick, _deltaTime);
         }
     }
 }

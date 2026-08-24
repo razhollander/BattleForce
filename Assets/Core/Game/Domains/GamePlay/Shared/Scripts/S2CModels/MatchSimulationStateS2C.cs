@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.Extensions;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
@@ -1253,9 +1254,16 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
 
         public void ResetStageScorePerTeam()
         {
+            Span<ushort> teamIds = stackalloc ushort[StageScorePerTeamId.Count];
+            var teamIndex = 0;
             foreach (var key in StageScorePerTeamId.Keys)
             {
-                StageScorePerTeamId[key] = 0;
+                teamIds[teamIndex++] = key;
+            }
+
+            foreach (var teamId in teamIds)
+            {
+                StageScorePerTeamId[teamId] = 0;
             }
         }
 

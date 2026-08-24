@@ -39,9 +39,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
         public PlayerTalentControllers(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
             IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, SharedGamePlayConfig sharedGamePlayConfig,
             IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService,
-            IScoreGatePassTrackerService scoreGatePassTrackerService)
+            IPlayersPassedScoreGateTrackerService playersPassedScoreGateTrackerService)
         {
-            _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, scoreGatePassTrackerService);
+            _swapTalentController = new SwapTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, playersPassedScoreGateTrackerService);
             _koTalentController = new KOTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory);
             _dashPulseTalentController = new DashPulseTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfigService, commandFactory);
             _sentryGunTalentController = new SentryGunTalentController(netEventsDataService, overrideableNetEventsService, matchDataService, gamePlayConfigService, networkConfig, commandFactory);
@@ -55,7 +55,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             _rockTalentController = new RockTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, commandFactory, playersInLavaTrackerService);
             _frigidBlockTalentController = new FrigidBlockTalentController(matchDataService, gamePlayConfigService, networkConfig, sharedGamePlayConfig, commandFactory);
             _fishingRodTalentController = new FishingRodTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, commandFactory, playersMouseDataService);
-            _soulTalentController = new SoulTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, scoreGatePassTrackerService);
+            _soulTalentController = new SoulTalentController(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, sharedGamePlayConfig, playersPassedScoreGateTrackerService);
             _frozenTalentController = new FrozenTalentController(netEventsDataService, matchDataService, gamePlayConfigService, networkConfig, commandFactory, playersInLavaTrackerService);
         }
 

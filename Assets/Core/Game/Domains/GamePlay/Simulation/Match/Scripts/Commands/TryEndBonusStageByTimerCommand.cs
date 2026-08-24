@@ -6,11 +6,7 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    /// <summary>
-    /// Ends a Whac-A-Mole stage once its countdown expires. Each team is awarded one gem per team it
-    /// strictly outscored, so with N teams the pool is 0+1+...+(N-1) and tied teams share the lower place.
-    /// </summary>
-    public class TryEndWhacAMoleStageCommand : BaseCommand, ICommandVoid
+    public class TryEndBonusStageByTimerCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
         private IStageDataService _stageDataService;
@@ -20,7 +16,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private int _processedTick;
 
-        public TryEndWhacAMoleStageCommand SetProcessedTick(int processedTick)
+        public TryEndBonusStageByTimerCommand SetProcessedTick(int processedTick)
         {
             _processedTick = processedTick;
             return this;
@@ -48,10 +44,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
 
-            HideAllMoles();
+            if (simulationState.StageType == StageType.WhacAMole)
+            {
+                HideAllMoles();
+            }
 
-            var highestMolesKilled = GetHighestMolesKilled();
-            var winningTeamId = GetLowestTeamIdWithMolesKilled(highestMolesKilled);
+            var highestScore = GetHighestScore();
+            var winningTeamId = GetLowestTeamIdWithScore(highestScore);
             AwardGemsByRank();
             _stageEndedCommand
                 .SetWinningTeamId(winningTeamId)
@@ -59,7 +58,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 .Execute();
         }
 
-        // No per-mole hide net event is sent: the client hides every mole on its own once it sees the stage end,
+        // No per-mole hide net event is sent: the client hides every mole on its own once it sees the stage end to save network bandwidth,
         // so here the moles only need to leave the physics simulation and the state.
         private void HideAllMoles()
         {
@@ -78,29 +77,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             moles.Clear();
         }
 
-        private int GetHighestMolesKilled()
+        private int GetHighestScore()
         {
-            var highestMolesKilled = 0;
+            var highestScore = 0;
 
             foreach (var kvp in _matchDataService.SimulationState.StageScorePerTeamId)
             {
-                if (kvp.Value > highestMolesKilled)
+                if (kvp.Value > highestScore)
                 {
-                    highestMolesKilled = kvp.Value;
+                    highestScore = kvp.Value;
                 }
             }
 
-            return highestMolesKilled;
+            return highestScore;
         }
 
         // The stage end event carries a single winner, so ties resolve to the lowest team id to stay deterministic.
-        private ushort GetLowestTeamIdWithMolesKilled(int molesKilled)
+        private ushort GetLowestTeamIdWithScore(int score)
         {
             var winningTeamId = ushort.MaxValue;
 
             foreach (var kvp in _matchDataService.SimulationState.StageScorePerTeamId)
             {
-                if (kvp.Value == molesKilled && kvp.Key < winningTeamId)
+                if (kvp.Value == score && kvp.Key < winningTeamId)
                 {
                     winningTeamId = kvp.Key;
                 }
@@ -110,7 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         }
 
         // Each team earns one gem for every team it strictly outscored. With N teams the total pool is
-        // 0+1+...+(N-1); teams tied on moles hit each count zero teams between them, so they receive the
+        // 0+1+...+(N-1); teams tied on score each count zero teams between them, so they receive the
         // same lower-placed amount and the higher place they share is skipped.
         private void AwardGemsByRank()
         {

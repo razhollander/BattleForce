@@ -103,6 +103,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             _physicsSimulator.DisablePlayerHeartCollider(_casterPlayerId);
 
             PushAndSpinNearbyEnemies(tick, casterPlayerState, config);
+            WhackMolesCoveredByRock(tick);
+
             casterSpaceship.IsSpinned = false;
             _netEventsDataService.AddPlayerSpinnedEndedNetEvent(tick, _casterPlayerId);
             _netEventsDataService.AddActivateRockTalentNetEvent(tick, _casterPlayerId);
@@ -137,8 +139,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 _trySpinPlayerCommand.SetPlayer(enemyPlayerState.Id).SetSpinAmount(config.EnemySpinAmount).SetTick(tick).Execute();
             }
         }
-
-        // Runs every tick the rock lasts, so a mole that emerges under the rock or one the rock is pushed onto is whacked just like the moles it covered the moment it grew.
+        
         private void WhackMolesCoveredByRock(int tick)
         {
             var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
@@ -177,9 +178,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             {
                 return;
             }
-
-            WhackMolesCoveredByRock(tick);
-
+            
             var elapsedSecondsBeingRock = (tick - _startTick) * deltaTime;
             var didRockDurationFinish = elapsedSecondsBeingRock >= _gamePlayConfigService.GamePlayConfig.Talents.RockTalentConfig.DurationInSeconds;
             if (didRockDurationFinish)

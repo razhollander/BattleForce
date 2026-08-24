@@ -47,12 +47,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TryHideExpiredMolesCommand _tryHideExpiredMolesCommand;
         private TryEmergeMolesCommand _tryEmergeMolesCommand;
         private TrySpawnMolesCommand _trySpawnMolesCommand;
-        private TryEndWhacAMoleStageCommand _tryEndWhacAMoleStageCommand;
+        private TryEndBonusStageByTimerCommand _tryEndBonusStageByTimerCommand;
         private TryScoreGatePassesCommand _tryScoreGatePassesCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
-        private StepFrigidBlocksCommand _stepFrigidBlocksCommand;
+        private DestroyIdleFrigidBlocksCommand _destroyIdleFrigidBlocksCommand;
         private StepTimersCommand _stepTimersCommand;
         private TryEndPlayersSpinIfReachedZeroAngularVecityCommand _tryEndPlayersSpinIfReachedZeroAngularVecityCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
@@ -97,11 +97,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryHideExpiredMolesCommand = _commandFactory.CreateCommandVoid<TryHideExpiredMolesCommand>();
             _tryEmergeMolesCommand = _commandFactory.CreateCommandVoid<TryEmergeMolesCommand>();
             _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
-            _tryEndWhacAMoleStageCommand = _commandFactory.CreateCommandVoid<TryEndWhacAMoleStageCommand>();
+            _tryEndBonusStageByTimerCommand = _commandFactory.CreateCommandVoid<TryEndBonusStageByTimerCommand>();
             _tryScoreGatePassesCommand = _commandFactory.CreateCommandVoid<TryScoreGatePassesCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
-            _stepFrigidBlocksCommand = _commandFactory.CreateCommandVoid<StepFrigidBlocksCommand>();
+            _destroyIdleFrigidBlocksCommand = _commandFactory.CreateCommandVoid<DestroyIdleFrigidBlocksCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
@@ -137,12 +137,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryHideExpiredMolesCommand.SetProcessedTick(currentTick).Execute();
                 _tryEmergeMolesCommand.SetProcessedTick(currentTick).Execute();
                 _trySpawnMolesCommand.SetProcessedTick(currentTick).Execute();
-                _tryEndWhacAMoleStageCommand.SetProcessedTick(currentTick).Execute();
+                _tryEndBonusStageByTimerCommand.SetProcessedTick(currentTick).Execute();
                 _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
                 _applyGalacticPullForcesCommand.Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
-                _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
+                _destroyIdleFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
                 _tryScoreGatePassesCommand.SetProcessedTick(currentTick).Execute(); // after the physics step, so gate and player positions are post-step
                 _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();

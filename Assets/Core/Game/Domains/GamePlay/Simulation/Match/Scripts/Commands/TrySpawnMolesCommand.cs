@@ -16,12 +16,9 @@ using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    /// <summary>
-    /// Spawns a new mole into a free hole whenever the spawn timer ends and the stage is still accepting moles.
-    /// </summary>
     public class TrySpawnMolesCommand : BaseCommand, ICommandVoid
     {
-        private const ushort NO_MOLE_HOLE_ID = 0; // authored mole hole ids start at one, so zero means no hole was found
+        private const ushort NO_MOLE_HOLE_ID = 0;
 
         private static readonly PhysicsBodyType[] BLOCKING_SPAWN_BODY_TYPES =
         {
@@ -92,9 +89,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 SpawnMole(whacAMoleConfig);
             }
         }
-
-        // The mole is only added to the state here, it stays out of the physics simulation until its hole finished shaking,
-        // so nothing can target or hit it while it is still hidden.
+        
         private void SpawnMole(WhacAMoleConfig whacAMoleConfig)
         {
             if (!TryFindAvailableSpawnPoint(whacAMoleConfig.MoleRadius, out var moleHoleId, out var position))
@@ -114,8 +109,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             return (int)System.MathF.Ceiling(_sharedGamePlayConfig.MoleHoleShakeDurationSeconds * _networkConfig.TicksPerSeconds);
         }
-
-        // The lifetime only starts once the mole is actually out of its hole, the shake is not part of it.
+        
         private int CalculateDisappearOnTick(WhacAMoleConfig whacAMoleConfig, int emergeOnTick)
         {
             if (whacAMoleConfig.MaxMoleLifetimeSeconds <= 0)
@@ -161,8 +155,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             return false;
         }
-
-        // A mole whose hole is still shaking has no physics body yet, so the physics check above cannot see it.
+        
         private bool IsSpawnPointTakenByShakingMole(ushort moleHoleId)
         {
             foreach (var mole in _matchDataService.SimulationState.Moles.AsSpan())

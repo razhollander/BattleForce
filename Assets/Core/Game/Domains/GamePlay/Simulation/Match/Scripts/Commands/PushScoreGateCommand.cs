@@ -5,9 +5,6 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
-    // The single place any talent shoves the score gate. Impulse and spin are given per unit mass / inertia, so the
-    // tuning numbers stay stable when the gate's density is changed. Callers must set every field they care about;
-    // set the impulse to zero for a spin-only hit (chicken egg) and the spin to zero for a pure push.
     public class PushScoreGateCommand : BaseCommand, ICommandVoid
     {
         private IMatchDataService _matchDataService;
