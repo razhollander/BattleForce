@@ -16,8 +16,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float NukeForce = 15f;
         public float NukeMinSpinAmount = 180f;
         public float NukeMaxSpinAmount = 720f;
-        // How hard the nuke shoves a score gate lives in GatePassConfig, with every other gate impulse, so the whole set
-        // stays on one scale.
         public float ShuffleSwapIntervalInSeconds = 0.35f;
     }
 }

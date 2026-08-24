@@ -219,7 +219,7 @@ MonoBehaviour:
     EveryXStages: 2
     AreBonusStagesEnabled: 1
     BonusStageEveryXStages: 1
-    EnabledBonusStageTypes: 02000000
+    EnabledBonusStageTypes: 03000000
     DefaultWhacAMoleEnvironmentId: 22
     DefaultGatePassEnvironmentId: 23
     WhacAMole:
@@ -231,7 +231,7 @@ MonoBehaviour:
       MoleHoleReuseCooldownSeconds: 1
       MinMoleLifetimeSeconds: 10
       MaxMoleLifetimeSeconds: 13
-      ScorePerMoleHit: 1
+      ScorePerMoleKilled: 1
       MinMolesUntilGoldenMole: 3
       MaxMolesUntilGoldenMole: 6
       GoldenMoleLives: 3
