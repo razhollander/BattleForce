@@ -913,8 +913,8 @@ MonoBehaviour:
   _gemCountText: {fileID: 510796559825919576}
   _boltsCountText: {fileID: 7815101060805522004}
   _backgroundImage: {fileID: 7450827566868595952}
-  _molesHitContainer: {fileID: 1606984956088522858}
-  _molesHitCountText: {fileID: 6875879603246633776}
+  _molesKilledContainer: {fileID: 1606984956088522858}
+  _molesKilledCountText: {fileID: 6875879603246633776}
   _gatePassScoreContainer: {fileID: 5879339116163394125}
   _gatePassScoreCountText: {fileID: 6225228098421634240}
 --- !u!114 &307606426804420270

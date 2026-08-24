@@ -85,8 +85,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
                 if (isGoldenMoleAliveAfterHit)
                 {
-                    DamageMole(mole, goldenMoleDamagePerHit);
-
+                    DamageMole(ref mole, goldenMoleDamagePerHit);
                     return;
                 }
             }
@@ -94,7 +93,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             KillMole(mole);
         }
 
-        private void DamageMole(MoleStateS2C mole, byte damageAmount)
+        private void DamageMole(ref MoleStateS2C mole, byte damageAmount)
         {
             mole.RemainingLives -= damageAmount;
             _netEventsDataService.AddGoldenMoleDamagedNetEvent(_processedTick, _moleId, mole.MoleHoleId, mole.RemainingLives, mole.MaxLives);

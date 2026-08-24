@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8811110004}
   - component: {fileID: 9063138468441702294}
   m_Layer: 5
-  m_Name: MolesHitScoreText
+  m_Name: MolesKillScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -230,8 +230,8 @@ MonoBehaviour:
   _moneyText: {fileID: 5447874160441701297}
   _healthBar: {fileID: 2875161570312970966}
   _healthBarGameObject: {fileID: 2875161570323005688}
-  _molesHitScoreText: {fileID: 8811110004}
-  _molesHitScoreContainer: {fileID: 1705406126981311474}
+  _molesKilledScoreText: {fileID: 8811110004}
+  _molesKilledScoreContainer: {fileID: 1705406126981311474}
   _gatePassScoreText: {fileID: 7100000000000000013}
   _gatePassScoreContainer: {fileID: 7100000000000000001}
   _canvasGroup: {fileID: 65682781423828582}
@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 4798690389302320550}
   - component: {fileID: 2801897723538063897}
   m_Layer: 5
-  m_Name: MolesHitScore
+  m_Name: MolesKillScore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

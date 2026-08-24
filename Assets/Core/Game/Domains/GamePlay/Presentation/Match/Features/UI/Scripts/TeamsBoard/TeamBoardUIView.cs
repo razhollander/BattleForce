@@ -2,7 +2,6 @@ using System.Threading;
 using CoreDomain.Scripts.Helpers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard
