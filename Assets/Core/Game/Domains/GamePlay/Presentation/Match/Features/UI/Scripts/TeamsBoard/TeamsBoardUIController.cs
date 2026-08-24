@@ -31,6 +31,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamBolts(teamId, teamBolts, _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
+        public void UpdateTeamMolesKilled(ushort teamId, int molesKilled)
+        {
+            _view.UpdateTeamMolesKilled(teamId, molesKilled);
+        }
+
+        public void UpdateTeamGatePassScore(ushort teamId, int gatePassScore)
+        {
+            _view.UpdateTeamGatePassScore(teamId, gatePassScore);
+        }
+
+        public void SetIsMolesKilledShown(bool isShown)
+        {
+            _view.SetIsMolesKilledShown(isShown);
+        }
+
+        public void SetIsGatePassScoreShown(bool isShown)
+        {
+            _view.SetIsGatePassScoreShown(isShown);
+        }
+
         public void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts)
         {
             if (_presentationGamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))

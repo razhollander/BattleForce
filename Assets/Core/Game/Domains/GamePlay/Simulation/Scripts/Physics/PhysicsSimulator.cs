@@ -558,6 +558,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _circleShapePool.Return(circleShape);
         }
 
+        // Moles are stationary sensors: they must notice bullets and spaceships without pushing them around.
+        public void AddMole(ushort id, Vector2 position, float radius)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Static;
+            bodyDef.position = position;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.Mole);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var circleShape = GetCircleShape();
+            circleShape.Radius = radius;
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = circleShape;
+            fixtureDef.density = 0;
+            fixtureDef.friction = 0;
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.Mole.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.Mole.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _circleShapePool.Return(circleShape);
+        }
+
+        public void RemoveMole(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.Mole, id);
+            RemoveBody(body);
+        }
+
         public Body GetBullet(ushort bulletId)
         {
             return GetBody(PhysicsBodyType.PlayerBullet, bulletId);
@@ -738,11 +771,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             return hasCollision;
         }
 
-        public bool RectangleCastOnPlayers(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        // Casts the rectangle against two body types at once. firstPriorityBodyType wins when both are inside the shape;
+        // ignoreTeamId only applies to players, since they are the only bodies grouped by team. hitBodyData carries the type that was hit.
+        public bool RectangleCastByPriority(Vector2 center, Vector2 size, float angleRadians, short ignoreTeamId, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, out PhysicsBodyData hitBodyData)
+        {
+            return TryRectangleCast(center, size, angleRadians, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+        }
+
+        private bool TryRectangleCast(Vector2 center, Vector2 size, float angleRadians, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             _unityMainThreadDispatcher.EnqueueDraw(()=>DebugDrawUtils.DrawRotatedRect(center, size, angleRadians));
-            var hasCollision = false;
-            hitBodyData = default;
 
             var hx = size.X * 0.5f;
             var hy = size.Y * 0.5f;
@@ -757,49 +795,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             var max = Vector2.Max(Vector2.Max(v1, v2), Vector2.Max(v3, v4));
 
             var aabb = new AABB(min, max);
-            PhysicsBodyData hitBody = default;
 
-            _world.QueryAABB(fixture =>
-            {
-                var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
-                var shouldContinueQuery = true;
-                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
-                if (isPlayerFromNotIgnoredTeam)
-                {
-                    var polygonShape = GetPolygonShape();
-                    polygonShape.SetAsBox(hx, hy);
+            var polygonShape = GetPolygonShape();
+            polygonShape.SetAsBox(hx, hy);
 
-                    var input = new ShapeCastInput();
-                    input.proxyA.Set(polygonShape, 0);
-                    input.proxyB.Set(fixture.Shape, 0);
-                    input.transformA = new Transform(center, rot);
-                    input.transformB = fixture.Body.GetTransform();
-                    input.translationB = Vector2.Zero;
+            var hasCollision = TryShapeCastHit(polygonShape, new Transform(center, rot), aabb, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
 
-                    if (Contact.ShapeCast(out _, input))
-                    {
-                        hasCollision = true;
-                        hitBody = currentBodyData;
-                    }
-
-                    _polygonShapePool.Return(polygonShape);
-                    shouldContinueQuery = !hasCollision;
-                }
-
-                return shouldContinueQuery;
-            }, aabb);
-
-            hitBodyData = hitBody;
+            _polygonShapePool.Return(polygonShape);
 
             return hasCollision;
         }
 
-        public bool ArcCastOnPlayers(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        // Casts the arc against two body types at once. firstPriorityBodyType wins when both are inside the shape;
+        // ignoreTeamId only applies to players, since they are the only bodies grouped by team. hitBodyData carries the type that was hit.
+        public bool ArcCastByPriority(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, out PhysicsBodyData hitBodyData)
+        {
+            return TryArcCast(center, radius, direction, arcAngleDegrees, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+        }
+
+        private bool TryArcCast(Vector2 center, float radius, Vector2 directon, float arcAngleDegrees, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
         {
             var arcAngleRad = arcAngleDegrees.ToRadians();
             var startAngleRad = directon.ToAngleRadians()-arcAngleRad*0.5f;
-            var hasCollision = false;
-            
+
             // We use 1 point for the center, leaving up to 7 points for the outer curve
             int vertexCount = 8;
             var vertices = new Vector2[vertexCount];
@@ -831,47 +849,86 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
             _unityMainThreadDispatcher.EnqueueDraw(() => DebugDrawUtils.DrawPolygon(center, vertices));
 
             var aabb = new AABB(min, max);
-            PhysicsBodyData hitBody = default;
 
-            // 3. Query the world
+            var polygonShape = GetPolygonShape();
+            // Set the approximation vertices
+            polygonShape.Set(vertices);
+
+            // transformA handles the position. Rotation is baked into vertices
+            // but we pass Identity to stay consistent with local-space vertices.
+            var hasCollision = TryShapeCastHit(polygonShape, new Transform(center, Matrix3x2.Identity), aabb, firstPriorityBodyType, secondPriorityBodyType, ignoreTeamId, out hitBodyData);
+
+            _polygonShapePool.Return(polygonShape);
+
+            return hasCollision;
+        }
+
+        // Runs one broadphase query for both body types. A first-priority hit ends the query at once; a second-priority hit is
+        // remembered but the search continues, so a first-priority body that is also inside the shape still wins. ignoreTeamId
+        // only filters players, the only bodies grouped by team.
+        private bool TryShapeCastHit(PolygonShape castShape, Transform castTransform, AABB aabb, PhysicsBodyType firstPriorityBodyType, PhysicsBodyType secondPriorityBodyType, short ignoreTeamId, out PhysicsBodyData hitBodyData)
+        {
+            var hasFirstPriorityHit = false;
+            var hasSecondPriorityHit = false;
+            PhysicsBodyData firstPriorityHitBody = default;
+            PhysicsBodyData secondPriorityHitBody = default;
+
             _world.QueryAABB(fixture =>
             {
                 var currentBodyData = (PhysicsBodyData) fixture.Body.UserData;
-                var shouldContinueQuery = true;
-                var isPlayerFromNotIgnoredTeam = currentBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex != -ignoreTeamId;
-                if (isPlayerFromNotIgnoredTeam)
+                var bodyType = currentBodyData.PhysicsBodyType;
+
+                var isFirstPriority = bodyType == firstPriorityBodyType;
+                var isSecondPriority = bodyType == secondPriorityBodyType;
+                if (!isFirstPriority && !isSecondPriority)
                 {
-                    var polygonShape = GetPolygonShape();
-
-                    // Set the approximation vertices
-                    polygonShape.Set(vertices);
-
-                    var input = new ShapeCastInput();
-                    input.proxyA.Set(polygonShape, 0);
-                    input.proxyB.Set(fixture.Shape, 0);
-
-                    // transformA handles the position. Rotation is baked into vertices
-                    // but we pass Identity to stay consistent with local-space vertices.
-                    input.transformA = new Transform(center, Matrix3x2.Identity);
-                    input.transformB = fixture.Body.GetTransform();
-                    input.translationB = Vector2.Zero;
-                    
-                    if (Contact.ShapeCast(out _, input))
-                    {
-                        hasCollision = true;
-                        hitBody = currentBodyData;
-                    }
-
-                    _polygonShapePool.Return(polygonShape);
-                    shouldContinueQuery = !hasCollision;
+                    return true;
                 }
 
-                return shouldContinueQuery;
+                var isPlayerFromIgnoredTeam = bodyType == PhysicsBodyType.PlayerSpaceship && fixture.FilterData.groupIndex == -ignoreTeamId;
+                if (isPlayerFromIgnoredTeam)
+                {
+                    return true;
+                }
+
+                // A second-priority hit is already recorded, so another one cannot change the outcome - only a first-priority hit still matters.
+                if (isSecondPriority && hasSecondPriorityHit)
+                {
+                    return true;
+                }
+
+                var input = new ShapeCastInput();
+                input.proxyA.Set(castShape, 0);
+                input.proxyB.Set(fixture.Shape, 0);
+                input.transformA = castTransform;
+                input.transformB = fixture.Body.GetTransform();
+                input.translationB = Vector2.Zero;
+
+                if (!Contact.ShapeCast(out _, input))
+                {
+                    return true;
+                }
+
+                if (isFirstPriority)
+                {
+                    hasFirstPriorityHit = true;
+                    firstPriorityHitBody = currentBodyData;
+                    return false; // nothing outranks a first-priority hit, so stop querying
+                }
+
+                hasSecondPriorityHit = true;
+                secondPriorityHitBody = currentBodyData;
+                return true; // keep looking in case a first-priority body is also inside the shape
             }, aabb);
 
-            hitBodyData = hitBody;
+            if (hasFirstPriorityHit)
+            {
+                hitBodyData = firstPriorityHitBody;
+                return true;
+            }
 
-            return hasCollision;
+            hitBodyData = secondPriorityHitBody;
+            return hasSecondPriorityHit;
         }
 
         public bool EllipseCastOnPlayers(Vector2 center, float radius, Vector2 direction, float arcAngleDegrees, short ignoreTeamId, out PhysicsBodyData hitBodyData)
@@ -1184,6 +1241,78 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         public void RemoveFrigidBlock(ushort id)
         {
             var body = GetBody(PhysicsBodyType.FrigidBlock, id);
+            RemoveBody(body);
+        }
+
+        // A score gate is a single dynamic body carrying two square post fixtures, so the posts can never drift apart
+        // and the whole gate rotates as one rigid piece. The gap between them is what players score by passing through.
+        public void AddScoreGate(ushort id, Vector2 position, float rotationDegrees, Vector2 postSize, float gapWidth, float mass, float density, float restitution, float linearDamping, float angularDamping)
+        {
+            var bodyDef = GetBodyDef();
+            bodyDef.type = BodyType.Dynamic;
+            bodyDef.position = position;
+            bodyDef.angle = rotationDegrees.ToRadians();
+            bodyDef.linearDamping = linearDamping;
+            bodyDef.angularDamping = angularDamping;
+            bodyDef.userData = new PhysicsBodyData(id, PhysicsBodyType.ScoreGate);
+
+            var body = _world.CreateBody(bodyDef);
+            _bodyDefPool.Return(bodyDef);
+
+            var postHalfWidth = postSize.X * 0.5f;
+            var postHalfHeight = postSize.Y * 0.5f;
+            var postOffsetX = gapWidth * 0.5f + postHalfWidth;
+
+            AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(-postOffsetX, 0f), density, restitution);
+            AddScoreGatePostFixture(body, postHalfWidth, postHalfHeight, new Vector2(postOffsetX, 0f), density, restitution);
+
+            OverrideScoreGateMass(body, mass);
+        }
+
+        // The fixtures give the body a density-derived mass; when a direct mass is configured we override it, scaling the
+        // rotational inertia by the same ratio so the spin feel stays consistent with the new mass.
+        private static void OverrideScoreGateMass(Body body, float mass)
+        {
+            if (mass <= 0f)
+            {
+                return;
+            }
+
+            body.GetMassData(out var massData);
+            if (massData.mass > 0f)
+            {
+                massData.I *= mass / massData.mass;
+            }
+            massData.mass = mass;
+            body.SetMassData(massData);
+        }
+
+        private void AddScoreGatePostFixture(Body body, float postHalfWidth, float postHalfHeight, Vector2 postCenter, float density, float restitution)
+        {
+            var boxShape = GetPolygonShape();
+            boxShape.SetAsBox(postHalfWidth, postHalfHeight, postCenter, 0f);
+
+            var fixtureDef = GetFixtureDef();
+            fixtureDef.shape = boxShape;
+            fixtureDef.density = density;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = restitution;
+            fixtureDef.filter.categoryBits = PhysicsBodyType.ScoreGate.GetCollisionsCategory();
+            fixtureDef.filter.maskBits = PhysicsCollisionType.ScoreGate.GetCollisionMask();
+
+            body.CreateFixture(fixtureDef);
+            _fixtureDefPool.Return(fixtureDef);
+            _polygonShapePool.Return(boxShape);
+        }
+
+        public Body GetScoreGate(ushort id)
+        {
+            return GetBody(PhysicsBodyType.ScoreGate, id);
+        }
+
+        public void RemoveScoreGate(ushort id)
+        {
+            var body = GetBody(PhysicsBodyType.ScoreGate, id);
             RemoveBody(body);
         }
 

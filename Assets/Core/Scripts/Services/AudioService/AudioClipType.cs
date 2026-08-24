@@ -53,6 +53,12 @@ namespace Core.Scripts.Services.AudioService
         FishingRodActivate = 52,
         FishingRodThrowEnemy = 53,
         WaterGunLoop = 54,
-        FishingRodHitWall = 55
+        FishingRodHitWall = 55,
+        MoleSpawned = 56,
+        MoleKilled = 57,
+        MoleDespawned = 58,
+        ScoreGatePassed = 59,
+        BarrelDash = 60,
+        TimerTick = 61,
     }
 }

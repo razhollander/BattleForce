@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions.Linq;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs
 {
@@ -11,15 +12,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentWallView _wallViewPrefab;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly List<MatchEnvironmentWallController> _wallControllers = new ();
         private GameObject _wallsParent;
         
-        public MatchEnvironmentWallsControllers(IMatchDataService matchDataService, EnvironmentWallView wallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public MatchEnvironmentWallsControllers(IMatchDataService matchDataService, EnvironmentWallView wallViewPrefab, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _wallViewPrefab = wallViewPrefab;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -29,7 +30,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
 
         public void CreateWall(ushort wallId)
         {
-            var wallController = new MatchEnvironmentWallController(wallId, _matchDataService, _gamePlayConfig);
+            var wallController = new MatchEnvironmentWallController(wallId, _matchDataService, _interpolationDecayService);
             wallController.CreateWallView(_wallViewPrefab, _wallsParent.transform);
             _wallControllers.Add(wallController);
         }

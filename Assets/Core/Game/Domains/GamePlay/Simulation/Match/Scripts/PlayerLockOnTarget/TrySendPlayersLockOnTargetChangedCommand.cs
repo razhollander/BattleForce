@@ -2,6 +2,7 @@ using System.Numerics;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
 using Core.Scripts.Network;
@@ -22,7 +23,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private ILockOnTargetTimerService _lockOnTargetTimerService;
 
         private FixedUnorderedList<ObjectLockedOnTargetS2C> _cachedLockedOnObjects;
-        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit = {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall, PhysicsBodyType.PowerUpBall};
+        private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit =
+            {PhysicsBodyType.PlayerHeart, PhysicsBodyType.Wall, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.StartMatchWall, PhysicsBodyType.PowerUpBall, PhysicsBodyType.Mole};
+        private IStageDataService _stageDataService;
         private int _processedTick;
 
         public TrySendPlayersLockOnTargetChangedCommand SetProcessedTick(int processedTick)
@@ -38,6 +41,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _stageDataService = _diContainer.Resolve<IStageDataService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
             _cachedLockedOnObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(networkConfig.MaxCap.ConcurrentLockOnTargets);
         }
@@ -62,7 +66,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     DebugDrawUtils.DrawArc2D(rayOriginPosition, playerState.Spaceship.Transform.Direction,
                         _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange,
                         _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetHalfArcAngleDegrees);
-                    FindTargetedEnemyIdsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    
+                    if (_stageDataService.IsWhacAMoleStage)
+                    {
+                        FindTargetedMolesOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    }
+                    else if (!_stageDataService.IsBonusStage)
+                    {
+                        FindTargetedEnemyIdsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    }
+
                     FindTargetedPowerUpBallsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
                 }
 
@@ -152,10 +165,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, System.Numerics.Vector2 rayOriginPosition, System.Numerics.Vector2 targetPosition)
+        private void FindTargetedMolesOfCaster(Vector2 rayOriginPosition, PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedObjects)
+        {
+            var casterBody = new PhysicsBodyData(casterPlayerState.Id, PhysicsBodyType.PlayerSpaceship);
+            var moles = _matchDataService.SimulationState.Moles;
+
+            for (int i = 0; i < moles.Count; i++)
+            {
+                var mole = moles.GetByIndex(i);
+                var molePosition = mole.Position;
+
+                if (!mole.IsEmerged)
+                {
+                    continue;
+                }
+
+                if (!IsPositionInLockOnCone(casterPlayerState, rayOriginPosition, molePosition))
+                {
+                    continue;
+                }
+
+                var didRayTowardMoleHitAnything = _physicsSimulator.RayCast(rayOriginPosition, molePosition, out var hitBodyData, _cachedBodyTypesRayCastCanHit, casterBody);
+                var didHitMole = didRayTowardMoleHitAnything && hitBodyData.PhysicsBodyType == PhysicsBodyType.Mole && hitBodyData.Id == mole.Id;
+
+                if (!didHitMole)
+                {
+                    continue;
+                }
+
+                AddLockedOnTarget(outputTargetedObjects, casterPlayerState.Id, mole.MoleHoleId, LockOnTargetType.Mole);
+            }
+        }
+
+        private bool IsPositionInLockOnCone(PlayerStateS2C casterPlayerState, Vector2 rayOriginPosition, Vector2 targetPosition)
         {
             var maxRange = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.LockOnTargetMaxRange;
-            var rayOriginToTargetDistanceSquared = System.Numerics.Vector2.DistanceSquared(rayOriginPosition, targetPosition);
+            var rayOriginToTargetDistanceSquared = Vector2.DistanceSquared(rayOriginPosition, targetPosition);
             var isTargetInRange = rayOriginToTargetDistanceSquared <= maxRange * maxRange;
 
             if (!isTargetInRange)

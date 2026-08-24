@@ -12,6 +12,8 @@ using Core.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Mvc.WorldCamera;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.UpdateService;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
+using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
 {
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly IMatchPlayerUIControllers _matchPlayerUIControllers;
         private readonly IFullTickPacketsHandler _fullTickPacketsHandler;
         private readonly IWorldCameraController _worldCameraController;
+        private readonly INetworkDiagnosticsService _networkDiagnosticsService;
 
         private readonly HandleBulletSpawnNetEventsCommand _handleBulletSpawnNetEventsCommand;
         private readonly HandlePlayerTakeDamangeNetEventsCommand _handlePlayerTakeDamangeNetEventsCommand;
@@ -46,6 +49,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEnvironmentSpikePlayerCollisionNetEventsCommand _handleEnvironmentSpikePlayerCollisionNetEventsCommand;
         private readonly HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand;
         private readonly UpdateObjectTransformInsideRotatingWheelsCommand _updateObjectTransformInsideRotatingWheelsCommand;
+        private readonly UpdateGateTrapsViewCommand _updateGateTrapsViewCommand;
         private readonly HandlePreparationPhaseEndedNetEventsCommand _handlePreparationPhaseEndedNetEventsCommand;
         private readonly HandleDeactivateSwapTalentNetEventsCommand _handleDeactivateSwapTalentNetEventsCommand;
         private readonly UpdateSwapFieldsTransformCommand _updateSwapFieldsTransformCommand;
@@ -68,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleShootFrigidBlockNetEventsCommand _handleShootFrigidBlockNetEventsCommand;
         private readonly HandleDestroyFrigidBlockNetEventsCommand _handleDestroyFrigidBlockNetEventsCommand;
         private readonly UpdateFrigidBlocksTransformCommand _updateFrigidBlocksTransformCommand;
+        private readonly UpdateScoreGatesTransformCommand _updateScoreGatesTransformCommand;
         private readonly HandleActivateSentryGunTalentNetEventsCommand _handleActivateSentryGunTalentNetEventsCommand;
         private readonly HandleDeactivateSentryGunTalentNetEventsCommand _handleDeactivateSentryGunTalentNetEventsCommand;
         private readonly HandleActivateRockTalentNetEventsCommand _handleActivateRockTalentNetEventsCommand;
@@ -81,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleDeactivateWaterGunTalentNetEventsCommand _handleDeactivateWaterGunTalentNetEventsCommand;
         private readonly HandleActivateHeadbuttChargingNetEventsCommand _handleActivateHeadbuttChargingNetEventsCommand;
         private readonly HandlePerformHeadbuttDashNetEventsCommand _handlePerformHeadbuttDashNetEventsCommand;
+        private readonly HandlePerformBarrelDashNetEventsCommand _handlePerformBarrelDashNetEventsCommand;
         private readonly HandleDeactivateHeadbuttTalentNetEventsCommand _handleDeactivateHeadbuttTalentNetEventsCommand;
         private readonly HandleHeadbuttHitEnemyNetEventsCommand _handleHeadbuttHitEnemyNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
@@ -105,10 +111,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
         private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
         private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
+        private readonly UpdateMatchTimerCountdownCommand _updateMatchTimerCountdownCommand;
+        private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
+        private readonly HandleMoleKilledNetEventsCommand _handleMoleKilledNetEventsCommand;
+        private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
+        private readonly HandleGoldenMoleDamagedNetEventsCommand _handleGoldenMoleDamagedNetEventsCommand;
+        private readonly HandlePlayerPassedScoreGateNetEventsCommand _handlePlayerPassedScoreGateNetEventsCommand;
 
         public ClientMatchPresentationTickProcessor(IUpdateSubscriptionService updateSubscriptionService, IMatchPlayerControllers playerControllers, ICommandFactory commandFactory,
-            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler)
+            IMatchBulletControllers bulletControllers, IPowerUpBallControllers powerUpBallControllers, IMatchPlayerUIControllers matchPlayerUIControllers, IFullTickPacketsHandler fullTickPacketsHandler,
+            INetworkDiagnosticsService networkDiagnosticsService)
         {
+            _networkDiagnosticsService = networkDiagnosticsService;
             _updateSubscriptionService = updateSubscriptionService;
             _playerControllers = playerControllers;
             _bulletControllers = bulletControllers;
@@ -136,6 +150,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEnvironmentSpikePlayerCollisionNetEventsCommand = commandFactory.CreateCommandVoid<Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents.HandleEnvironmentSpikePlayerCollisionNetEventsCommand>();
             _handlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerToEnvironmentTeleportGateCollisionNetEventsCommand>();
             _updateObjectTransformInsideRotatingWheelsCommand = commandFactory.CreateCommandVoid<UpdateObjectTransformInsideRotatingWheelsCommand>();
+            _updateGateTrapsViewCommand = commandFactory.CreateCommandVoid<UpdateGateTrapsViewCommand>();
             _handlePreparationPhaseEndedNetEventsCommand = commandFactory.CreateCommandVoid<HandlePreparationPhaseEndedNetEventsCommand>();
             _handleDeactivateSwapTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSwapTalentNetEventsCommand>();
             _updateSwapFieldsTransformCommand = commandFactory.CreateCommandVoid<UpdateSwapFieldsTransformCommand>();
@@ -158,6 +173,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleShootFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleShootFrigidBlockNetEventsCommand>();
             _handleDestroyFrigidBlockNetEventsCommand = commandFactory.CreateCommandVoid<HandleDestroyFrigidBlockNetEventsCommand>();
             _updateFrigidBlocksTransformCommand = commandFactory.CreateCommandVoid<UpdateFrigidBlocksTransformCommand>();
+            _updateScoreGatesTransformCommand = commandFactory.CreateCommandVoid<UpdateScoreGatesTransformCommand>();
             _handleActivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateSentryGunTalentNetEventsCommand>();
             _handleDeactivateSentryGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateSentryGunTalentNetEventsCommand>();
             _handleActivateRockTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateRockTalentNetEventsCommand>();
@@ -170,6 +186,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateWaterGunTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateWaterGunTalentNetEventsCommand>();
             _handleActivateHeadbuttChargingNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateHeadbuttChargingNetEventsCommand>();
             _handlePerformHeadbuttDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformHeadbuttDashNetEventsCommand>();
+            _handlePerformBarrelDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformBarrelDashNetEventsCommand>();
             _handleDeactivateHeadbuttTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateHeadbuttTalentNetEventsCommand>();
             _handleHeadbuttHitEnemyNetEventsCommand = commandFactory.CreateCommandVoid<HandleHeadbuttHitEnemyNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
@@ -195,6 +212,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
             _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
             _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
+            _updateMatchTimerCountdownCommand = commandFactory.CreateCommandVoid<UpdateMatchTimerCountdownCommand>();
+            _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
+            _handleMoleKilledNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleKilledNetEventsCommand>();
+            _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
+            _handleGoldenMoleDamagedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGoldenMoleDamagedNetEventsCommand>();
+            _handlePlayerPassedScoreGateNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPassedScoreGateNetEventsCommand>();
         }
         
         public void InitEntryPoint()
@@ -240,6 +263,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateSwapFieldsTransformCommand.SetTick(lastProcessedTickFromServer).Execute();// must be after _playerControllers.UpdatePlayersTickDeltas();
             _handleKOProjectileCreatedNetEventsCommand.Execute(); // must be after _playerControllers.UpdatePlayersTickDeltas();
             _updatePreperationPhaseCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _updateMatchTimerCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
+            _handleGoldenMoleDamagedNetEventsCommand.Execute();
+            _handleMoleKilledNetEventsCommand.Execute();
+            _handlePlayerPassedScoreGateNetEventsCommand.Execute();
+            _handleMoleExpiredNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();
             _handleDeactivateKOTalentNetEventsCommand.Execute();
             _handleCreateGrapplingHookProjecitleNetEventsCommand.Execute();
@@ -266,6 +295,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleDeactivateWaterGunTalentNetEventsCommand.Execute();
             _handleActivateHeadbuttChargingNetEventsCommand.Execute();
             _handlePerformHeadbuttDashNetEventsCommand.Execute();
+            _handlePerformBarrelDashNetEventsCommand.Execute();
             _handleDeactivateHeadbuttTalentNetEventsCommand.Execute();
             _handleHeadbuttHitEnemyNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();
@@ -279,10 +309,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateFishingRodTipsTransformCommand.Execute();
             _updateSoulGhostsTransformCommand.Execute();
             _updateFrigidBlocksTransformCommand.Execute();
+            _updateScoreGatesTransformCommand.Execute();
             _playerControllers.UpdatePlayersBulletCooldowns();
             _bulletControllers.UpdateBulletsTransform();
             _powerUpBallControllers.UpdatePowerUpBallsTransform();
             _updateObjectTransformInsideRotatingWheelsCommand.Execute();
+            _updateGateTrapsViewCommand.Execute();
             _handleProcessPlayerSelectedTalentFinishedCooldownEventsCommands.Execute();
             _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute();
             _handlePlayerLockedOnTargetHitNetEventsCommand.Execute();
@@ -298,6 +330,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleEndPowerUpGrantingPhaseNetEventsCommand.Execute();
             _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
             _fullTickPacketsHandler.ClearUnprocessedPacketsByView();
+            _networkDiagnosticsService.OnFrameRendered(Time.unscaledDeltaTime);
         }
     }
 }

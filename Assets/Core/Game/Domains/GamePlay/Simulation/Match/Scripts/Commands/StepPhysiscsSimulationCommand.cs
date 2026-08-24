@@ -22,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private IPlayersEngineLogic _playersEngineLogic;
         private ICommandFactory _commandFactory;
         private StepAllWheelsRotationCommand _stepAllWheelsRotationCommand;
+        private StepGateTrapsCommand _stepGateTrapsCommand;
         private EnforceFieldBarriersCommand _enforceFieldBarriersCommand;
         private EnforceStageBarriersCommand _enforceStageBarriersCommand;
 
@@ -51,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _stepAllWheelsRotationCommand = _commandFactory.CreateCommandVoid<StepAllWheelsRotationCommand>();
+            _stepGateTrapsCommand = _commandFactory.CreateCommandVoid<StepGateTrapsCommand>();
             _processCachedCollisionsCommand = _commandFactory.CreateCommandVoid<ProcessCachedCollisionsCommand>();
             _addNormalForceToPlayerStickWithWallCommand = _commandFactory.CreateCommandVoid<AddNormalForceToPlayerStickWithWallCommand>();
             _enforceFieldBarriersCommand = _commandFactory.CreateCommandVoid<EnforceFieldBarriersCommand>();
@@ -80,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             if (!_matchDataService.SimulationState.IsInPreparationPhase)
             {
+                _stepGateTrapsCommand.SetTime(_tick, stepDeltaTime).Execute(); // before the wheels, which turn a trap wall's local transform into its world one
                 _stepAllWheelsRotationCommand.SetTime(_tick, stepDeltaTime).Execute();
             }
 
@@ -180,6 +183,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 frigidBlock.Rotation = body.GetAngle().FromAngleRadians();
                 frigidBlock.Velocity = body.GetLinearVelocity();
                 frigidBlock.AngularVelocity = body.GetAngularVelocity();
+            }
+
+            for (int i = 0; i < _matchDataService.SimulationState.ScoreGates.Count; i++)
+            {
+                ref var scoreGate = ref _matchDataService.SimulationState.ScoreGates.GetByIndex(i);
+                var body = _physicsSimulator.GetScoreGate(scoreGate.Id);
+                scoreGate.Position = body.Position;
+                scoreGate.Rotation = body.GetAngle().FromAngleRadians();
             }
         }
     }

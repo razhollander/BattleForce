@@ -17,6 +17,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public EnvironmentRotatingWheelConfig[] RotatingWheels { get; private set; }
         public EnvironmentFieldBarrierConfig[] FieldBarrierConfigs { get; private set; }
         public PowerUpSpawnPointConfig[] PowerUpSpawnPoints { get; private set; }
+        public MoleSpawnPointConfig[] MoleSpawnPoints { get; private set; }
+        public ScoreGateConfig[] ScoreGates { get; private set; }
+        public EnvironmentGateTrapConfig[] GateTraps { get; private set; }
 
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         
@@ -39,6 +42,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             EnvironmentHalfSize = environmentLayoutConfig.GetEnvironmentHalfSize();
             FieldBarrierConfigs = environmentLayoutConfig.GetFieldBarriers();
             PowerUpSpawnPoints = environmentLayoutConfig.GetPowerUpSpawnPoints();
+            MoleSpawnPoints = environmentLayoutConfig.GetMoleSpawnPoints();
+            ScoreGates = environmentLayoutConfig.GetScoreGates();
+            GateTraps = environmentLayoutConfig.GetGateTraps();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using LiteNetLib.Utils;
 
 namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents
@@ -9,13 +10,15 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort ProjectileId;
         public ushort CasterPlayerId;
         public ushort CaughtEnemyId;
+        public FishingRodCaughtEnemyType CaughtEnemyType;
 
-        public FishingRodCaughtEnemyNetEventS2C(int occuredOnTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId)
+        public FishingRodCaughtEnemyNetEventS2C(int occuredOnTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType)
         {
             OccuredOnTick = occuredOnTick;
             ProjectileId = projectileId;
             CasterPlayerId = casterPlayerId;
             CaughtEnemyId = caughtEnemyId;
+            CaughtEnemyType = caughtEnemyType;
         }
 
         public void Serialize(NetDataWriter writer)
@@ -24,6 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(ProjectileId);
             writer.Put((byte)CasterPlayerId);
             writer.Put((byte)CaughtEnemyId);
+            writer.Put((byte)CaughtEnemyType);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -32,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             ProjectileId = reader.GetUShort();
             CasterPlayerId = reader.GetByte();
             CaughtEnemyId = reader.GetByte();
+            CaughtEnemyType = (FishingRodCaughtEnemyType)reader.GetByte();
         }
 
         public int CompareTo(FishingRodCaughtEnemyNetEventS2C other)

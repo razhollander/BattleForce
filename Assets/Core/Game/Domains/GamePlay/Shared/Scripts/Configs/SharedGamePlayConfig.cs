@@ -26,4 +26,13 @@ public class SharedGamePlayConfig : ScriptableObject
     public float MagneticPullFieldRadius = 10f;
     public float LockOnTargetDurationInSeconds = 1.5f;
     public float HeadbuttMaxChargeDurationSeconds = 2f;
+    public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
+    public byte GoldenMoleDamagePerHit = 1; // lives a golden mole loses per hit, also the amount shown on its damage indicator
+    public float MoleHideShakeDurationSeconds = 1f; // once its lifetime ends the mole shakes in place before hiding, and stays hittable while it does
+
+    // GatePass ScoreGateObstacle geometry. Both the server (body) and the client (view) read these, so they live in the
+    // Shared config. One gate = two square posts of ScoreGatePostSize with ScoreGateGapWidth between them. The gate's
+    // mass/solver tuning is server-only and lives in GatePassConfig instead.
+    public UnityEngine.Vector2 ScoreGatePostSize = new UnityEngine.Vector2(1.5f, 1.5f);
+    public float ScoreGateGapWidth = 4f;
 }

@@ -14,6 +14,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchPlayerModel> Players { get; }
         List<MatchPlayerBulletModel> Bullets { get; }
         List<MatchPowerUpBallModel> PowerUpBalls { get; }
+        List<MatchMoleModel> Moles { get; }
         List<MatchEnvironmentRotatingWheelModel> RotatingWheels { get; }
         List<MatchEnvironmentTeleportPairModel> EnvironmentTeleportPairs { get; }
         List<MatchEnvironmentSpikeModel> EnvironmentSpikes { get; }
@@ -21,6 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchEnvironmentWallModel> EnvironmentWalls { get; }
         List<MatchEnvironmentLavaWallModel> EnvironmentLavaWalls { get; }
         List<MatchEnvironmentFieldBarrierModel> FieldBarriers { get; }
+        List<MatchEnvironmentGateTrapModel> GateTraps { get; }
         List<MatchSwapFieldModel> SwapFields { get; }
         HashSet<ushort> TeamIds {get; }
         int PreperationPhaseStartedOnTick { get; set; }
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public bool IsInShowoffWinners { get; set; }
         public ushort CurrentStageWinnerTeamId { get; set; }
         public StageType StageType { get; set; }
+        public int WhacAMoleEndTick { get; set; }
         List<MatchKOProjectileModel> KOProjectiles { get; }
         List<MatchGrapplingHookProjectileModel> GrapplingHookProjectiles { get; }
         List<MatchFishingRodTipModel> FishingRodTips { get; }
@@ -36,10 +39,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
         Dictionary<ushort, int> BoltsPerTeam  {get; }
         Dictionary<ushort, int> GemsPerTeam  {get; }
+        Dictionary<ushort, int> StageScorePerTeam  {get; }
         void AddTeamIdIfDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
-        MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
+        MatchPlayerModel AddPlayer(PlayerStateS2C playerState, int stageScore);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape);
@@ -53,16 +57,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchPowerUpBallModel GetPowerUpBall(ushort powerUpBallId);
         MatchPowerUpBallModel AddPowerUpBall(ushort powerUpBallId, UnityEngine.Vector2 position);
         void RemovePowerUpBall(ushort powerUpBallId);
+        MatchMoleModel GetMole(ushort moleId);
+        MatchMoleModel AddMole(ushort moleId, ushort moleHoleId, bool isGolden, byte remainingLives, byte maxLives);
+        void RemoveMole(ushort moleId);
         MatchEnvironmentLavaWallModel GetEnvironmentLavaWall(ushort lavaWallId);
         MatchEnvironmentSpringModel AddSpring(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpringModel GetEnvironmentSpring(ushort springId);
         MatchEnvironmentSpikeModel AddSpike(ushort id, Vector2 localPosition, Vector2 worldPosition, float localRotationAngle, float worldRotationAngle);
         MatchEnvironmentSpikeModel GetEnvironmentSpike(ushort spikeId);
         MatchEnvironmentFieldBarrierModel GetFieldBarrier(ushort id);
+        MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap);
+        bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap);
+        MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap);
         MatchEnvironmentRotatingWheelModel AddEnvironmentRotatingWheel(ushort id, Vector2 centerPosition, float rotationSpeed, List<ushort> wallIds, List<ushort> lavaWallIds, List<ushort> springIds, List<ushort> spikeIds, List<RotatingTeleportGate> teleportGates);
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
+        void SetStageScoreOfTeam(ushort teamId, int totalStageScore);
+        void SetPlayerStageScore(ushort playerId, int totalStageScore);
         bool IsTeamLeadingInGems(ushort teamId);
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
@@ -74,7 +86,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchGrapplingHookProjectileModel AddGrapplingHookProjectile(ushort id, ushort casterPlayerId, Vector2 position);
         MatchGrapplingHookProjectileModel GetGrapplingHookProjectile(ushort id);
         void RemoveGrapplingHookProjectile(ushort id);
-        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase);
+        MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType);
         MatchFishingRodTipModel GetFishingRodTip(ushort id);
         void RemoveFishingRodTip(ushort id);
         bool IsPlayerAimingFishingRodThrow(ushort casterPlayerId);
@@ -83,6 +95,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void RemoveSoulGhost(ushort id);
         MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation);
         void RemoveFrigidBlock(ushort id);
+        List<MatchScoreGateModel> ScoreGates { get; }
+        MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, ushort scoreMultiplier);
+        bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate);
+        void SetScoreGateLastScoredTeam(ushort id, ushort teamId);
+        void SetScoreGateMultiplier(ushort id, ushort scoreMultiplier);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
         MatchChickenEggModel GetChickenEgg(ushort id);

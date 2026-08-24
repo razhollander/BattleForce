@@ -6,6 +6,7 @@ using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.StateMachineService;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc
 {
@@ -14,16 +15,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentSpikeView _environmentSpikeViewPrefab;
         private readonly IStageCancellationTokenProvider _stageCancellationTokenProvider;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly Dictionary<ushort, MatchEnvironmentSpikeController> _spikeControllers = new Dictionary<ushort, MatchEnvironmentSpikeController>();
         private GameObject _spikesParent;
 
-        public EnvironmentSpikeControllers(IMatchDataService matchDataService, EnvironmentSpikeView environmentSpikeViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentSpikeControllers(IMatchDataService matchDataService, EnvironmentSpikeView environmentSpikeViewPrefab, IStageCancellationTokenProvider stageCancellationTokenProvider, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _environmentSpikeViewPrefab = environmentSpikeViewPrefab;
             _stageCancellationTokenProvider = stageCancellationTokenProvider;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -33,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
 
         public void CreateSpike(ushort spikeId)
         {
-            var spikeController = new MatchEnvironmentSpikeController(_gamePlayConfig);
+            var spikeController = new MatchEnvironmentSpikeController(_interpolationDecayService);
             var spikeModel = _matchDataService.GetEnvironmentSpike(spikeId);
             spikeController.CreateView(_environmentSpikeViewPrefab, _spikesParent.transform, spikeModel.WorldPosition.ToUnityVector2(), spikeModel.WorldRotationAngle);
             _spikeControllers.Add(spikeId, spikeController);

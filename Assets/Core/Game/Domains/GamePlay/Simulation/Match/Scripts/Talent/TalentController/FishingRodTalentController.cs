@@ -34,6 +34,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly IPlayersMouseDataService _playersMouseDataService;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
 
         public TalentType TalentType => TalentType.FishingRod;
 
@@ -66,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
 
         public void SetCasterId(ushort casterPlayerId)
@@ -131,6 +133,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 return;
             }
 
+            if (projectile.CaughtEnemyType == FishingRodCaughtEnemyType.Mole)
+            {
+                PerformSpinCaughtMole(tick, casterPlayerState, ref projectile);
+                return;
+            }
+
             PerformThrowEnemy(tick, casterPlayerState, ref projectile);
         }
 
@@ -189,8 +197,20 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
         private void UpdateCaughtPhase(int tick, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
         {
-            var caughtEnemy = _matchDataService.SimulationState.GetPlayerById(projectile.CaughtEnemyId);
-            projectile.Position = caughtEnemy.Spaceship.Transform.Position;
+            if (projectile.CaughtEnemyType == FishingRodCaughtEnemyType.Mole)
+            {
+                // A mole never moves, so the tip stays where it hooked it - only its disappearance has to be noticed here.
+                if (!_matchDataService.SimulationState.TryGetMoleIndexById(projectile.CaughtEnemyId, out _)) // the hooked mole expired or was whacked by someone else
+                {
+                    DeactivateTalent(tick);
+                    return;
+                }
+            }
+            else
+            {
+                var caughtEnemy = _matchDataService.SimulationState.GetPlayerById(projectile.CaughtEnemyId);
+                projectile.Position = caughtEnemy.Spaceship.Transform.Position;
+            }
 
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FishingRodTalentConfig;
             var throwWindowEndTick = TickUtils.GetTickPassedAfterDuration(_caughtOnTick, config.ThrowWindowSeconds, _networkConfig.DeltaTime);
@@ -205,7 +225,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             // The throw-aim arrow lives on the projectile so multiple rods catching the same enemy each show their own arrow.
             projectile.EnemyCaughtArrowDirection = IsCurrentlyAiming
-                ? GetThrowDirection(casterPlayerState, caughtEnemy)
+                ? GetThrowDirection(casterPlayerState, projectile.Position)
                 : Vector2.Zero;
         }
 
@@ -242,6 +262,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
 
             projectile.Phase = FishingRodTipPhase.CaughtEnemy;
             projectile.CaughtEnemyId = enemyPlayerId;
+            projectile.CaughtEnemyType = FishingRodCaughtEnemyType.Player;
             projectile.Velocity = Vector2.Zero;
             projectile.Position = _matchDataService.SimulationState.GetPlayerById(enemyPlayerId).Spaceship.Transform.Position;
             _caughtOnTick = tick;
@@ -250,7 +271,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             IsCurrentlyAiming = true;
 
             _physicsSimulator.RemoveFishingRodTip(_projectileId);
-            _netEventsDataService.AddFishingRodCaughtEnemyNetEvent(tick, _projectileId, _casterPlayerId, enemyPlayerId);
+            _netEventsDataService.AddFishingRodCaughtEnemyNetEvent(tick, _projectileId, _casterPlayerId, enemyPlayerId, FishingRodCaughtEnemyType.Player);
+        }
+
+        public void CatchMole(ushort moleId, int tick)
+        {
+            if (!IsCurrentlyActive)
+            {
+                return;
+            }
+
+            ref var projectile = ref _matchDataService.SimulationState.GetFishingRodProjectileById(_projectileId);
+            if (projectile.Phase != FishingRodTipPhase.FlyingForward)
+            {
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleById(moleId, out var mole))
+            {
+                return;
+            }
+
+            projectile.Phase = FishingRodTipPhase.CaughtEnemy;
+            projectile.CaughtEnemyId = moleId;
+            projectile.CaughtEnemyType = FishingRodCaughtEnemyType.Mole;
+            projectile.Velocity = Vector2.Zero;
+            projectile.Position = mole.Position;
+            _caughtOnTick = tick;
+
+            // The caster starts aiming the second cast immediately on catch, so a single talent press then spins the mole.
+            IsCurrentlyAiming = true;
+
+            _physicsSimulator.RemoveFishingRodTip(_projectileId);
+            _netEventsDataService.AddFishingRodCaughtEnemyNetEvent(tick, _projectileId, _casterPlayerId, moleId, FishingRodCaughtEnemyType.Mole);
         }
 
         public void HitWall(int tick)
@@ -270,29 +323,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             StartReturnPhase(ref projectile);
         }
 
+        // A mole is nailed to its hole, so there is nowhere to throw it - the second cast simply spins it in place, and that is what damages it.
+        private void PerformSpinCaughtMole(int tick, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
+        {
+            _tryHitMoleCommand
+                .SetMoleId(projectile.CaughtEnemyId)
+                .SetByPlayerId(_casterPlayerId)
+                .SetByTeamId(casterPlayerState.TeamId)
+                .SetProcessedTick(tick)
+                .Execute();
+
+            _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, projectile.CaughtEnemyId, FishingRodCaughtEnemyType.Mole, GetThrowDirection(casterPlayerState, projectile.Position));
+            DeactivateTalent(tick);
+        }
+
         private void PerformThrowEnemy(int tick, PlayerStateS2C casterPlayerState, ref TalentFishingRodProjectileStateS2C projectile)
         {
             var config = _gamePlayConfigService.GamePlayConfig.Talents.FishingRodTalentConfig;
             var caughtEnemy = _matchDataService.SimulationState.GetPlayerById(projectile.CaughtEnemyId);
-            var throwDirection = GetThrowDirection(casterPlayerState, caughtEnemy);
+            var throwDirection = GetThrowDirection(casterPlayerState, caughtEnemy.Spaceship.Transform.Position);
             var force = throwDirection * config.ThrowPushForce;
             var spinAmount = RNG.NextFloat(config.ThrowMinSpin, config.ThrowMaxSpin);
 
             _trySpinPlayerCommand.SetPlayer(caughtEnemy.Id).SetSpinAmount(spinAmount).SetTick(tick).Execute();
             _tryAddForceToPlayerCommand.SetPlayerId(caughtEnemy.Id).SetForce(force).ShouldTurnOffEngine(true).Execute();
             
-            _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, caughtEnemy.Id, throwDirection);
+            _netEventsDataService.AddFishingRodThrowNetEvent(tick, _casterPlayerId, caughtEnemy.Id, FishingRodCaughtEnemyType.Player, throwDirection);
             DeactivateTalent(tick);
         }
 
-        private Vector2 GetThrowDirection(PlayerStateS2C casterPlayerState, PlayerStateS2C caughtEnemy)
+        private Vector2 GetThrowDirection(PlayerStateS2C casterPlayerState, Vector2 caughtTargetPosition)
         {
             var mouseData = _playersMouseDataService.GetPlayerMouseData(_casterPlayerId);
-            
+
             if (mouseData.IsUsingMouseAim)
             {
-                var enemyPosition = caughtEnemy.Spaceship.Transform.Position;
-                return (mouseData.MouseWorldPosition - enemyPosition).NormalizeSafe();
+                return (mouseData.MouseWorldPosition - caughtTargetPosition).NormalizeSafe();
             }
 
             return casterPlayerState.Spaceship.AimDirection;

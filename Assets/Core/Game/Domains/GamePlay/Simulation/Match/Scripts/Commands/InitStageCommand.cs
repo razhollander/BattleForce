@@ -16,8 +16,11 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.Configs;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
@@ -29,19 +32,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 {
     public class InitStageCommand : BaseCommand, ICommandVoid
     {
-        private static int _stageNumber = 1;
         private IMatchDataService _matchDataService;
         private IPhysicsSimulator _physicsSimulator;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private IStageDataService _stageDataService;
+        private IBonusStageRotationService _bonusStageRotationService;
+        private IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private ITeleportGateService _teleportGateService;
         private SharedGamePlayConfig _sharedGamePlayConfig;
         private NetworkConfig _networkConfig;
         private IMatchEnvironmentConfigDataService _matchEnvironmentConfigDataService;
+        private IMolesSpawnCooldownService _molesSpawnCooldownService;
+        private IGoldenMoleSpawnedTrackerService _goldenMoleSpawnedTrackerService;
         private IPreparationPhaseTimerService _preparationPhaseTimerService;
         private IPlayersTalentsManager _playersTalentsManager;
         private IPlayersPowerUpsManager _playersPowerUpsManager;
+        private IPowerUpsSpawnerService _powerUpsSpawnerService;
         private IFrigidBlocksController _frigidBlocksController;
         private ICommandFactory _commandFactory;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
@@ -59,14 +66,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _physicsSimulator = _diContainer.Resolve<IPhysicsSimulator>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
+            _playersPassedScoreGateTrackerService = _diContainer.Resolve<IPlayersPassedScoreGateTrackerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _teleportGateService = _diContainer.Resolve<ITeleportGateService>();
             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
             _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _matchEnvironmentConfigDataService = _diContainer.Resolve<IMatchEnvironmentConfigDataService>();
+            _molesSpawnCooldownService = _diContainer.Resolve<IMolesSpawnCooldownService>();
+            _goldenMoleSpawnedTrackerService = _diContainer.Resolve<IGoldenMoleSpawnedTrackerService>();
             _preparationPhaseTimerService = _diContainer.Resolve<IPreparationPhaseTimerService>();
             _playersTalentsManager = _diContainer.Resolve<IPlayersTalentsManager>();
             _playersPowerUpsManager = _diContainer.Resolve<IPlayersPowerUpsManager>();
+            _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
             _frigidBlocksController = _diContainer.Resolve<IFrigidBlocksController>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
             _setRandomTalentsForPlayerCommand = _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
@@ -83,19 +95,52 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
             RestartStageData();
+            _stageDataService.IncrementStagesEnteredAmount();
+            var stageType = ResolveStageTypeForStageNumber(_stageDataService.AmountOfStagesEntered);
+            _matchDataService.SimulationState.StageType = stageType;
+            SetupBonusStageData(stageType);
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
-            CreateEnvironmentLayout(mapSizeMultiplier);
+            CreateEnvironmentLayout(stageType, mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
-            _stageNumber++;
+        }
+        
+        private StageType ResolveStageTypeForStageNumber(int stageNumber)
+        {
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+            var isRotationConfigured = gamePlayConfig.AreBonusStagesEnabled && gamePlayConfig.BonusStageEveryXStages > 0;
+            var didReachBonusStage = isRotationConfigured && stageNumber % gamePlayConfig.BonusStageEveryXStages == 0;
+            return didReachBonusStage ? _bonusStageRotationService.ResolveNextBonusStageType() : StageType.DeathMatch;
+        }
+        
+        private void SetupBonusStageData(StageType stageType)
+        {
+            var simulationState = _matchDataService.SimulationState;
+
+            if (!stageType.IsBonusStage())
+            {
+                simulationState.WhacAMoleEndTick = 0;
+                return;
+            }
+
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+            var bonusStageDurationSeconds = stageType == StageType.WhacAMole
+                ? gamePlayConfig.WhacAMole.StageDurationSeconds
+                : gamePlayConfig.GatePass.StageDurationSeconds;
+            var stageDurationSeconds = gamePlayConfig.PreparationPhaseDuration + bonusStageDurationSeconds;
+            var stageDurationTicks = (int)System.MathF.Ceiling(stageDurationSeconds * _networkConfig.TicksPerSeconds);
+            simulationState.WhacAMoleEndTick = _tickService.CurrentTick + stageDurationTicks;
         }
 
-        private void CreateEnvironmentLayout(float mapSizeMultiplier)
+        private void CreateEnvironmentLayout(StageType stageType, float mapSizeMultiplier)
         {
-            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId();
+            var environmentLayoutId = GenerateNextStageEnvironmentLayoutId(stageType);
             _matchDataService.SimulationState.EnvironmentLayoutId = environmentLayoutId;
             _matchEnvironmentConfigDataService.InitEnvironmentLayout(environmentLayoutId);
-            
+            _molesSpawnCooldownService.ClearAllCooldowns();
+            _goldenMoleSpawnedTrackerService.ResetGoldenMoleSpawnCounter();
+
             CreateWalls(mapSizeMultiplier);
+            CreateScoreGates(mapSizeMultiplier);
             CreateLavaWalls(mapSizeMultiplier);
             CreateStageBoundaries(mapSizeMultiplier);
             CreateTalentCards(mapSizeMultiplier);
@@ -103,32 +148,56 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             CreateEnvironmentSpikes(mapSizeMultiplier);
             CreateRotatingWheels(mapSizeMultiplier);
             CreateTeleportGates(mapSizeMultiplier);
+            CreateGateTraps(mapSizeMultiplier); // after the wheels, so a trap can register its wall with the wheel it rides
             CreateFieldBarriers(mapSizeMultiplier);
         }
         
-        private int GenerateNextStageEnvironmentLayoutId()
+        private int GenerateNextStageEnvironmentLayoutId(StageType stageType)
         {
-            var environmentLayoutId = _gamePlayConfigService.GamePlayConfig.DeafultEnvironmentId;
+            var environmentLayoutId = GetDefaultEnvironmentLayoutId(stageType);
             if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomStage)
             {
-                environmentLayoutId = GenerateRandomStageId();
+                environmentLayoutId = GenerateRandomStageId(stageType);
             }
 
             return environmentLayoutId;
         }
 
-        private int GenerateRandomStageId()
+        // Each stage type has its own default layout, because a WhacAMole layout authors mole spawn points
+        // that a DeathMatch layout does not, and vice versa.
+        private int GetDefaultEnvironmentLayoutId(StageType stageType)
         {
-            var didntPlayYetStageIndexes = _matchDataService.DidntPlayYetStageIndexes;
+            var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
+
+            switch (stageType)
+            {
+                case StageType.WhacAMole: return gamePlayConfig.DefaultWhacAMoleEnvironmentId;
+                case StageType.GatePass: return gamePlayConfig.DefaultGatePassEnvironmentId;
+                default: return gamePlayConfig.DeafultEnvironmentId;
+            }
+        }
+
+        // Each stage type draws from its own pool and never repeats a layout until that pool is exhausted.
+        private int GenerateRandomStageId(StageType stageType)
+        {
+            var availableLayoutIndexes = _sharedGamePlayConfig.Environment.GetLayoutIndexesForStageType(stageType);
+
+            if (availableLayoutIndexes.IsNullOrEmpty())
+            {
+                LogService.LogError($"No environment layout indexes configured for stage type {stageType}!");
+                return GetDefaultEnvironmentLayoutId(stageType);
+            }
+
+            var didntPlayYetStageIndexes = _matchDataService.GetDidntPlayYetStageIndexes(stageType);
 
             if (didntPlayYetStageIndexes.IsNullOrEmpty())
             {
-                foreach (int index in _sharedGamePlayConfig.Environment.AvailableLayoutIndexes)
+                foreach (int index in availableLayoutIndexes)
                 {
                     didntPlayYetStageIndexes.Add(index);
                 }
             }
-                
+
             var randomIndex = RNG.NextInt(0, didntPlayYetStageIndexes.Count);
             var environmentLayoutId = didntPlayYetStageIndexes[randomIndex];
             didntPlayYetStageIndexes.RemoveAt(randomIndex);
@@ -142,19 +211,24 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService.ClearAllData();
             _teleportGateService.ClearData();
             ClearStageObjectsInSimulationState();
-            _matchDataService.SimulationState.IsInPreparationPhase = true;
-            _matchDataService.SimulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
-            _matchDataService.SimulationState.PreperationPhaseEndedOnTick = 0;
-            _matchDataService.SimulationState.IsInShowoffWinners = false;
-            _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
+            var simulationState = _matchDataService.SimulationState;
+            simulationState.IsInPreparationPhase = true;
+            simulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
+            simulationState.PreperationPhaseEndedOnTick = 0;
+            simulationState.IsInShowoffWinners = false;
+            simulationState.CurrentStageWinnerTeamId = 0;
+            simulationState.ResetStageScorePerTeam();
+            simulationState.ResetStageScoreForAllPlayers();
             _playersTalentsManager.ResetAllTalentsData();
             _frigidBlocksController.ResetData();
             _playersPowerUpsManager.RemoveAllPowerUps();
+            _powerUpsSpawnerService.RestartSpawnTimer();
             _preparationPhaseTimerService.RestartTimer();
             _playersOutsideStageTrackerService.ClearAllData();
             _playersTouchingWallDataService.ClearAllData();
             _playersTouchingSpikesTrackerService.ClearAllData();
             _lockOnTargetTimerService.ResetAllTimers();
+            _playersPassedScoreGateTrackerService.ClearAllData(); // stale previous positions across a stage boundary would score phantom passes
             _stageDataService.ClearData();
         }
 
@@ -207,7 +281,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
                 else if (_gamePlayConfigService.GamePlayConfig.ShouldAddTalentEveryXStages)
                 {
-                    var didReachStage = _stageNumber % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
+                    var didReachStage = _stageDataService.AmountOfStagesEntered % _gamePlayConfigService.GamePlayConfig.EveryXStages == 0;
                     if (didReachStage)
                     {
                         _tryAddARandomTalentForPlayerCommand.SetPlayerId(player.Id).Execute();
@@ -307,6 +381,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService.EnvironmentData.AddWall(wallId, wallPoints, lavaWallLocalPosition, lavaWallWorldPosition, lavaWallWorldRotationAngle);
             _physicsSimulator.AddWall(wallId, wallPoints, lavaWallWorldPosition);
+        }
+
+        // Only GatePass layouts author score gates, so this is a no-op for every other stage type.
+        private void CreateScoreGates(float mapSizeMultiplier)
+        {
+            var scoreGateConfigs = _matchEnvironmentConfigDataService.ScoreGates;
+            if (scoreGateConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var postSize = _sharedGamePlayConfig.ScoreGatePostSize.ToNumericsVector2() * mapSizeMultiplier;
+            var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * mapSizeMultiplier;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            foreach (var scoreGateConfig in scoreGateConfigs)
+            {
+                var position = scoreGateConfig.Position * mapSizeMultiplier;
+                _matchDataService.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees);
+                _physicsSimulator.AddScoreGate(scoreGateConfig.Id, position, scoreGateConfig.RotationDegrees, postSize, gapWidth,
+                    gatePassConfig.ScoreGateMass, gatePassConfig.ScoreGateDensity, gatePassConfig.ScoreGateRestitution,
+                    gatePassConfig.ScoreGateLinearDamping, gatePassConfig.ScoreGateAngularDamping);
+            }
         }
 
         private void CreateLavaWalls(float mapSizeMultiplier)
@@ -491,6 +588,117 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 gateAWorldPosition, gateAWorldRotation, gateBWorldPosition, gateBWorldRotation);
             _physicsSimulator.AddTeleportGate(gateAId, gateAWorldPosition, gateAWorldRotation, gateSize);
             _physicsSimulator.AddTeleportGate(gateBId, gateBWorldPosition, gateBWorldRotation, gateSize);
+        }
+
+        // A gate trap owns one regular environment wall and drives its transform, so the wall collides like every other
+        // wall and the trap only has to decide where it should be this tick.
+        private void CreateGateTraps(float mapSizeMultiplier)
+        {
+            var gateTrapConfigs = _matchEnvironmentConfigDataService.GateTraps;
+            if (gateTrapConfigs.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            // Runs after every other wall layer, so this sees the whole layout's wall ids - including earlier traps'.
+            foreach (var gateTrapConfig in gateTrapConfigs)
+            {
+                if (_matchDataService.EnvironmentData.TryGetEnvironmentWall(gateTrapConfig.WallId, out _))
+                {
+                    // Two walls sharing an id makes CopyWallStateToBody drive both bodies onto one transform, dragging
+                    // an authored wall around with the trap, so the trap is dropped instead of breaking the arena.
+                    LogService.LogError($"Gate trap {gateTrapConfig.Id} reuses wall id {gateTrapConfig.WallId}, which the layout already owns! Skipping this gate trap.");
+                    continue;
+                }
+
+                var gateTrap = AddGateTrapToEnvironment(gateTrapConfig, mapSizeMultiplier);
+                AddGateTrapWallToEnvironment(gateTrap, gateTrapConfig, mapSizeMultiplier);
+
+                ref var gateTrapState = ref _matchDataService.SimulationState.GateTraps.AddAndGet();
+                gateTrapState.Id = gateTrap.Id;
+                gateTrapState.State = GateTrapState.Open;
+                gateTrapState.StateEndTick = 0; // a fresh stage arms every trap immediately
+            }
+        }
+
+        private MatchEnvironmentGateTrapModel AddGateTrapToEnvironment(EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            var ticksPerSecond = _networkConfig.TicksPerSeconds;
+            var gateTrap = _matchDataService.EnvironmentData.AddGateTrap(gateTrapConfig.Id, gateTrapConfig.WallId);
+
+            gateTrap.OpenPosition = gateTrapConfig.OpenPosition * mapSizeMultiplier;
+            gateTrap.ClosedPosition = gateTrapConfig.ClosedPosition * mapSizeMultiplier;
+            gateTrap.OpenRotationDegrees = gateTrapConfig.OpenRotationDegrees;
+            gateTrap.ClosedRotationDegrees = gateTrapConfig.ClosedRotationDegrees;
+            gateTrap.LocalRotationPivot = gateTrapConfig.LocalRotationPivot * mapSizeMultiplier;
+            gateTrap.IsAttachedToRotationWheel = gateTrapConfig.IsAttachedToRotationWheel;
+            gateTrap.AttachedToRotationWheelId = gateTrapConfig.AttachToRotationWheelId;
+            gateTrap.AreaPolygons = ScaleGateTrapAreaPolygons(gateTrapConfig, mapSizeMultiplier);
+            // The travelled distance scales with the map, so the speed scales with it too and the cycle keeps its authored timing.
+            gateTrap.TransitionDurationInTicks = EnvironmentGateTrapUtils.CalculateTransitionDurationInTicks(gateTrap.OpenPosition, gateTrap.ClosedPosition,
+                gateTrap.OpenRotationDegrees, gateTrap.ClosedRotationDegrees, gateTrapConfig.MovementSpeed * mapSizeMultiplier, ticksPerSecond);
+            gateTrap.StayClosedDurationInTicks = EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayClosed, ticksPerSecond);
+            gateTrap.StayOpenDurationInTicks = EnvironmentGateTrapUtils.SecondsToTicks(gateTrapConfig.SecondsStayOpen, ticksPerSecond);
+
+            return gateTrap;
+        }
+
+        private void AddGateTrapWallToEnvironment(MatchEnvironmentGateTrapModel gateTrap, EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            var calculationTick = 0;
+
+            EnvironmentGateTrapUtils.CalculateWallTransform(gateTrap.OpenPosition, gateTrap.ClosedPosition, gateTrap.OpenRotationDegrees, gateTrap.ClosedRotationDegrees,
+                gateTrap.LocalRotationPivot, 0f, out var localPosition, out var localRotation);
+
+            var worldPosition = localPosition;
+            var worldRotation = localRotation;
+
+            if (gateTrap.IsAttachedToRotationWheel)
+            {
+                var wheelConfig = _matchEnvironmentConfigDataService.RotatingWheels.FindWithId(gateTrap.AttachedToRotationWheelId);
+                EnvironmentRotatingWheelUtils.CalculateChildTransform(
+                    calculationTick, wheelConfig.RotationSpeed, _networkConfig.DeltaTime, wheelConfig.CenterPosition * mapSizeMultiplier, localPosition, localRotation,
+                    out worldPosition, out worldRotation
+                );
+
+                _matchDataService.EnvironmentData.GetRotatingWheel(gateTrap.AttachedToRotationWheelId).AddWall(gateTrap.WallId);
+            }
+
+            var wallPoints = new Vector2[gateTrapConfig.WallPoints.Length];
+            for (int i = 0; i < wallPoints.Length; i++)
+            {
+                wallPoints[i] = gateTrapConfig.WallPoints[i] * mapSizeMultiplier;
+            }
+
+            AddWallToEnvironment(gateTrap.WallId, wallPoints, localPosition, worldPosition, worldRotation);
+            // Unlike a wheel's own walls the trap wall swings, so its local rotation is not zero and the wheel step needs it.
+            _matchDataService.EnvironmentData.GetWall(gateTrap.WallId).Transform.LocalRotationDegrees = localRotation;
+        }
+
+        private Vector2[][] ScaleGateTrapAreaPolygons(EnvironmentGateTrapConfig gateTrapConfig, float mapSizeMultiplier)
+        {
+            if (gateTrapConfig.AreaPolygons.IsNullOrEmpty())
+            {
+                LogService.LogError($"Gate trap {gateTrapConfig.Id} has no area polygons, it will never close!");
+                return System.Array.Empty<Vector2[]>();
+            }
+
+            var areaPolygons = new Vector2[gateTrapConfig.AreaPolygons.Length][];
+
+            for (int polygonIndex = 0; polygonIndex < areaPolygons.Length; polygonIndex++)
+            {
+                var polygonPoints = gateTrapConfig.AreaPolygons[polygonIndex].Points;
+                var scaledPoints = new Vector2[polygonPoints.Length];
+
+                for (int pointIndex = 0; pointIndex < polygonPoints.Length; pointIndex++)
+                {
+                    scaledPoints[pointIndex] = polygonPoints[pointIndex] * mapSizeMultiplier;
+                }
+
+                areaPolygons[polygonIndex] = scaledPoints;
+            }
+
+            return areaPolygons;
         }
 
         private void CreateRotatingWheels(float mapSizeMultiplier)

@@ -8,6 +8,7 @@ using Core.Scripts.Network;
 using CoreDomain.Scripts.Services.Logger.Base;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.RNG;
 using CoreDomain.Scripts.Services.CommandFactory;
 using Core.Scripts.Extensions;
@@ -23,8 +24,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly IPhysicsSimulator _physicsSimulator;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
+        private PushScoreGateCommand _pushScoreGateCommand;
         private readonly ICommandFactory _commandFactory;
 
         public TalentType TalentType => TalentType.YearsOfPain;
@@ -42,13 +46,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         }
         
         public YearsOfPainTalentController(INetEventsDataService netEventsDataService, IMatchDataService matchDataService, ISimulationGamePlayConfigService gamePlayConfigService,
-            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, ICommandFactory commandFactory)
+            IPhysicsSimulator physicsSimulator, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, ICommandFactory commandFactory)
         {
             _netEventsDataService = netEventsDataService;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _physicsSimulator = physicsSimulator;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _commandFactory = commandFactory;
         }
 
@@ -56,6 +61,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
+            _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -104,19 +111,74 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
             var center = casterPlayerState.Spaceship.Transform.Position + (direction * (offset + colliderSize.Y * 0.5f));
             var angleRadians = direction.ToAngleRadians();
             ushort hitEnemyId = 0;
+            var didHitEnemy = false;
 
-            var didHitEnemy = _physicsSimulator.RectangleCastOnPlayers(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, out var hitBodyData);
-            if (didHitEnemy)
+            // A hit enemy takes priority; a mole is only whacked when none was inside the rectangle. Moles only exist in the WhacAMole stage, so elsewhere the mole type simply never matches.
+            if (_physicsSimulator.RectangleCastByPriority(center, colliderSize, angleRadians, (short) casterPlayerState.TeamId, PhysicsBodyType.PlayerSpaceship, PhysicsBodyType.Mole, out var hitBodyData))
             {
-                hitEnemyId = hitBodyData.Id;
-                ApplyEffectToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                if (hitBodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship)
+                {
+                    didHitEnemy = true;
+                    hitEnemyId = hitBodyData.Id;
+                    ApplyEffectToEnemyPhysics(tick, hitEnemyId, casterPlayerState);
+                }
+                else
+                {
+                    _tryHitMoleCommand
+                        .SetMoleId(hitBodyData.Id)
+                        .SetByPlayerId(_casterPlayerId)
+                        .SetByTeamId(casterPlayerState.TeamId)
+                        .SetProcessedTick(tick)
+                        .Execute();
+                }
             }
+
+            // Independently of the enemy/mole hit, the rectangle shoves and spins every score gate it covers.
+            PushOverlappedScoreGates(center, colliderSize * 0.5f, direction);
 
             ref var talentModel = ref casterPlayerState.Spaceship.TalentsState.Talents.Get(talentIndex);
             var cooldownEndTick = TickUtils.GetTickPassedAfterDuration(tick, talentModel.NormalCooldown.MaxCooldown, _networkConfig.DeltaTime);
             talentModel.NormalCooldown.CooldownEndTick = cooldownEndTick;
 
             _netEventsDataService.AddActivateYearsOfPainTalentNetEventS2C(tick, _casterPlayerId, direction, cooldownEndTick, didHitEnemy, hitEnemyId);
+        }
+
+        // A gate is two posts with a wide clear gap between them, so a shape cast against the post fixtures misses every
+        // swing aimed at the middle of the gate. The gate is one rigid body, so the hit is tested against its whole
+        // footprint (posts plus gap) instead and the shove lands wherever the rectangle covers the gate.
+        private void PushOverlappedScoreGates(System.Numerics.Vector2 rectangleCenter, System.Numerics.Vector2 rectangleHalfExtents, System.Numerics.Vector2 direction)
+        {
+            var simulationState = _matchDataService.SimulationState;
+            if (simulationState.ScoreGates.Count == 0)
+            {
+                return;
+            }
+
+            var postSize = _sharedGamePlayConfig.ScoreGatePostSize.ToNumericsVector2() * simulationState.MapSizeMultiplier;
+            var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * simulationState.MapSizeMultiplier;
+
+            foreach (var scoreGate in simulationState.ScoreGates.AsSpan())
+            {
+                if (!ScoreGateGeometryUtils.DoesRotatedRectangleOverlapGate(rectangleCenter, rectangleHalfExtents, direction, scoreGate.Position, scoreGate.Rotation, postSize, gapWidth))
+                {
+                    continue;
+                }
+
+                PushScoreGate(scoreGate.Id, direction);
+            }
+        }
+
+        private void PushScoreGate(ushort scoreGateId, System.Numerics.Vector2 direction)
+        {
+            var gatePosition = _matchDataService.SimulationState.GetScoreGateById(scoreGateId).Position;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(direction * gatePassConfig.YearsOfPainPushImpulse)
+                .SetWorldContactPoint(gatePosition)
+                .SetExtraSpinImpulse(gatePassConfig.YearsOfPainSpinImpulse)
+                .Execute();
         }
 
         private void ApplyEffectToEnemyPhysics(int tick, ushort enemyId, PlayerStateS2C casterPlayerState)

@@ -20,6 +20,9 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         [TextArea(1, 5)] [SerializeField] private string _fieldBarriersJson;
         [TextArea(1, 5)] [SerializeField] private string _stageBoundriesWallsJson;
         [TextArea(1, 5)] [SerializeField] private string _powerUpSpawnPointsJson;
+        [TextArea(1, 5)] [SerializeField] private string _moleSpawnPointsJson;
+        [TextArea(1, 5)] [SerializeField] private string _scoreGatesJson;
+        [TextArea(1, 5)] [SerializeField] private string _gateTrapsJson;
         [TextArea(1, 5)] [SerializeField] private string _cameraBoundariesJson;
 
         public EnvironmentLayoutConfig(string wallsJson, string talentCardsJson)
@@ -46,6 +49,11 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public WallConfig[] GetStageBoundaries()
         {
             return _stageBoundriesWallsJson.FromJson<WallConfig[]>();
+        }
+
+        public void SetEnvironmentHalfSizeJson(string environmentHalfSizeJson)
+        {
+            _environmentHalfSizeJson = environmentHalfSizeJson;
         }
 
         public void SetWallsJson(string wallsJson)
@@ -91,6 +99,21 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public void SetPowerUpSpawnPointsJson(string powerUpSpawnPointsJson)
         {
             _powerUpSpawnPointsJson = powerUpSpawnPointsJson;
+        }
+
+        public void SetMoleSpawnPointsJson(string moleSpawnPointsJson)
+        {
+            _moleSpawnPointsJson = moleSpawnPointsJson;
+        }
+
+        public void SetScoreGatesJson(string scoreGatesJson)
+        {
+            _scoreGatesJson = scoreGatesJson;
+        }
+
+        public void SetGateTrapsJson(string gateTrapsJson)
+        {
+            _gateTrapsJson = gateTrapsJson;
         }
 
         public void SetCameraBoundariesJson(string cameraBoundariesJson)
@@ -148,6 +171,33 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
                 return default;
             }
             return _powerUpSpawnPointsJson.FromJson<PowerUpSpawnPointConfig[]>();
+        }
+
+        public MoleSpawnPointConfig[] GetMoleSpawnPoints()
+        {
+            if (string.IsNullOrEmpty(_moleSpawnPointsJson))
+            {
+                return default;
+            }
+            return _moleSpawnPointsJson.FromJson<MoleSpawnPointConfig[]>();
+        }
+
+        public ScoreGateConfig[] GetScoreGates()
+        {
+            if (string.IsNullOrEmpty(_scoreGatesJson))
+            {
+                return default;
+            }
+            return _scoreGatesJson.FromJson<ScoreGateConfig[]>();
+        }
+
+        public EnvironmentGateTrapConfig[] GetGateTraps()
+        {
+            if (string.IsNullOrEmpty(_gateTrapsJson))
+            {
+                return default;
+            }
+            return _gateTrapsJson.FromJson<EnvironmentGateTrapConfig[]>();
         }
     }
 }

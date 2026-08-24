@@ -19,19 +19,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly ICommandFactory _commandFactory;
         private readonly IStageEndedUiController _stageEndedUiController;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
-        private readonly IAudioService _audioService;
         private readonly ICoolBGMusicController _coolBGMusicController;
         private readonly StartStagePacketS2C _startStagePacket;
 
         public PacketTypeS2C PacketType => PacketTypeS2C.StartStage;
 
-        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IStageEndedUiController stageEndedUiController, ILastFullSyncTickDataService lastFullSyncTickDataService, IAudioService audioService, ICoolBGMusicController coolBGMusicController)
+        public StartStagePacketHandler(IClientNetworkManager networkManager, ICommandFactory commandFactory, NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig,
+            IStageEndedUiController stageEndedUiController, ILastFullSyncTickDataService lastFullSyncTickDataService, ICoolBGMusicController coolBGMusicController)
         {
             _networkManager = networkManager;
             _commandFactory = commandFactory;
             _stageEndedUiController = stageEndedUiController;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
-            _audioService = audioService;
             _coolBGMusicController = coolBGMusicController;
             _startStagePacket = new StartStagePacketS2C(networkConfig.MaxCap, sharedGamePlayConfig.MaxConcurrentTalentsForPlayer, sharedGamePlayConfig.MaxTeamsAmount);
         }

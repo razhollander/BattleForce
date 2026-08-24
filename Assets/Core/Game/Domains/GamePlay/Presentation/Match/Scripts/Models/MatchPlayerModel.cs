@@ -7,13 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public ushort PlayerId;
         public string PlayerName;
         public ushort TeamId;
+        public int StageScore;
         public PlayerSpaceshipStateS2C Spaceship;
-        
-        public MatchPlayerModel(ushort playerId, string playerName, ushort teamId, PlayerSpaceshipStateS2C spaceship)
+
+        public MatchPlayerModel(ushort playerId, string playerName, ushort teamId, int stageScore, PlayerSpaceshipStateS2C spaceship)
         {
             PlayerId = playerId;
             PlayerName = playerName;
             TeamId = teamId;
+            StageScore = stageScore;
             Spaceship = spaceship.GetClone();
         }
     }

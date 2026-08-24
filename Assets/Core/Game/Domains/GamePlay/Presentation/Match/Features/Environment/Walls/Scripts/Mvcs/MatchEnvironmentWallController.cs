@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Object = UnityEngine.Object;
 using Vector2 = System.Numerics.Vector2;
 
@@ -15,14 +16,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
     {
         private EnvironmentWallView _wallView;
         private readonly IMatchDataService _matchDataService;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         public readonly ushort WallId;
         private Transform _wallViewTransform;
 
-        public MatchEnvironmentWallController(ushort wallId, IMatchDataService matchDataService, PresentationGamePlayConfig gamePlayConfig)
+        public MatchEnvironmentWallController(ushort wallId, IMatchDataService matchDataService, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             WallId = wallId;
         }
         
@@ -53,7 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Wal
             var direction = rotationDegrees.ToRadians().AngleToVector();
             var targetRotation = direction.ToQuaternion();
             var deltaTime = Time.deltaTime;
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
             
             var interpulatedRotation = MathUtils.ExpDecay(
                 _wallViewTransform.rotation, 

@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc
@@ -12,15 +13,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
     {
         private readonly IMatchDataService _matchDataService;
         private readonly BulletPool _bulletPool;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly List<MatchBulletController> _bulletControllers = new ();
         private Transform _bulletsParent;
         
-        public MatchBulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig)
+        public MatchBulletControllers(IMatchDataService matchDataService, BulletView bulletViewPrefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _bulletPool = new BulletPool(bulletViewPrefab, diContainer);
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -40,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts
         {
             foreach (var bulletController in _bulletControllers)
             {
-                bulletController.InterpolatePosition(_gamePlayConfig.ExponentialDecay);
+                bulletController.InterpolatePosition(_interpolationDecayService.CurrentDecay);
             }
         }
         

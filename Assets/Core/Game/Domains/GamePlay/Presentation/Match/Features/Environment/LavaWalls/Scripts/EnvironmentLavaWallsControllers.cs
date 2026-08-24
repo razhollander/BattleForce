@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Scripts.Extensions.Linq;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts
 {
@@ -10,15 +11,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
     {
         private readonly IMatchDataService _matchDataService;
         private readonly EnvironmentLavaWallView _lavaWallViewPrefab;
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly List<EnvironmentLavaWallController> _lavaWallControllers = new ();
         private GameObject _lavaWallsParent;
         
-        public EnvironmentLavaWallsControllers(IMatchDataService matchDataService, EnvironmentLavaWallView lavaWallViewPrefab, PresentationGamePlayConfig gamePlayConfig)
+        public EnvironmentLavaWallsControllers(IMatchDataService matchDataService, EnvironmentLavaWallView lavaWallViewPrefab, IInterpolationDecayService interpolationDecayService)
         {
             _matchDataService = matchDataService;
             _lavaWallViewPrefab = lavaWallViewPrefab;
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void InitEntryPoint()
@@ -28,7 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Lav
 
         public void CreateLavaWall(ushort wallId)
         {
-            var lavaWallController = new EnvironmentLavaWallController(wallId, _matchDataService, _gamePlayConfig);
+            var lavaWallController = new EnvironmentLavaWallController(wallId, _matchDataService, _interpolationDecayService);
             lavaWallController.CreateWallView(_lavaWallViewPrefab, _lavaWallsParent.transform);
             _lavaWallControllers.Add(lavaWallController);
         }

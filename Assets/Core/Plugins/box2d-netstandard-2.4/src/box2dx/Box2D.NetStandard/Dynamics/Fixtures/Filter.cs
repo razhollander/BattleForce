@@ -29,9 +29,10 @@ namespace Box2D.NetStandard.Dynamics.Fixtures
 {
     public class Filter
     {
-        public ushort categoryBits;
+        // Widened from ushort to uint against upstream Box2D so the game can define more than 16 collision channels.
+        public uint categoryBits;
         public short groupIndex;
-        public ushort maskBits;
+        public uint maskBits;
 
         public Filter()
         {
@@ -40,9 +41,9 @@ namespace Box2D.NetStandard.Dynamics.Fixtures
 
         public void Reset()
         {
-            categoryBits = 0x0001;
+            categoryBits = 0x00000001;
             groupIndex = 0;
-            maskBits = 0xFFFF;
+            maskBits = 0xFFFFFFFF;
         }
     }
 }

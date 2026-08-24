@@ -3,20 +3,21 @@ using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
 using Core.Scripts.Extensions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scripts.Mvc
 {
     public class GrapplingHookProjectilesControllers : IGrapplingHookProjectilesControllers
     {
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
         private readonly GrapplingHookProjectilePool _pool;
         private readonly Dictionary<ushort, GrapplingHookProjectileController> _controllers = new();
         private Transform _parentTransform;
 
-        public GrapplingHookProjectilesControllers(GrapplingHookProjectileView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, SharedGamePlayConfig sharedGamePlayConfig)
+        public GrapplingHookProjectilesControllers(GrapplingHookProjectileView prefab, DiContainer diContainer, IInterpolationDecayService interpolationDecayService, SharedGamePlayConfig sharedGamePlayConfig)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
             _pool = new GrapplingHookProjectilePool(prefab, diContainer);
         }
@@ -38,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.S
         {
             if (_controllers.TryGetValue(hookId, out var controller))
             {
-                controller.InterpolateTransform(position, rotation, casterPosition, _gamePlayConfig.ExponentialDecay);
+                controller.InterpolateTransform(position, rotation, casterPosition, _interpolationDecayService.CurrentDecay);
             }
         }
 

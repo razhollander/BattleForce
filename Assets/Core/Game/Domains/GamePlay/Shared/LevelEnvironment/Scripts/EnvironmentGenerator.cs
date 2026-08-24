@@ -12,10 +12,15 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
 {
     public class EnvironmentGenerator : MonoBehaviour
     {
+        private const int FIRST_MOLE_HOLE_ID = 1; // zero is kept free so it can mean "no mole hole"
+
         [SerializeField] private EnvironmentConfig _environmentConfig;
         [SerializeField] private List<PolygonPath2D> _walls;
         [SerializeField] private List<LavaWall> _lavaWalls;
         [SerializeField] private List<PowerUpSpawnPoint> _powerUpSpawnPoints;
+        [SerializeField] private List<MoleSpawnPoint> _moleSpawnPoints;
+        [SerializeField] private List<ScoreGateSpawnPoint> _scoreGates;
+        [SerializeField] private List<GateTrapSpawnPoint> _gateTraps;
         [SerializeField] private Transform _cameraTopLeftBoundary;
         [SerializeField] private Transform _cameraBottomRightBoundary;
         [SerializeField] private SharedGamePlayConfig _sharedGamePlayConfig;
@@ -31,6 +36,139 @@ namespace Core.Game.Domains.GamePlay.Shared.LevelEnvironment.Scripts
             }
 
             _environmentConfig.SetPowerUpSpawnPoints(powerUpSpawnPointConfigs, index);
+        }
+
+        [Button]
+        public void RefreshMoleSpawnPoints(int index)
+        {
+            var moleSpawnPointConfigs = new MoleSpawnPointConfig[_moleSpawnPoints.Count];
+
+            for (int i = 0; i < _moleSpawnPoints.Count; i++)
+            {
+                moleSpawnPointConfigs[i] = new MoleSpawnPointConfig((ushort)(i + FIRST_MOLE_HOLE_ID), _moleSpawnPoints[i].transform.position.ToVector2XY().ToNumericsVector2());
+            }
+
+            _environmentConfig.SetMoleSpawnPoints(moleSpawnPointConfigs, index);
+        }
+
+        [Button]
+        public void RefreshScoreGates(int index)
+        {
+            var scoreGateConfigs = new ScoreGateConfig[_scoreGates.Count];
+
+            for (int i = 0; i < _scoreGates.Count; i++)
+            {
+                scoreGateConfigs[i] = new ScoreGateConfig(
+                    _scoreGates[i].Id,
+                    _scoreGates[i].transform.position.ToVector2XY().ToNumericsVector2(),
+                    _scoreGates[i].transform.eulerAngles.z);
+            }
+
+            _environmentConfig.SetScoreGates(scoreGateConfigs, index);
+        }
+
+        // A trap that is not fully authored is reported by id and left out, so one unassigned reference cannot take the
+        // whole bake down with a nameless NullReferenceException.
+        [Button]
+        public void RefreshGateTraps(int index)
+        {
+            var gateTrapConfigs = new List<EnvironmentGateTrapConfig>(_gateTraps.Count);
+
+            foreach (var gateTrapSpawnPoint in _gateTraps)
+            {
+                var gateTrapConfig = BuildGateTrapConfig(gateTrapSpawnPoint);
+
+                if (gateTrapConfig != null)
+                {
+                    gateTrapConfigs.Add(gateTrapConfig);
+                }
+            }
+
+            _environmentConfig.SetGateTraps(gateTrapConfigs.ToArray(), index);
+        }
+
+        private EnvironmentGateTrapConfig BuildGateTrapConfig(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            if (!IsGateTrapFullyAuthored(gateTrapSpawnPoint))
+            {
+                return null;
+            }
+
+            var areaPolygons = new GateTrapAreaPolygonConfig[gateTrapSpawnPoint.AreaPolygons.Count];
+
+            for (int i = 0; i < areaPolygons.Length; i++)
+            {
+                var areaPolygon = gateTrapSpawnPoint.AreaPolygons[i];
+                var points = areaPolygon.GetPointsRelativeToObject().Select(p => p.ToNumericsVector2()).ToArray();
+                WarnIfTooManyPoints(points.Length, $"GateTrap {gateTrapSpawnPoint.Id} area polygon {i}");
+                areaPolygons[i] = new GateTrapAreaPolygonConfig { Points = points };
+            }
+
+            var wallPoints = gateTrapSpawnPoint.WallShape.GetPointsCCW().Select(p => p.ToNumericsVector2()).ToArray();
+            WarnIfTooManyPoints(wallPoints.Length, $"GateTrap {gateTrapSpawnPoint.Id} wall");
+
+            return new EnvironmentGateTrapConfig
+            {
+                Id = gateTrapSpawnPoint.Id,
+                WallId = gateTrapSpawnPoint.WallId,
+                WallPoints = wallPoints,
+                AreaPolygons = areaPolygons,
+                OpenPosition = gateTrapSpawnPoint.OpenPose.position.ToVector2XY().ToNumericsVector2(),
+                ClosedPosition = gateTrapSpawnPoint.ClosedPose.position.ToVector2XY().ToNumericsVector2(),
+                OpenRotationDegrees = gateTrapSpawnPoint.OpenPose.eulerAngles.z,
+                ClosedRotationDegrees = gateTrapSpawnPoint.ClosedPose.eulerAngles.z,
+                LocalRotationPivot = gateTrapSpawnPoint.LocalRotationPivot == null
+                    ? System.Numerics.Vector2.Zero
+                    : gateTrapSpawnPoint.LocalRotationPivot.localPosition.ToVector2XY().ToNumericsVector2(),
+                MovementSpeed = gateTrapSpawnPoint.MovementSpeed,
+                SecondsStayClosed = gateTrapSpawnPoint.SecondsStayClosed,
+                SecondsStayOpen = gateTrapSpawnPoint.SecondsStayOpen,
+                IsAttachedToRotationWheel = gateTrapSpawnPoint.IsAttachedToRotationWheel,
+                AttachToRotationWheelId = gateTrapSpawnPoint.AttachToRotationWheelId
+            };
+        }
+
+        private bool IsGateTrapFullyAuthored(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            if (gateTrapSpawnPoint == null)
+            {
+                Debug.LogError("The gate traps list has an empty slot, skipping it.");
+                return false;
+            }
+
+            var missingReferenceName = GetMissingGateTrapReferenceName(gateTrapSpawnPoint);
+
+            if (missingReferenceName == null)
+            {
+                return true;
+            }
+
+            Debug.LogError($"GateTrap {gateTrapSpawnPoint.Id} on '{gateTrapSpawnPoint.name}' has no {missingReferenceName} assigned, skipping it.", gateTrapSpawnPoint);
+            return false;
+        }
+
+        private string GetMissingGateTrapReferenceName(GateTrapSpawnPoint gateTrapSpawnPoint)
+        {
+            if (gateTrapSpawnPoint.WallShape == null) return nameof(gateTrapSpawnPoint.WallShape);
+            if (gateTrapSpawnPoint.OpenPose == null) return nameof(gateTrapSpawnPoint.OpenPose);
+            if (gateTrapSpawnPoint.ClosedPose == null) return nameof(gateTrapSpawnPoint.ClosedPose);
+            if (gateTrapSpawnPoint.AreaPolygons.IsNullOrEmpty()) return nameof(gateTrapSpawnPoint.AreaPolygons);
+
+            foreach (var areaPolygon in gateTrapSpawnPoint.AreaPolygons)
+            {
+                if (areaPolygon == null) return nameof(gateTrapSpawnPoint.AreaPolygons) + " (it has an empty slot)";
+            }
+
+            return null;
+        }
+
+        // The wall becomes a Box2D polygon and the areas are tested against it, so both are capped at the same 8 points.
+        private void WarnIfTooManyPoints(int pointsCount, string authoredObjectName)
+        {
+            if (pointsCount > GateTrapAreaPolygonConfig.MAX_POINTS)
+            {
+                Debug.LogError($"{authoredObjectName} has {pointsCount} points, only {GateTrapAreaPolygonConfig.MAX_POINTS} are supported!");
+            }
         }
 
         [Button]

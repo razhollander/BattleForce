@@ -89,13 +89,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         public void Execute()
         {
+            if (_stageDataService.IsBonusStage)
+            {
+                LogService.LogError("Tried damage player when players have no health");
+                return;
+            }
+
             var playerState = _matchDataService.SimulationState.GetPlayerById(_playerIdGotHit);
 
             if (!playerState.Spaceship.IsAlive)
             {
                 return;
             }
-            
+
             var isPlayerInvulnerableToDamage = _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Rock)
                 || _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(_playerIdGotHit, TalentType.Frozen);
             if (isPlayerInvulnerableToDamage)

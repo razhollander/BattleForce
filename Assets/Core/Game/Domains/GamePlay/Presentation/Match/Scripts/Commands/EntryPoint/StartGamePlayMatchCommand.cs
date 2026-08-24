@@ -3,12 +3,15 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Bullets.Scripts.Mvc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ChickenEggs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.CoolBGMusic.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.DashPulse.Scripts.Effect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.FieldBarriers.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.LavaWalls.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.GateTraps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
@@ -18,6 +21,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GrapplingHook.Scrip
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
@@ -50,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ITalentCardObtainedEffectController _talentCardObtainedEffectController;
         private IEnvironmentLavaWallsControllers _environmentLavaWallsControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
+        private IMoleControllers _moleControllers;
         private IPowerUpBallObtainedEffectController _powerUpBallObtainedEffectController;
         private ITalentCardControllers _talentCardControllers;
         private IMatchPlayerControllers _playerControllers;
@@ -58,6 +63,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IGalacticPullStarEffectControllers _galacticPullStarEffectControllers;
         private ITickProcessor _tickProcessor;
         private IMatchEnvironmentWallsControllers _environmentWallsControllers;
+        private IMatchEnvironmentGateTrapsControllers _environmentGateTrapsControllers;
         private IEnvironmentSpringControllers _environmentSpringControllers;
         private IEnvironmentSpikeControllers _environmentSpikeControllers;
         private IFullTickPacketsHandler _fullTickPacketsHandler;
@@ -67,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IStartStagePacketHandler _startStagePacketHandler;
         private IGainBoltEffectController _gainBoltEffectController;
         private IHitDamageIndicatorEffectController _hitDamageIndicatorEffectController;
+        private IScoreGainedEffectController _scoreGainedEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IHeadbuttHitEffectController _headbuttHitEffectController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
@@ -78,6 +85,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private ISecondCastAimArrowControllers _secondCastAimArrowControllers;
         private ISoulGhostControllers _soulGhostControllers;
         private IFrigidBlocksControllers _frigidBlocksControllers;
+        private IScoreGatesControllers _scoreGatesControllers;
         private IDashPulseGustEffectController _dashPulseGustEffectController;
         private IMagneticPullEffectController _magneticPullEffectController;
         private IBackgroundParallaxController _backgroundParallaxController;
@@ -100,6 +108,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentLavaWallsControllers = _diContainer.Resolve<IEnvironmentLavaWallsControllers>();
             _talentCardObtainedEffectController = _diContainer.Resolve<ITalentCardObtainedEffectController>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
+            _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _powerUpBallObtainedEffectController = _diContainer.Resolve<IPowerUpBallObtainedEffectController>();
             _talentCardControllers = _diContainer.Resolve<ITalentCardControllers>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
@@ -108,6 +117,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _galacticPullStarEffectControllers = _diContainer.Resolve<IGalacticPullStarEffectControllers>();
             _tickProcessor = _diContainer.Resolve<ITickProcessor>();
             _environmentWallsControllers = _diContainer.Resolve<IMatchEnvironmentWallsControllers>();
+            _environmentGateTrapsControllers = _diContainer.Resolve<IMatchEnvironmentGateTrapsControllers>();
             _environmentSpringControllers = _diContainer.Resolve<IEnvironmentSpringControllers>();
             _environmentSpikeControllers = _diContainer.Resolve<IEnvironmentSpikeControllers>();
             _fullTickPacketsHandler = _diContainer.Resolve<IFullTickPacketsHandler>();
@@ -117,6 +127,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _startStagePacketHandler = _diContainer.Resolve<IStartStagePacketHandler>();
             _gainBoltEffectController = _diContainer.Resolve<IGainBoltEffectController>();
             _hitDamageIndicatorEffectController = _diContainer.Resolve<IHitDamageIndicatorEffectController>();
+            _scoreGainedEffectController = _diContainer.Resolve<IScoreGainedEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _headbuttHitEffectController = _diContainer.Resolve<IHeadbuttHitEffectController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
@@ -128,6 +139,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _secondCastAimArrowControllers = _diContainer.Resolve<ISecondCastAimArrowControllers>();
             _soulGhostControllers = _diContainer.Resolve<ISoulGhostControllers>();
             _frigidBlocksControllers = _diContainer.Resolve<IFrigidBlocksControllers>();
+            _scoreGatesControllers = _diContainer.Resolve<IScoreGatesControllers>();
             _dashPulseGustEffectController = _diContainer.Resolve<IDashPulseGustEffectController>();
             _magneticPullEffectController = _diContainer.Resolve<IMagneticPullEffectController>();
             _backgroundParallaxController = _diContainer.Resolve<IBackgroundParallaxController>();
@@ -150,6 +162,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentFieldBarrierControllers.InitEntryPoint();
             _talentCardObtainedEffectController.InitEntryPoint();
             _powerUpBallControllers.InitEntryPoint();
+            _moleControllers.InitEntryPoint();
             _swapFieldControllers.InitEntryPoint();
             _koProjectilesControllers.InitEntryPoint();
             _grapplingHookProjectilesControllers.InitEntryPoint();
@@ -157,6 +170,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _secondCastAimArrowControllers.InitEntryPoint();
             _soulGhostControllers.InitEntryPoint();
             _frigidBlocksControllers.InitEntryPoint();
+            _scoreGatesControllers.InitEntryPoint();
             _powerUpBallObtainedEffectController.InitEntryPoint();
             _playerControllers.InitEntryPoint();
             _bulletControllers.InitEntryPoint();
@@ -164,6 +178,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _nukeShockwaveEffectController.InitEntryPoint();
             _galacticPullStarEffectControllers.InitEntryPoint();
             _environmentWallsControllers.InitEntryPoint();
+            _environmentGateTrapsControllers.InitEntryPoint();
             _environmentSpringControllers.InitEntryPoint();
             _environmentSpikeControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();
@@ -179,6 +194,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             AddPlayersDevicesNotAddedDuringMatchMaking(); // in case we entered from playback
             _gainBoltEffectController.InitEntryPoint();
             _hitDamageIndicatorEffectController.InitEntryPoint();
+            _scoreGainedEffectController.InitEntryPoint();
             _dashPulseGustEffectController.InitEntryPoint();
             _magneticPullEffectController.InitEntryPoint();
             _tickProcessor.InitEntryPoint();

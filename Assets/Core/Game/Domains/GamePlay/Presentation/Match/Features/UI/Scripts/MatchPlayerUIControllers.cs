@@ -3,8 +3,10 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.StageCancellationToken;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Scripts.Utils.CustomCollections;
 using Core.Scripts.Network;
+using CoreDomain.Scripts.Services.Logger.Base;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 {
@@ -33,6 +35,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         {
             var newPlayerController = new MatchPlayerUIController(_matchDataService, playerId, _gamePlayConfig, _sharedGamePlayConfig, _networkConfig, _stageCancellationTokenProvider);
             newPlayerController.CreateView(_view.PlayerUIView, _view.PlayersContainer);
+
+            switch (_matchDataService.StageType)
+            {
+                case StageType.DeathMatch:
+                    break;
+                case StageType.WhacAMole:
+                    newPlayerController.ShowMolesKilledScore(_matchDataService.GetPlayer(playerId).StageScore);
+                    newPlayerController.HideHealthBar();
+                    break;
+                case StageType.GatePass:
+                    newPlayerController.ShowGatePassScore(_matchDataService.GetPlayer(playerId).StageScore);
+                    newPlayerController.HideHealthBar();
+                    break;
+                default:
+                    LogService.LogError($"Not implemented stage type: {_matchDataService.StageType}");
+                    break;
+            }
+
             var playerTalentsState =_matchDataService.GetPlayer(playerId).Spaceship.TalentsState;
             newPlayerController.UpdateTalents(playerTalentsState.Talents, playerTalentsState.SelectedTalentIndex, currentServerTick);
             _playerControllers.Add(playerId, newPlayerController);
@@ -46,6 +66,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         public void HidePlayerHealthBar(ushort playerId)
         {
             _playerControllers[playerId].HideHealthBar();
+        }
+
+        public void UpdatePlayerMolesKilledScore(ushort playerId, int molesKilledScore)
+        {
+            _playerControllers[playerId].UpdateMolesKilledScore(molesKilledScore);
+        }
+
+        public void UpdatePlayerGatePassScore(ushort playerId, int gatePassScore)
+        {
+            _playerControllers[playerId].UpdateGatePassScore(gatePassScore);
         }
 
         public void SwitchToPlayerDeadState(ushort playerId)

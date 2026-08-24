@@ -28,6 +28,32 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boardViewsPerTeam[teamId].UpdateBolts(teamBolts, cancellationTokenSource);
         }
 
+        public void UpdateTeamMolesKilled(ushort teamId, int molesKilled)
+        {
+            _boardViewsPerTeam[teamId].UpdateMolesKilled(molesKilled);
+        }
+
+        public void UpdateTeamGatePassScore(ushort teamId, int gatePassScore)
+        {
+            _boardViewsPerTeam[teamId].UpdateGatePassScore(gatePassScore);
+        }
+
+        public void SetIsMolesKilledShown(bool isShown)
+        {
+            foreach (var boardUIView in _boardViewsPerTeam)
+            {
+                boardUIView.Value.SetIsMolesKilledShown(isShown);
+            }
+        }
+
+        public void SetIsGatePassScoreShown(bool isShown)
+        {
+            foreach (var boardUIView in _boardViewsPerTeam)
+            {
+                boardUIView.Value.SetIsGatePassScoreShown(isShown);
+            }
+        }
+
         public void DestroyAll()
         {
             foreach (var boardUIView in _boardViewsPerTeam)

@@ -7,9 +7,11 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.PlayersForcesService;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
@@ -32,6 +34,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             _diContainer.Bind<IMatchDataService>().To<MatchDataService>().AsSingle();
             _diContainer.Bind<IStageDataService>().To<StageDataService>().AsSingle();
+            _diContainer.Bind<IBonusStageRotationService>().To<BonusStageRotationService>().AsSingle();
+            _diContainer.Bind<IPlayersPassedScoreGateTrackerService>().To<PlayersPassedScoreGateTrackerService>().AsSingle();
             _diContainer.Bind<IPreparationPhaseTimerService>().To<PreparationPhaseTimerService>().AsSingle();
             _diContainer.Bind<ITickProcessor>().To<ServerMatchNetworkTickProcessor>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersTalentsManager>().To<PlayersTalentsManager>().AsSingle().NonLazy();
@@ -43,6 +47,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _diContainer.Bind<IPlayersTouchingSpikesTrackerService>().To<PlayersTouchingSpikesTrackerService>().AsSingle().NonLazy();
             _diContainer.Bind<IOverrideableNetEventsService>().To<OverrideableNetEventsService>().AsSingle().NonLazy();
             _diContainer.Bind<IPowerUpsSpawnerService>().To<PowerUpsSpawnTimerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IMolesSpawnTimerService>().To<MolesSpawnTimerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IGoldenMoleSpawnedTrackerService>().To<GoldenMoleSpawnedTrackerService>().AsSingle().NonLazy();
+            _diContainer.Bind<IMolesSpawnCooldownService>().To<MolesSpawnCooldownService>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerJoinPacketsHandler>().To<MatchPlayerJoinPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IMatchPlayerInputsPacketsHandler>().To<MatchPlayerInputsPacketsHandler>().AsSingle().NonLazy();
             _diContainer.Bind<IPlayersDecelerationLogic>().To<PlayersDecelerationLogic>().AsSingle().NonLazy();

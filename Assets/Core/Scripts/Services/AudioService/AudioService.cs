@@ -270,7 +270,7 @@ namespace Core.Scripts.Services.AudioService
                 }
             }
 
-            LogService.LogError($"No clip of name {audioClipId} found");
+            LogService.LogError($"No audio clip of name {audioClipId} found");
             audioData = default;
             return false;
         }

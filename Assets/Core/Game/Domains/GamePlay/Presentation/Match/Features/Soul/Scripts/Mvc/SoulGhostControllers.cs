@@ -4,20 +4,23 @@ using Core.Scripts.Mvc.WorldCamera;
 using UnityEngine;
 using Zenject;
 using Core.Scripts.Extensions;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc
 {
     public class SoulGhostControllers : ISoulGhostControllers
     {
         private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private readonly IWorldCameraController _worldCameraController;
         private readonly SoulGhostPool _pool;
         private readonly Dictionary<ushort, SoulGhostController> _controllers = new();
         private Transform _parentTransform;
 
-        public SoulGhostControllers(SoulGhostView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IWorldCameraController worldCameraController)
+        public SoulGhostControllers(SoulGhostView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService, IWorldCameraController worldCameraController)
         {
             _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
             _worldCameraController = worldCameraController;
             _pool = new SoulGhostPool(prefab, diContainer);
         }
@@ -41,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mv
         {
             if (_controllers.TryGetValue(ghostId, out var controller))
             {
-                controller.InterpolateTransform(position, rotation, _gamePlayConfig.ExponentialDecay);
+                controller.InterpolateTransform(position, rotation, _interpolationDecayService.CurrentDecay);
             }
         }
 

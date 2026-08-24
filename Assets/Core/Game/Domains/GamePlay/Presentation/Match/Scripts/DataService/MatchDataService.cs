@@ -31,8 +31,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public List<MatchFishingRodTipModel> FishingRodTips { get; private set; }
         public List<MatchSoulGhostModel> SoulGhosts { get; private set; }
         public List<MatchFrigidBlockModel> FrigidBlocks { get; private set; }
+        public List<MatchScoreGateModel> ScoreGates { get; private set; }
+        public List<MatchEnvironmentGateTrapModel> GateTraps { get; private set; }
         public List<MatchTalentCardModel> TalentCards { get; private set; }
         public List<MatchPowerUpBallModel> PowerUpBalls { get; private set; }
+        public List<MatchMoleModel> Moles { get; private set; }
         public List<MatchChickenEggModel> ChickenEggs { get; private set; }
 
         public HashSet<ushort> TeamIds  {get; private set; }
@@ -43,6 +46,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
+        public Dictionary<ushort, int> StageScorePerTeam  {get; private set; }
+        public int WhacAMoleEndTick { get; set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
         {
@@ -55,9 +60,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             RotatingWheels = new List<MatchEnvironmentRotatingWheelModel>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels);
             TalentCards = new List<MatchTalentCardModel>(networkConfig.MaxCap.ConcurrentTalentCards);
             PowerUpBalls = new List<MatchPowerUpBallModel>(networkConfig.MaxCap.ConcurrentPowerUpBalls);
+            Moles = new List<MatchMoleModel>(networkConfig.MaxCap.ConcurrentMoles);
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            StageScorePerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -66,7 +73,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FishingRodTips = new List<MatchFishingRodTipModel>(networkConfig.MaxCap.ConcurrentPlayers);
             SoulGhosts = new List<MatchSoulGhostModel>(networkConfig.MaxCap.ConcurrentPlayers);
             FrigidBlocks = new List<MatchFrigidBlockModel>(networkConfig.MaxCap.ConcurrentFrigidBlocks);
+            ScoreGates = new List<MatchScoreGateModel>(networkConfig.MaxCap.ConcurrentScoreGates);
             ChickenEggs = new List<MatchChickenEggModel>(networkConfig.MaxCap.ConcurrentChickenEggs);
+            GateTraps = new List<MatchEnvironmentGateTrapModel>(networkConfig.MaxCap.ConcurrentEnvironmentGateTraps);
         }
 
         public MatchPlayerBulletModel GetBullet(ushort bulletId)
@@ -131,6 +140,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return newPowerUpBall;
         }
 
+        public MatchMoleModel GetMole(ushort moleId)
+        {
+            return Moles.Find(x => x.Id == moleId);
+        }
+
+        public MatchMoleModel AddMole(ushort moleId, ushort moleHoleId, bool isGolden, byte remainingLives, byte maxLives)
+        {
+            var newMole = new MatchMoleModel(moleId, moleHoleId, isGolden, remainingLives, maxLives);
+            Moles.Add(newMole);
+            return newMole;
+        }
+
+        public void RemoveMole(ushort moleId)
+        {
+            var moleModel = GetMole(moleId);
+
+            if (moleModel == null)
+            {
+                LogService.LogError($"No mole to remove with id {moleId}!");
+                return;
+            }
+
+            Moles.Remove(moleModel);
+        }
+
         public void RemoveTalentCard(ushort cardId)
         {
             var talentCardModel = TalentCards.Find(x => x.Id == cardId);
@@ -167,10 +201,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return Players.Find(x => x.PlayerId == playerId).TeamId;
         }
 
-        public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
+        public MatchPlayerModel AddPlayer(PlayerStateS2C playerState, int stageScore)
         {
             var playerTeamId = playerState.TeamId;
-            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.Spaceship);
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, stageScore, playerState.Spaceship);
             Players.Add(newPlayer);
             return newPlayer;
         }
@@ -180,6 +214,49 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TeamIds.Add(teamId);
             BoltsPerTeam.TryAdd(teamId, 0);
             GemsPerTeam.TryAdd(teamId, 0);
+            StageScorePerTeam.TryAdd(teamId, 0);
+        }
+
+        public MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap)
+        {
+            GateTraps.Add(gateTrap);
+            return gateTrap;
+        }
+
+        // Gate trap packets can arrive before the traps are built, so every lookup goes through Try and a miss is quiet.
+        public bool TryGetGateTrap(ushort gateTrapId, out MatchEnvironmentGateTrapModel gateTrap)
+        {
+            for (int i = 0; i < GateTraps.Count; i++)
+            {
+                if (GateTraps[i].Id == gateTrapId)
+                {
+                    gateTrap = GateTraps[i];
+                    return true;
+                }
+            }
+
+            gateTrap = null;
+            return false;
+        }
+
+        // A trap that rides a wheel is placed in the wheel's local space, so both the full sync and the per-tick step
+        // need the wheel it belongs to. A free-standing trap has none.
+        public MatchEnvironmentRotatingWheelModel GetRotatingWheelOfGateTrap(MatchEnvironmentGateTrapModel gateTrap)
+        {
+            if (!gateTrap.IsAttachedToRotationWheel)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < RotatingWheels.Count; i++)
+            {
+                if (RotatingWheels[i].Id == gateTrap.AttachedToRotationWheelId)
+                {
+                    return RotatingWheels[i];
+                }
+            }
+
+            return null;
         }
 
         public MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle)
@@ -247,8 +324,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             RotatingWheels.Clear();
             TalentCards.Clear();
             PowerUpBalls.Clear();
+            Moles.Clear();
             BoltsPerTeam.Clear();
             GemsPerTeam.Clear();
+            StageScorePerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
             SwapFields.Clear();
@@ -257,7 +336,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             FishingRodTips.Clear();
             SoulGhosts.Clear();
             FrigidBlocks.Clear();
+            ScoreGates.Clear();
             ChickenEggs.Clear();
+            GateTraps.Clear();
         }
 
         public void SetTeamBolts(ushort teamId, int totalTeamBolts)
@@ -268,6 +349,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public void SetTeamGems(ushort teamId, int totalTeamGems)
         {
             GemsPerTeam[teamId] = totalTeamGems;
+        }
+
+        public void SetStageScoreOfTeam(ushort teamId, int totalStageScore)
+        {
+            StageScorePerTeam[teamId] = totalStageScore;
+        }
+
+        public void SetPlayerStageScore(ushort playerId, int totalStageScore)
+        {
+            GetPlayer(playerId).StageScore = totalStageScore;
         }
 
         public bool IsTeamLeadingInGems(ushort teamId)
@@ -377,9 +468,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
-        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase)
+        public MatchFishingRodTipModel AddFishingRodTip(ushort id, ushort casterPlayerId, Vector2 position, FishingRodTipPhase phase, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType)
         {
-            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2(), phase);
+            var model = new MatchFishingRodTipModel(id, casterPlayerId, position.ToUnityVector2(), phase, caughtEnemyId, caughtEnemyType);
             FishingRodTips.Add(model);
             return model;
         }
@@ -469,6 +560,45 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
+        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, ushort scoreMultiplier)
+        {
+            var model = new MatchScoreGateModel(id, position.ToUnityVector2(), rotation.ToUnityVector2(), lastScoredTeamId, scoreMultiplier);
+            ScoreGates.Add(model);
+            return model;
+        }
+
+        // Score gate packets can arrive before the gates are built, so every lookup goes through Try and a miss is quiet.
+        public bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate)
+        {
+            for (int i = 0; i < ScoreGates.Count; i++)
+            {
+                if (ScoreGates[i].Id == id)
+                {
+                    scoreGate = ScoreGates[i];
+                    return true;
+                }
+            }
+
+            scoreGate = null;
+            return false;
+        }
+
+        public void SetScoreGateLastScoredTeam(ushort id, ushort teamId)
+        {
+            if (TryGetScoreGate(id, out var scoreGate))
+            {
+                scoreGate.LastScoredTeamId = teamId;
+            }
+        }
+
+        public void SetScoreGateMultiplier(ushort id, ushort scoreMultiplier)
+        {
+            if (TryGetScoreGate(id, out var scoreGate))
+            {
+                scoreGate.ScoreMultiplier = scoreMultiplier;
+            }
+        }
+
         public MatchKOProjectileModel GetKOProjectile(ushort id)
         {
             var model = KOProjectiles.Find(x => x.Id == id);
@@ -537,8 +667,44 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 return false;
             }
 
+            // In bonus stages only the winning-team player who contributed the most score is kinged.
+            if (StageType.IsBonusStage())
+            {
+                kingedPlayers = new List<MatchPlayerModel>(1);
+                var topScoringPlayerInWinningTeam = GetTopScoringPlayerInWinningTeam();
+
+                if (topScoringPlayerInWinningTeam != null)
+                {
+                    kingedPlayers.Add(topScoringPlayerInWinningTeam);
+                }
+
+                return true;
+            }
+
             kingedPlayers = Players.FindAll(x => x.TeamId == CurrentStageWinnerTeamId);
             return true;
+        }
+
+        private MatchPlayerModel GetTopScoringPlayerInWinningTeam()
+        {
+            MatchPlayerModel topScoringPlayer = null;
+
+            foreach (var player in Players)
+            {
+                if (player.TeamId != CurrentStageWinnerTeamId)
+                {
+                    continue;
+                }
+
+                // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
+                if (topScoringPlayer == null || player.StageScore > topScoringPlayer.StageScore ||
+                    (player.StageScore == topScoringPlayer.StageScore && player.PlayerId < topScoringPlayer.PlayerId))
+                {
+                    topScoringPlayer = player;
+                }
+            }
+
+            return topScoringPlayer;
         }
     }
 }

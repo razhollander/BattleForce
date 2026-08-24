@@ -650,3 +650,5 @@ MonoBehaviour:
   - {fileID: 6455190655695517483}
   - {fileID: 3755152538394417381}
   - {fileID: 5817252694903099049}
+  _outlineText: {fileID: 6455190655695517483}
+  _underlineText: {fileID: 5817252694903099049}

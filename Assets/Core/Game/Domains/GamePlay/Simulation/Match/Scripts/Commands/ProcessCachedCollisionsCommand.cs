@@ -10,6 +10,7 @@ using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersOutsideStageTra
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingWall;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Services.TeleportGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -43,6 +44,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
         private UpdatePlayerLavaExposureCommand _updatePlayerLavaExposureCommand;
         private CollidePlayerWithEnvironmentSpikeCommand _collidePlayerWithEnvironmentSpikeCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
+        private PushScoreGateCommand _pushScoreGateCommand;
+        private BreakEggCommand _breakEggCommand;
+        private IPlayersPassedScoreGateTrackerService _playersPassedScoreGateTrackerService;
 
         public ProcessCachedCollisionsCommand SetProcessedTick(int processedTick)
         {
@@ -62,6 +67,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _obtainPowerUpBallCommand = _commandFactory.CreateCommandVoid<ObtainPowerUpBallCommand>();
             _updatePlayerLavaExposureCommand = _commandFactory.CreateCommandVoid<UpdatePlayerLavaExposureCommand>();
             _collidePlayerWithEnvironmentSpikeCommand = _commandFactory.CreateCommandVoid<CollidePlayerWithEnvironmentSpikeCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
+            _pushScoreGateCommand = _commandFactory.CreateCommandVoid<PushScoreGateCommand>();
+            _breakEggCommand = _commandFactory.CreateCommandVoid<BreakEggCommand>();
+            _playersPassedScoreGateTrackerService = _diContainer.Resolve<IPlayersPassedScoreGateTrackerService>();
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersOutsideStageTrackerService = _diContainer.Resolve<IPlayersOutsideStageTrackerService>();
@@ -122,6 +131,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 HandlePowerUpBallFrigidBlockCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePlayerRockCollision(objectA, objectB, collisionEvent.Contact);
                 HandlePowerUpBallRockCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletMoleCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePlayerMoleCollision(objectA, objectB);
+                HandleKOProjectileMoleCollision(objectA, objectB);
+                HandleFishingRodTipMoleCollision(objectA, objectB);
+                HandleHeadbuttScoreGateCollision(objectA, objectB); // before the player bounce, so the push reads the dash velocity, not the reflected one
+                HandlePlayerScoreGateCollision(objectA, objectB, collisionEvent.Contact);
+                HandleBulletScoreGateCollision(objectA, objectB, collisionEvent.Contact);
+                HandlePowerUpBallScoreGateCollision(objectA, objectB, collisionEvent.Contact);
+                HandleKOProjectileScoreGateCollision(objectA, objectB);
+                HandleChickenEggScoreGateCollision(objectA, objectB);
             }
 
             _physicsSimulator.ClearCachedCollisions();
@@ -202,6 +221,299 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
+        }
+        
+        private void HandlePlayerScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToGate && !isGateToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToGate ? objectA.Id : objectB.Id;
+            var playerModel = _matchDataService.SimulationState.GetPlayerById(playerId);
+
+            contact.GetWorldManifold(out var worldManifold);
+            var gateNormal = isPlayerToGate ? -worldManifold.normal : worldManifold.normal; // orient the normal to point from the gate toward the player
+
+            var relativeVelocity = playerModel.Spaceship.Transform.Velocity;
+            if (!relativeVelocity.IsFacingWall(gateNormal))
+            {
+                return;
+            }
+
+            playerModel.Spaceship.Transform.Velocity = relativeVelocity.ReflectFromWall(gateNormal);
+
+            if (IsFrozenActiveForPlayer(playerId))
+            {
+                return;
+            }
+
+            var currentDirection = playerModel.Spaceship.Transform.Direction;
+            var reflectedDirection = currentDirection.ReflectFromWall(gateNormal);
+            playerModel.Spaceship.Transform.Direction = reflectedDirection.Length() > 0
+                ? reflectedDirection.NormalizeSafe()
+                : currentDirection;
+        }
+
+        private void HandleBulletScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToBullet = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+            if (!isBulletToGate && !isGateToBullet)
+            {
+                return;
+            }
+
+            var bulletId = isBulletToGate ? objectA.Id : objectB.Id;
+            var bulletBody = isBulletToGate ? contact.FixtureA.Body : contact.FixtureB.Body;
+
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bulletModel))
+            {
+                LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+        }
+
+        private void HandlePowerUpBallScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isPowerUpToGate = objectA.PhysicsBodyType == PhysicsBodyType.PowerUpBall && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToPowerUp = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.PowerUpBall;
+            if (!isPowerUpToGate && !isGateToPowerUp)
+            {
+                return;
+            }
+
+            ref var powerUpBallModel = ref _matchDataService.SimulationState.GetPowerUpBallById(isPowerUpToGate ? objectA.Id : objectB.Id);
+            var relativeVelocity = powerUpBallModel.Velocity;
+            contact.GetWorldManifold(out var worldManifold);
+            var collisionNormal = isPowerUpToGate ? -worldManifold.normal : worldManifold.normal;
+            if (!relativeVelocity.IsFacingWall(collisionNormal))
+            {
+                return;
+            }
+
+            powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
+        }
+
+        // A KO projectile is a sensor, so the solver never pushes the gate for it. Apply the push + spin manually, then
+        // end the projectile the same way a wall hit does.
+        private void HandleKOProjectileScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isProjectileToGate = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+            if (!isProjectileToGate && !isGateToProjectile)
+            {
+                return;
+            }
+
+            var projectileId = isProjectileToGate ? objectA.Id : objectB.Id;
+            var scoreGateId = isProjectileToGate ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                return;
+            }
+
+            var projectileBody = _physicsSimulator.GetKOProjectile(projectileId);
+            var pushDirection = projectileBody.GetLinearVelocity().NormalizeSafe();
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(pushDirection * gatePassConfig.KOPushImpulse)
+                .SetWorldContactPoint(projectileBody.Position)
+                .SetExtraSpinImpulse(gatePassConfig.KOSpinImpulse)
+                .Execute();
+
+            _playersTalentsManager.HitKOTalentWithWall(koProjectile.PlayerCasterId);
+        }
+
+        // A headbutt mid-dash is the single hardest shove in the game, so it launches the gate with a large impulse and a spin.
+        private void HandleHeadbuttScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+            if (!isPlayerToGate && !isGateToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToGate ? objectA.Id : objectB.Id;
+            var scoreGateId = isPlayerToGate ? objectB.Id : objectA.Id;
+
+            if (!IsHeadbuttDashingForPlayer(playerId))
+            {
+                return;
+            }
+
+            var playerModel = _matchDataService.SimulationState.GetPlayerById(playerId);
+            var pushDirection = playerModel.Spaceship.Transform.Velocity.NormalizeSafe();
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(pushDirection * gatePassConfig.HeadbuttPushImpulse)
+                .SetWorldContactPoint(playerModel.Spaceship.Transform.Position)
+                .SetExtraSpinImpulse(gatePassConfig.HeadbuttSpinImpulse)
+                .Execute();
+        }
+
+        // The gate crushes the egg, and the egg twists the gate a little (spin only, no push). The sign is randomised so
+        // repeated eggs do not wind the gate up in one direction.
+        private void HandleChickenEggScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isEggToGate = objectA.PhysicsBodyType == PhysicsBodyType.ChickenEgg && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;
+            var isGateToEgg = objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate && objectB.PhysicsBodyType == PhysicsBodyType.ChickenEgg;
+            if (!isEggToGate && !isGateToEgg)
+            {
+                return;
+            }
+
+            var eggId = isEggToGate ? objectA.Id : objectB.Id;
+            var scoreGateId = isEggToGate ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetChickenEggById(eggId, out var egg))
+            {
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetScoreGateIndexById(scoreGateId, out _))
+            {
+                return;
+            }
+
+            var spinSign = RNG.NextInt(0, 2) == 0 ? -1f : 1f;
+            var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
+
+            _pushScoreGateCommand
+                .SetScoreGateId(scoreGateId)
+                .SetImpulse(System.Numerics.Vector2.Zero)
+                .SetWorldContactPoint(egg.Position)
+                .SetExtraSpinImpulse(spinSign * gatePassConfig.ChickenEggSpinImpulse)
+                .Execute();
+
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
+        }
+
+        private void HandleBulletMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
+        {
+            var isBulletToMole = objectA.PhysicsBodyType == PhysicsBodyType.PlayerBullet && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToBullet = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.PlayerBullet;
+
+            if (!isBulletToMole && !isMoleToBullet)
+            {
+                return;
+            }
+
+            var bulletId = isBulletToMole ? objectA.Id : objectB.Id;
+            var bulletBody = isBulletToMole ? contact.FixtureA.Body : contact.FixtureB.Body;
+            var moleId = isBulletToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetBulletById(bulletId, out var bulletModel))
+            {
+                LogService.LogTopic("Bullet was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            DestroyBullet(bulletModel, bulletBody);
+            HitMole(moleId, bulletModel.BelongToPlayerId);
+        }
+
+        private void HandleKOProjectileMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isProjectileToMole = objectA.PhysicsBodyType == PhysicsBodyType.KOProjectile && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToProjectile = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.KOProjectile;
+
+            if (!isProjectileToMole && !isMoleToProjectile)
+            {
+                return;
+            }
+
+            var projectileId = isProjectileToMole ? objectA.Id : objectB.Id;
+            var moleId = isProjectileToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetKOProjectileById(projectileId, out var koProjectile))
+            {
+                LogService.LogTopic("Ko Projectile was already destroyed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            _playersTalentsManager.HitKOTalentWithMole(koProjectile.PlayerCasterId, moleId, _processedTick);
+        }
+
+        // A mole is smashed by a ship only while that ship carries a talent that spins whatever it touches.
+        private void HandlePlayerMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isPlayerToMole = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToPlayer = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship;
+
+            if (!isPlayerToMole && !isMoleToPlayer)
+            {
+                return;
+            }
+
+            var playerId = isPlayerToMole ? objectA.Id : objectB.Id;
+            var moleId = isPlayerToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            if (!CanPlayerSmashMoles(playerId))
+            {
+                return;
+            }
+
+            HitMole(moleId, playerId);
+
+            if (IsHeadbuttDashingForPlayer(playerId))
+            {
+                _playersTalentsManager.HeadbuttHitMole(playerId);
+            }
+        }
+
+        // Being spinned is not enough - only a talent that spins the target it hits can whack a mole.
+        // Rock is deliberately absent: it decides what it covers by distance inside RockTalentController, so a contact here would whack the same mole a second time.
+        private bool CanPlayerSmashMoles(ushort playerId)
+        {
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.GrapplingHook)
+                   || IsHeadbuttDashingForPlayer(playerId);
+        }
+
+        private bool IsHeadbuttDashingForPlayer(ushort playerId)
+        {
+            return _matchDataService.SimulationState.GetIsTalentCurrentlyActiveForPlayer(playerId, TalentType.Headbutt)
+                   && !_playersTalentsManager.IsHeadbuttCharging(playerId);
+        }
+
+        private void HitMole(ushort moleId, ushort byPlayerId)
+        {
+            var byTeamId = _matchDataService.SimulationState.GetPlayerById(byPlayerId).TeamId;
+            _tryHitMoleCommand
+                .SetMoleId(moleId)
+                .SetByPlayerId(byPlayerId)
+                .SetByTeamId(byTeamId)
+                .SetProcessedTick(_processedTick)
+                .Execute();
         }
 
         private bool IsRockActiveForPlayer(ushort playerId)
@@ -335,9 +647,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 return;
             }
             
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
-            _physicsSimulator.RemoveChickenEgg(egg.Id);
-            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
         }
 
         // The grappling hook attaches to walls, frigid blocks, and players that are currently in Rock state.
@@ -379,6 +689,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 case PhysicsBodyType.FrigidBlock:
                     hitType = GrapplingHookHitType.FrigidBlock;
                     return true;
+                case PhysicsBodyType.ScoreGate: // anchor on the gate like a wall and reel the caster in
+                    hitType = GrapplingHookHitType.Wall;
+                    return true;
                 case PhysicsBodyType.PlayerSpaceship when IsRockActiveForPlayer(attachedObject.Id):
                     hitType = GrapplingHookHitType.RockPlayer;
                     return true;
@@ -391,9 +704,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void HandleFishingRodTipWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
         {
             var isTipToWall = objectA.PhysicsBodyType == PhysicsBodyType.FishingRodTip &&
-                              (objectB.PhysicsBodyType == PhysicsBodyType.Wall || objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+                              (objectB.PhysicsBodyType == PhysicsBodyType.Wall || objectB.PhysicsBodyType == PhysicsBodyType.FrigidBlock || objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate);
             var isWallToTip = objectB.PhysicsBodyType == PhysicsBodyType.FishingRodTip &&
-                              (objectA.PhysicsBodyType == PhysicsBodyType.Wall || objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock);
+                              (objectA.PhysicsBodyType == PhysicsBodyType.Wall || objectA.PhysicsBodyType == PhysicsBodyType.FrigidBlock || objectA.PhysicsBodyType == PhysicsBodyType.ScoreGate);
 
             if (!isTipToWall && !isWallToTip)
             {
@@ -408,6 +721,33 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             _playersTalentsManager.HitFishingRodWithWall(projectile.PlayerCasterId, projectileId, _processedTick);
+        }
+
+        private void HandleFishingRodTipMoleCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
+        {
+            var isTipToMole = objectA.PhysicsBodyType == PhysicsBodyType.FishingRodTip && objectB.PhysicsBodyType == PhysicsBodyType.Mole;
+            var isMoleToTip = objectA.PhysicsBodyType == PhysicsBodyType.Mole && objectB.PhysicsBodyType == PhysicsBodyType.FishingRodTip;
+
+            if (!isTipToMole && !isMoleToTip)
+            {
+                return;
+            }
+
+            var projectileId = isTipToMole ? objectA.Id : objectB.Id;
+            var moleId = isTipToMole ? objectB.Id : objectA.Id;
+
+            if (!_matchDataService.SimulationState.TryGetFishingRodProjectileById(projectileId, out var projectile))
+            {
+                return;
+            }
+
+            if (!_matchDataService.SimulationState.TryGetMoleIndexById(moleId, out _))
+            {
+                LogService.LogTopic("Mole was already removed in this frame!", LogTopicType.ServerPhysics);
+                return;
+            }
+
+            _playersTalentsManager.CatchFishingRodWithMole(projectile.PlayerCasterId, moleId, _processedTick);
         }
 
         private void HandleSoulGhostWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -433,6 +773,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private bool IsSoulGhostBlockerBody(PhysicsBodyData bodyData)
         {
             return IsWallLikeBodyType(bodyData.PhysicsBodyType)
+                   || bodyData.PhysicsBodyType == PhysicsBodyType.ScoreGate
                    || (bodyData.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && IsRockActiveForPlayer(bodyData.Id));
         }
 
@@ -527,9 +868,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var config = _gamePlayConfigService.GamePlayConfig.Talents.ChickenTalentConfig;
             _trySpinPlayerCommand.SetPlayer(player.Id).SetSpinAmount(config.SpinAmount).SetTick(_processedTick).Execute();
             
-            _netEventsDataService.AddChickenEggHitNetEventS2C(_processedTick, eggId);
-            _physicsSimulator.RemoveChickenEgg(egg.Id);
-            _matchDataService.SimulationState.RemoveChickenEggById(egg.Id);
+            _breakEggCommand.SetEggId(eggId).SetProcessedTick(_processedTick).Execute();
         }
 
         private void HandleKOProjectileWallCollision(PhysicsBodyData objectA, PhysicsBodyData objectB)
@@ -663,6 +1002,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var exitGateNormal = exitGateRotation.ToRadians().AngleToVector();
             var exitPoint = MathUtils.TeleportsLogic.GetRelativeExitPoint(enterPoint, enterGatePosition, enterGateNormal, exitGatePosition, exitGateNormal);
             playerState.Spaceship.Transform.Position = exitPoint;
+            _playersPassedScoreGateTrackerService.InvalidatePreviousPosition(playerId); // the jump must not be read as a gate pass
             var newDirection = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Direction, enterGateNormal, exitGateNormal);
             playerState.Spaceship.Transform.Direction = newDirection;
             var newVelocity = MathUtils.TeleportsLogic.ConvertVectorTelativeToExitTeleport(playerState.Spaceship.Transform.Velocity, enterGateNormal, exitGateNormal);
@@ -965,7 +1305,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             {
                 return;
             }
-            
+
             _tryHitPlayerCommand
                 .SetPlayerIdGotHit(playerId)
                 .SetWasHitByAnotherPlayer(true, bulletModel.BelongToPlayerId)

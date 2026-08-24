@@ -4,18 +4,19 @@ using Core.Scripts.Extensions;
 using Core.Scripts.Utils;
 using CoreDomain.Scripts.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc
 {
     public class MatchEnvironmentSpikeController
     {
-        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         private EnvironmentSpikeView _view;
         private Transform _viewTransform;
 
-        public MatchEnvironmentSpikeController(PresentationGamePlayConfig gamePlayConfig)
+        public MatchEnvironmentSpikeController(IInterpolationDecayService interpolationDecayService)
         {
-            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
         }
 
         public void CreateView(EnvironmentSpikeView viewPrefab, Transform parent, Vector2 position, float rotationDegrees)
@@ -30,7 +31,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spi
             var direction = rotationDegrees.ToRadians().AngleToVector();
             var targetRotation = direction.ToQuaternion();
             var deltaTime = Time.deltaTime;
-            var decay = _gamePlayConfig.ExponentialDecay;
+            var decay = _interpolationDecayService.CurrentDecay;
 
             var interpulatedRotation = MathUtils.ExpDecay(
                 _viewTransform.rotation,

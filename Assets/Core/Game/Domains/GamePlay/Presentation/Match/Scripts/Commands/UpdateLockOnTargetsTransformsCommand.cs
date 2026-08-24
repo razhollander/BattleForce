@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
@@ -14,10 +15,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
+        private IMoleControllers _moleControllers;
         private IMatchDataService _matchDataService;
 
         public override void ResolveDependencies()
         {
+            _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _lockOnTargetEffectController = _diContainer.Resolve<ILockOnTargetEffectController>();
             _playerControllers = _diContainer.Resolve<IMatchPlayerControllers>();
             _powerUpBallControllers = _diContainer.Resolve<IPowerUpBallControllers>();
@@ -32,20 +35,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
                 foreach (var targetedObject in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    var targetPosition = GetTargetPosition(targetedObject);
+                    if (!TryGetTargetPosition(targetedObject, out var targetPosition))
+                    {
+                        continue;
+                    }
+
                     _lockOnTargetEffectController.UpdateTargetsPositionOnPlayer(playerModel.PlayerId, targetedObject.GetKey(), casterPlayerHeadPosition, targetPosition);
                 }
             }
         }
 
-        private Vector2 GetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy)
+        private bool TryGetTargetPosition(ObjectLockedOnTargetS2C targetedEnemy, out Vector2 targetPosition)
         {
             switch (targetedEnemy.TargetType)
             {
                 case LockOnTargetType.PowerUpBall:
-                    return _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
+                    targetPosition = _powerUpBallControllers.GetPowerUpBallPosition(targetedEnemy.TargetId);
+                    return true;
+                case LockOnTargetType.Mole:
+                    return _moleControllers.TryGetMoleHolePosition(targetedEnemy.TargetId, out targetPosition);
                 default:
-                    return _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
+                    targetPosition = _playerControllers.GetPlayerHeartTransform(targetedEnemy.TargetId).position.ToVector2XY();
+                    return true;
             }
         }
     }

@@ -3,6 +3,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersTouchingSpikesTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUpsSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Controllers;
 using CoreDomain.Scripts.Services.CommandFactory;
@@ -17,6 +18,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private IMatchDataService _matchDataService;
         private IPowerUpsSpawnerService _powerUpsSpawnerService;
+        private IMolesSpawnTimerService _molesSpawnTimerService;
         private IPlayersInLavaTrackerService _playersInLavaTrackerService;
         private IPlayersTouchingSpikesTrackerService _playersTouchingSpikesTrackerService;
         private IHeadLessQuitterController _headLessQuitterController;
@@ -36,6 +38,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _powerUpsSpawnerService = _diContainer.Resolve<IPowerUpsSpawnerService>();
+            _molesSpawnTimerService = _diContainer.Resolve<IMolesSpawnTimerService>();
             _playersInLavaTrackerService = _diContainer.Resolve<IPlayersInLavaTrackerService>();
             _playersTouchingSpikesTrackerService = _diContainer.Resolve<IPlayersTouchingSpikesTrackerService>();
             _headLessQuitterController = _diContainer.Resolve<IHeadLessQuitterController>();
@@ -49,6 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             StepPlayersShootCooldown(_deltaTime);
             _powerUpsSpawnerService.StepTimer(_deltaTime);
+            _molesSpawnTimerService.StepTimer(_deltaTime);
             StepPlayersInHazardsTimers(_deltaTime);
             _headLessQuitterController.StepTimer(_deltaTime);
             StepPreperationPhaseTimer(_deltaTime);

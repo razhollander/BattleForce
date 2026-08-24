@@ -48,6 +48,28 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _view.HideHealthBar();
         }
 
+        public void ShowMolesKilledScore(int molesKilledScore)
+        {
+            _view.ShowMolesKilledScore();
+            UpdateMolesKilledScore(molesKilledScore);
+        }
+
+        public void UpdateMolesKilledScore(int molesKilledScore)
+        {
+            _view.UpdateMolesKilledScore(molesKilledScore);
+        }
+
+        public void ShowGatePassScore(int gatePassScore)
+        {
+            _view.ShowGatePassScore();
+            UpdateGatePassScore(gatePassScore);
+        }
+
+        public void UpdateGatePassScore(int gatePassScore)
+        {
+            _view.UpdateGatePassScore(gatePassScore);
+        }
+
         public void SwitchToPlayerDeadState()
         {
             _view.SetOpacity(0.5f);

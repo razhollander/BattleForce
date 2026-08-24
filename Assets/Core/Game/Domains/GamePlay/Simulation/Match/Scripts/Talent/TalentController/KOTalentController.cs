@@ -29,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         private readonly ICommandFactory _commandFactory;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
+        private TryHitMoleCommand _tryHitMoleCommand;
 
         public TalentType TalentType => TalentType.KO;
         private bool IsCurrentlyActive
@@ -72,6 +73,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
         {
             _trySpinPlayerCommand = _commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = _commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
+            _tryHitMoleCommand = _commandFactory.CreateCommandVoid<TryHitMoleCommand>();
         }
         
         public void SetCasterId(ushort casterPlayerId)
@@ -197,6 +199,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent.TalentContr
                 .Execute();
             _tryAddForceToPlayerCommand.SetForce(pushForce).SetPlayerId(enemyPlayerId).ShouldTurnOffEngine(true).Execute();
             _netEventsDataService.AddKOProjectHitPlayerNetEvent(tick, _projectileId, enemyPlayerState.Id, projectile.Position);
+            StartReturnPhase();
+        }
+
+        public void HitMole(ushort moleId, int tick)
+        {
+            if (!IsCurrentlyActive || _isInReturnPhase)
+            {
+                return;
+            }
+
+            var casterPlayerState = _matchDataService.SimulationState.GetPlayerById(_casterPlayerId);
+            _tryHitMoleCommand
+                .SetMoleId(moleId)
+                .SetByPlayerId(_casterPlayerId)
+                .SetByTeamId(casterPlayerState.TeamId)
+                .SetProcessedTick(tick)
+                .Execute();
             StartReturnPhase();
         }
 

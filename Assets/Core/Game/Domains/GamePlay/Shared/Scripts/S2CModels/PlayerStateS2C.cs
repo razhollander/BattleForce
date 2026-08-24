@@ -10,12 +10,12 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public string Name;
         public PlayerSpaceshipStateS2C Spaceship;
         public ushort TeamId;
-        
+
         public PlayerStateS2C(int maxTalents, int maxEnemiesAmount)
         {
             Spaceship = new PlayerSpaceshipStateS2C(maxTalents, maxEnemiesAmount);
         }
-        
+
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Id);
@@ -23,7 +23,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             writer.Put((byte)TeamId);
             Spaceship.Serialize(writer);
         }
-        
+
         public void Deserialize(NetDataReader reader)
         {
             Id = reader.GetByte();

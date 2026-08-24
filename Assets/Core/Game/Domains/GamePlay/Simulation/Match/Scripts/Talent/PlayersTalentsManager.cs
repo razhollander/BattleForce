@@ -5,6 +5,7 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.OverrideableNetEvents;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayersInLavaTracker;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
@@ -26,7 +27,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
         public PlayersTalentsManager(NetworkConfig networkConfig, IMatchDataService matchDataService, SharedGamePlayConfig sharedGamePlayConfig,
             INetEventsDataService netEventsDataService, ISimulationGamePlayConfigService gamePlayConfigService, IPhysicsSimulator physicsSimulator,
-            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService)
+            IOverrideableNetEventsService overrideableNetEventsService, ICommandFactory commandFactory, IPlayersMouseDataService playersMouseDataService, IPlayersInLavaTrackerService playersInLavaTrackerService,
+            IPlayersPassedScoreGateTrackerService playersPassedScoreGateTrackerService)
         {
             _matchDataService = matchDataService;
             _sharedGamePlayConfig = sharedGamePlayConfig;
@@ -35,7 +37,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
 
             _talentControllersPool = new ConcurrentPool<PlayerTalentControllers>(
                 () => new PlayerTalentControllers(netEventsDataService, matchDataService, gamePlayConfigService, physicsSimulator, networkConfig, overrideableNetEventsService,
-                    commandFactory, sharedGamePlayConfig, playersMouseDataService, playersInLavaTrackerService), networkConfig.MaxCap.ConcurrentPlayers);
+                    commandFactory, sharedGamePlayConfig, playersMouseDataService, playersInLavaTrackerService, playersPassedScoreGateTrackerService), networkConfig.MaxCap.ConcurrentPlayers);
         }
 
         public void AddPlayer(ushort playerId)
@@ -206,6 +208,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             }
         }
 
+        public void HitKOTalentWithMole(ushort casterId, ushort moleId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HitKOTalentWithMole(moleId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
         public void HitGrapplingHook(ushort casterId, ushort projectileId, GrapplingHookHitType hitType, ushort attachedEntityId, int tick)
         {
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
@@ -223,6 +237,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
             {
                 controllers.CatchFishingRodEnemy(enemyPlayerId, tick);
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
+            }
+        }
+
+        public void CatchFishingRodWithMole(ushort casterId, ushort moleId, int tick)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.CatchFishingRodMole(moleId, tick);
             }
             else
             {
@@ -273,6 +299,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent
             if (_talentControllersPerPlayer.TryGetValue(potentialCasterId, out var controllers))
             {
                 controllers.TryHeadbuttHitEnemy(potentialCasterId, potentialEnemyId, tick);
+            }
+        }
+
+        public void HeadbuttHitMole(ushort casterId)
+        {
+            if (_talentControllersPerPlayer.TryGetValue(casterId, out var controllers))
+            {
+                controllers.HeadbuttHitMole();
+            }
+            else
+            {
+                LogService.LogError($"No caster found for player id {casterId}");
             }
         }
 

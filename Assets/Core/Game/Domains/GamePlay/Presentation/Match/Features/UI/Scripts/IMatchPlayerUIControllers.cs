@@ -8,6 +8,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         void AddPlayer(ushort playerId, int currentServerTick);
         void SetPlayerHealth(ushort playerId, ushort currentHealth, ushort maxHealth);
         void HidePlayerHealthBar(ushort playerId);
+        void UpdatePlayerMolesKilledScore(ushort playerId, int molesKilledScore);
+        void UpdatePlayerGatePassScore(ushort playerId, int gatePassScore);
         void SwitchToPlayerDeadState(ushort playerId);
         void DestroyAll();
         void UpdatePlayerTalents(ushort playerId, FixedOrderedList<TalentStateS2C> talents, int currentServerTick);

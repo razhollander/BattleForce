@@ -1,8 +1,5 @@
-using System.Collections.Generic;
 using System.Threading;
 using Core.Game.Domains.GamePlay.Presentation.Features.Simple_Health_Bar.Scripts;
-using Core.Game.Domains.GamePlay.Shared.S2CModels;
-using Core.Scripts.Utils.CustomCollections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +13,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private Image _equipmentImage;
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private SimpleHealthBar _healthBar;
+        [SerializeField] private GameObject _healthBarGameObject;
+        [SerializeField] private TextMeshProUGUI _molesKilledScoreText;
+        [SerializeField] private GameObject _molesKilledScoreContainer;
+        [SerializeField] private TextMeshProUGUI _gatePassScoreText;
+        [SerializeField] private GameObject _gatePassScoreContainer;
         [SerializeField]private CanvasGroup _canvasGroup;
 
         [Header("Talents")]
@@ -61,7 +63,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
 
         public void HideHealthBar()
         {
-            _healthBar.gameObject.SetActive(false);
+            _healthBarGameObject.SetActive(false);
+        }
+        
+        public void ShowMolesKilledScore()
+        {
+            _molesKilledScoreContainer.SetActive(true);
+        }
+
+        public void UpdateMolesKilledScore(int molesKilledScore)
+        {
+            _molesKilledScoreText.text = molesKilledScore.ToString();
+        }
+
+        public void ShowGatePassScore()
+        {
+            _gatePassScoreContainer.SetActive(true);
+        }
+
+        public void UpdateGatePassScore(int gatePassScore)
+        {
+            _gatePassScoreText.text = gatePassScore.ToString();
         }
 
         public void UpdateTalents(TalentVisualData[] talents)

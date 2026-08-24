@@ -19,16 +19,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         
         private PlayerStateS2C _playerState;
         private int _currentServerTick;
+        private int _stageScore;
 
         public AddMatchPlayerCommand SetPlayerState(PlayerStateS2C playerState)
         {
             _playerState = playerState;
             return this;
         }
-        
+
         public AddMatchPlayerCommand SetCurrentServerTick(int currentServerTick)
         {
             _currentServerTick = currentServerTick;
+            return this;
+        }
+
+        public AddMatchPlayerCommand SetStageScore(int stageScore)
+        {
+            _stageScore = stageScore;
             return this;
         }
 
@@ -44,7 +51,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
         public void Execute()
         {
             var playerId = _playerState.Id;
-            _matchDataService.AddPlayer(_playerState);
+            _matchDataService.AddPlayer(_playerState, _stageScore);
             _playerControllers.AddPlayer(playerId);
             _playerUIControllers.AddPlayer(playerId, _currentServerTick);
             _worldCameraController.AddFollowTarget(_playerControllers.GetPlayerSpaceshipTransform(playerId));

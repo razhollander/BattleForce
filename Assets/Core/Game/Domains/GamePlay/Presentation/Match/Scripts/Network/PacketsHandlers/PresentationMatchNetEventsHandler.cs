@@ -45,7 +45,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
                     if (!isLocalPlayer)
                     {
-                        _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(currentServerTick).Execute();
+                        var stageScore = playerRejoinAcceptNetEvent.StageScorePerPlayerId[playerState.Id];
+                        _addMatchPlayerCommand.SetPlayerState(playerState).SetStageScore(stageScore).SetCurrentServerTick(currentServerTick).Execute();
                     }
                 }
             }
@@ -266,6 +267,113 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 var powerUpBallId = powerUpBallObtainedNetEvent.Id;
                 _matchDataService.RemovePowerUpBall(powerUpBallId);
                 _cachedPresentationEventsService.PowerUpBallObtainedNetEvents.Add(powerUpBallObtainedNetEvent);
+            }
+        }
+
+        public void ProcessMoleSpawnedEvents(CapacityList<MoleSpawnedNetEventS2C> moleSpawnedNetEvents)
+        {
+            if (moleSpawnedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
+            {
+                _matchDataService.AddMole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.MoleHoleId,
+                    moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
+                _cachedPresentationEventsService.MoleSpawnedNetEvents.Add(moleSpawnedNetEvent);
+            }
+        }
+
+        public void ProcessMoleKilledEvents(CapacityList<MoleKilledNetEventS2C> moleKilledNetEvents)
+        {
+            if (moleKilledNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleKilledNetEvent in moleKilledNetEvents)
+            {
+                _matchDataService.RemoveMole(moleKilledNetEvent.MoleId);
+                var byTeamId = _matchDataService.GetPlayerTeamId(moleKilledNetEvent.ByPlayerId);
+                _matchDataService.SetStageScoreOfTeam(byTeamId, moleKilledNetEvent.TeamMolesKilledTotal);
+                _matchDataService.SetPlayerStageScore(moleKilledNetEvent.ByPlayerId, moleKilledNetEvent.ByPlayerMolesKilledScoreTotal);
+                _cachedPresentationEventsService.MoleKilledNetEvents.Add(moleKilledNetEvent);
+            }
+        }
+        
+        public void ProcessPlayerPassedScoreGateEvents(CapacityList<PlayerPassedScoreGateNetEventS2C> playerPassedScoreGateNetEvents)
+        {
+            if (playerPassedScoreGateNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var playerPassedScoreGateNetEvent in playerPassedScoreGateNetEvents)
+            {
+                var byTeamId = _matchDataService.GetPlayerTeamId(playerPassedScoreGateNetEvent.ByPlayerId);
+                _matchDataService.SetStageScoreOfTeam(byTeamId, playerPassedScoreGateNetEvent.TeamBonusScoreTotal);
+                _matchDataService.SetPlayerStageScore(playerPassedScoreGateNetEvent.ByPlayerId, playerPassedScoreGateNetEvent.ByPlayerBonusScoreTotal);
+                _matchDataService.SetScoreGateLastScoredTeam(playerPassedScoreGateNetEvent.ScoreGateId, byTeamId);
+                _matchDataService.SetScoreGateMultiplier(playerPassedScoreGateNetEvent.ScoreGateId, playerPassedScoreGateNetEvent.NextScoreMultiplier);
+                _cachedPresentationEventsService.PlayerPassedScoreGateNetEvents.Add(playerPassedScoreGateNetEvent);
+            }
+        }
+        
+        public void ProcessGateTrapClosingEvents(CapacityList<GateTrapClosingNetEventS2C> gateTrapClosingNetEvents)
+        {
+            if (gateTrapClosingNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var gateTrapClosingNetEvent in gateTrapClosingNetEvents)
+            {
+                if (!_matchDataService.TryGetGateTrap(gateTrapClosingNetEvent.GateTrapId, out var gateTrapModel))
+                {
+                    LogService.LogError($"No gate trap for id {gateTrapClosingNetEvent.GateTrapId}");
+                    continue;
+                }
+
+                gateTrapModel.State = GateTrapState.Closing;
+                gateTrapModel.StateEndTick = gateTrapClosingNetEvent.FinishClosingOnTick;
+                gateTrapModel.IsWaitingForOpenCooldown = false;
+            }
+        }
+
+        // An expired mole is not gone yet, it only starts its pre-hide shake and stays hittable until it goes into its
+        // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleKilledEvents, and one
+        // that hides on its own leaves no event, so its stale model entry is cleared with the rest on the next full sync.
+        public void ProcessMoleExpiredEvents(CapacityList<MoleExpiredNetEventS2C> moleExpiredNetEvents)
+        {
+            if (moleExpiredNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var moleExpiredNetEvent in moleExpiredNetEvents)
+            {
+                _cachedPresentationEventsService.MoleExpiredNetEvents.Add(moleExpiredNetEvent);
+            }
+        }
+
+        public void ProcessGoldenMoleDamagedEvents(CapacityList<GoldenMoleDamagedNetEventS2C> goldenMoleDamagedNetEvents)
+        {
+            if (goldenMoleDamagedNetEvents.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            foreach (var goldenMoleDamagedNetEvent in goldenMoleDamagedNetEvents)
+            {
+                var moleModel = _matchDataService.GetMole(goldenMoleDamagedNetEvent.MoleId);
+
+                if (moleModel != null)
+                {
+                    moleModel.RemainingLives = goldenMoleDamagedNetEvent.RemainingLives;
+                }
+
+                _cachedPresentationEventsService.GoldenMoleDamagedNetEvents.Add(goldenMoleDamagedNetEvent);
             }
         }
 
@@ -497,7 +605,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 var tipState = netEvent.FishingRodProjectile;
                 SetPlayerTalentActive(tipState.PlayerCasterId, TalentType.FishingRod);
-                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase);
+                _matchDataService.AddFishingRodTip(tipState.Id, tipState.PlayerCasterId, tipState.Position, tipState.Phase, tipState.CaughtEnemyId, tipState.CaughtEnemyType);
                 _cachedPresentationEventsService.CreateFishingRodProjectileNetEvents.Add(netEvent);
             }
         }
@@ -511,7 +619,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
             foreach (var netEvent in events)
             {
-                _matchDataService.GetFishingRodTip(netEvent.ProjectileId).Phase = FishingRodTipPhase.CaughtEnemy;
+                var tipModel = _matchDataService.GetFishingRodTip(netEvent.ProjectileId);
+                tipModel.Phase = FishingRodTipPhase.CaughtEnemy;
+                tipModel.CaughtEnemyId = netEvent.CaughtEnemyId;
+                tipModel.CaughtEnemyType = netEvent.CaughtEnemyType;
                 _cachedPresentationEventsService.FishingRodCaughtEnemyNetEvents.Add(netEvent);
             }
         }
@@ -1082,6 +1193,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var netEvent in netEvents)
             {
                 _cachedPresentationEventsService.PerformHeadbuttDashNetEvents.Add(netEvent);
+            }
+        }
+
+        public void ProcessPerformBarrelDashEvents(CapacityList<PerformBarrelDashNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.PerformBarrelDashNetEvents.Add(netEvent);
             }
         }
 

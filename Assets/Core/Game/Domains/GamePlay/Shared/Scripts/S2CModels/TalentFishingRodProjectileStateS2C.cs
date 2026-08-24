@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public Vector2 Velocity;
         public FishingRodTipPhase Phase;
         public ushort CaughtEnemyId;
+        public FishingRodCaughtEnemyType CaughtEnemyType;
         public Vector2 EnemyCaughtArrowDirection;
 
         public void Serialize(NetDataWriter writer)
@@ -24,6 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.PutVector2Quantized(Position);
             writer.Put((byte)Phase);
             writer.Put((byte)CaughtEnemyId);
+            writer.Put((byte)CaughtEnemyType);
             writer.PutVector2Quantized(EnemyCaughtArrowDirection);
         }
 
@@ -34,6 +36,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             Position = reader.GetVector2Quantized();
             Phase = (FishingRodTipPhase)reader.GetByte();
             CaughtEnemyId = reader.GetByte();
+            CaughtEnemyType = (FishingRodCaughtEnemyType)reader.GetByte();
             EnemyCaughtArrowDirection = reader.GetVector2Quantized();
         }
 

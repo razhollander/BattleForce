@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
@@ -68,6 +69,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>> DeactivateRockTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<MoleKilledNetEventS2C>> MoleKilledNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> GoldenMoleDamagedNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>> PlayerPassedScoreGateNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<GateTrapClosingNetEventS2C>> GateTrapClosingNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> CreateMagneticPullFieldNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
@@ -75,6 +82,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         public CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> DeactivateWaterGunTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
+        public CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>> PerformBarrelDashNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         public CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
@@ -150,6 +158,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>> _deactivateRockTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> _activateFrozenTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> _deactivateFrozenTalentNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<MoleSpawnedNetEventS2C>> _moleSpawnedNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<MoleKilledNetEventS2C>> _moleKilledNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<MoleExpiredNetEventS2C>> _moleExpiredNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> _goldenMoleDamagedNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>> _playerPassedScoreGateNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<GateTrapClosingNetEventS2C>> _gateTrapClosingNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>> _createMagneticPullFieldNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> _activateUmbrellaTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> _deactivateUmbrellaTalentNetEventsListPool;
@@ -157,6 +171,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> _deactivateWaterGunTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> _activateHeadbuttChargingNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> _performHeadbuttDashNetEventsListPool;
+        private readonly ConcurrentPool<FixedUnorderedList<PerformBarrelDashNetEventS2C>> _performBarrelDashNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> _headbuttHitEnemyNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> _deactivateHeadbuttTalentNetEventsListPool;
         private readonly ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>> _layChickenEggNetEventsPool;
@@ -231,6 +246,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateRockTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateFrozenTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(maxConcurrentPlayers);
+            MoleSpawnedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>>(maxConcurrentPlayers);
+            MoleKilledNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<MoleKilledNetEventS2C>>(maxConcurrentPlayers);
+            MoleExpiredNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>>(maxConcurrentPlayers);
+            GoldenMoleDamagedNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>>(maxConcurrentPlayers);
+            PlayerPassedScoreGateNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>>(maxConcurrentPlayers);
+            GateTrapClosingNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<GateTrapClosingNetEventS2C>>(maxConcurrentPlayers);
             CreateMagneticPullFieldNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(maxConcurrentPlayers);
             ActivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
             DeactivateUmbrellaTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(maxConcurrentPlayers);
@@ -238,6 +259,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateWaterGunTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(maxConcurrentPlayers);
             ActivateHeadbuttChargingNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(maxConcurrentPlayers);
             PerformHeadbuttDashNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(maxConcurrentPlayers);
+            PerformBarrelDashNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>>(maxConcurrentPlayers);
             HeadbuttHitEnemyNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(maxConcurrentPlayers);
             DeactivateHeadbuttTalentNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(maxConcurrentPlayers);
             LayChickenEggNetEventsPerClient = new CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>>(maxConcurrentPlayers);
@@ -336,6 +358,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _deactivateRockTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateRockTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateRockTalentNetEventS2C>(networkConfig.MaxCap.DeactivateRockTalentNetEvents), maxConcurrentPlayers);
             _activateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.ActivateFrozenTalentNetEvents), maxConcurrentPlayers);
             _deactivateFrozenTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>(networkConfig.MaxCap.DeactivateFrozenTalentNetEvents), maxConcurrentPlayers);
+            _moleSpawnedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<MoleSpawnedNetEventS2C>>(() => new FixedUnorderedList<MoleSpawnedNetEventS2C>(networkConfig.MaxCap.MoleSpawnedNetEvents), maxConcurrentPlayers);
+            _moleKilledNetEventsListPool = new ConcurrentPool<FixedUnorderedList<MoleKilledNetEventS2C>>(() => new FixedUnorderedList<MoleKilledNetEventS2C>(networkConfig.MaxCap.MoleKilledNetEvents), maxConcurrentPlayers);
+            _moleExpiredNetEventsListPool = new ConcurrentPool<FixedUnorderedList<MoleExpiredNetEventS2C>>(() => new FixedUnorderedList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents), maxConcurrentPlayers);
+            _goldenMoleDamagedNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GoldenMoleDamagedNetEventS2C>>(() => new FixedUnorderedList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents), maxConcurrentPlayers);
+            _playerPassedScoreGateNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>>(() => new FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>(networkConfig.MaxCap.PlayerPassedScoreGateNetEvents), maxConcurrentPlayers);
+            _gateTrapClosingNetEventsListPool = new ConcurrentPool<FixedUnorderedList<GateTrapClosingNetEventS2C>>(() => new FixedUnorderedList<GateTrapClosingNetEventS2C>(networkConfig.MaxCap.GateTrapClosingNetEvents), maxConcurrentPlayers);
             _createMagneticPullFieldNetEventsListPool = new ConcurrentPool<FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>>(() => new FixedUnorderedList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents), maxConcurrentPlayers);
             _activateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.ActivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
             _deactivateUmbrellaTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>(networkConfig.MaxCap.DeactivateUmbrellaTalentNetEvents), maxConcurrentPlayers);
@@ -343,6 +371,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             _deactivateWaterGunTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents), maxConcurrentPlayers);
             _activateHeadbuttChargingNetEventsListPool = new ConcurrentPool<FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>>(() => new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents), maxConcurrentPlayers);
             _performHeadbuttDashNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformHeadbuttDashNetEventS2C>>(() => new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents), maxConcurrentPlayers);
+            _performBarrelDashNetEventsListPool = new ConcurrentPool<FixedUnorderedList<PerformBarrelDashNetEventS2C>>(() => new FixedUnorderedList<PerformBarrelDashNetEventS2C>(networkConfig.MaxCap.PerformBarrelDashNetEvents), maxConcurrentPlayers);
             _headbuttHitEnemyNetEventsListPool = new ConcurrentPool<FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>>(() => new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents), maxConcurrentPlayers);
             _deactivateHeadbuttTalentNetEventsListPool = new ConcurrentPool<FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>>(() => new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents), maxConcurrentPlayers);
             _layChickenEggNetEventsPool = new ConcurrentPool<FixedUnorderedList<LayChickenEggNetEventS2C>>(() => new FixedUnorderedList<LayChickenEggNetEventS2C>(networkConfig.MaxCap.LayChickenEggNetEvents), maxConcurrentPlayers);
@@ -726,6 +755,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             {
                 DeactivateFrozenTalentNetEventsPerClient.Add(clientId, _deactivateFrozenTalentNetEventsListPool.Get());
             }
+            if (!MoleSpawnedNetEventsPerClient.ContainsKey(clientId))
+            {
+                MoleSpawnedNetEventsPerClient.Add(clientId, _moleSpawnedNetEventsListPool.Get());
+            }
+            if (!MoleKilledNetEventsPerClient.ContainsKey(clientId))
+            {
+                MoleKilledNetEventsPerClient.Add(clientId, _moleKilledNetEventsListPool.Get());
+            }
+            if (!MoleExpiredNetEventsPerClient.ContainsKey(clientId))
+            {
+                MoleExpiredNetEventsPerClient.Add(clientId, _moleExpiredNetEventsListPool.Get());
+            }
+            if (!GoldenMoleDamagedNetEventsPerClient.ContainsKey(clientId))
+            {
+                GoldenMoleDamagedNetEventsPerClient.Add(clientId, _goldenMoleDamagedNetEventsListPool.Get());
+            }
+            if (!PlayerPassedScoreGateNetEventsPerClient.ContainsKey(clientId))
+            {
+                PlayerPassedScoreGateNetEventsPerClient.Add(clientId, _playerPassedScoreGateNetEventsListPool.Get());
+            }
+            if (!GateTrapClosingNetEventsPerClient.ContainsKey(clientId))
+            {
+                GateTrapClosingNetEventsPerClient.Add(clientId, _gateTrapClosingNetEventsListPool.Get());
+            }
             if (!CreateMagneticPullFieldNetEventsPerClient.ContainsKey(clientId))
             {
                 CreateMagneticPullFieldNetEventsPerClient.Add(clientId, _createMagneticPullFieldNetEventsListPool.Get());
@@ -753,6 +806,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             if (!PerformHeadbuttDashNetEventsPerClient.ContainsKey(clientId))
             {
                 PerformHeadbuttDashNetEventsPerClient.Add(clientId, _performHeadbuttDashNetEventsListPool.Get());
+            }
+            if (!PerformBarrelDashNetEventsPerClient.ContainsKey(clientId))
+            {
+                PerformBarrelDashNetEventsPerClient.Add(clientId, _performBarrelDashNetEventsListPool.Get());
             }
             if (!HeadbuttHitEnemyNetEventsPerClient.ContainsKey(clientId))
             {
@@ -1007,6 +1064,30 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             deactivateFrozenTalentNetEventsList.Clear();
             _deactivateFrozenTalentNetEventsListPool.Return(deactivateFrozenTalentNetEventsList);
 
+            var moleSpawnedNetEventsList = MoleSpawnedNetEventsPerClient[clientId];
+            moleSpawnedNetEventsList.Clear();
+            _moleSpawnedNetEventsListPool.Return(moleSpawnedNetEventsList);
+
+            var moleKilledNetEventsList = MoleKilledNetEventsPerClient[clientId];
+            moleKilledNetEventsList.Clear();
+            _moleKilledNetEventsListPool.Return(moleKilledNetEventsList);
+
+            var moleExpiredNetEventsList = MoleExpiredNetEventsPerClient[clientId];
+            moleExpiredNetEventsList.Clear();
+            _moleExpiredNetEventsListPool.Return(moleExpiredNetEventsList);
+
+            var goldenMoleDamagedNetEventsList = GoldenMoleDamagedNetEventsPerClient[clientId];
+            goldenMoleDamagedNetEventsList.Clear();
+            _goldenMoleDamagedNetEventsListPool.Return(goldenMoleDamagedNetEventsList);
+
+            var playerPassedScoreGateNetEventsList = PlayerPassedScoreGateNetEventsPerClient[clientId];
+            playerPassedScoreGateNetEventsList.Clear();
+            _playerPassedScoreGateNetEventsListPool.Return(playerPassedScoreGateNetEventsList);
+
+            var gateTrapClosingNetEventsList = GateTrapClosingNetEventsPerClient[clientId];
+            gateTrapClosingNetEventsList.Clear();
+            _gateTrapClosingNetEventsListPool.Return(gateTrapClosingNetEventsList);
+
             var createMagneticPullFieldNetEventsList = CreateMagneticPullFieldNetEventsPerClient[clientId];
             createMagneticPullFieldNetEventsList.Clear();
             _createMagneticPullFieldNetEventsListPool.Return(createMagneticPullFieldNetEventsList);
@@ -1035,6 +1116,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             var performHeadbuttDashList = PerformHeadbuttDashNetEventsPerClient[clientId];
             performHeadbuttDashList.Clear();
             _performHeadbuttDashNetEventsListPool.Return(performHeadbuttDashList);
+
+            var performBarrelDashList = PerformBarrelDashNetEventsPerClient[clientId];
+            performBarrelDashList.Clear();
+            _performBarrelDashNetEventsListPool.Return(performBarrelDashList);
 
             var headbuttHitEnemyList = HeadbuttHitEnemyNetEventsPerClient[clientId];
             headbuttHitEnemyList.Clear();
@@ -1147,12 +1232,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
             DeactivateRockTalentNetEventsPerClient.Remove(clientId);
             ActivateFrozenTalentNetEventsPerClient.Remove(clientId);
             DeactivateFrozenTalentNetEventsPerClient.Remove(clientId);
+            MoleSpawnedNetEventsPerClient.Remove(clientId);
+            MoleKilledNetEventsPerClient.Remove(clientId);
+            MoleExpiredNetEventsPerClient.Remove(clientId);
+            GoldenMoleDamagedNetEventsPerClient.Remove(clientId);
+            PlayerPassedScoreGateNetEventsPerClient.Remove(clientId);
+            GateTrapClosingNetEventsPerClient.Remove(clientId);
             ActivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             DeactivateUmbrellaTalentNetEventsPerClient.Remove(clientId);
             ActivateWaterGunTalentNetEventsPerClient.Remove(clientId);
             DeactivateWaterGunTalentNetEventsPerClient.Remove(clientId);
             ActivateHeadbuttChargingNetEventsPerClient.Remove(clientId);
             PerformHeadbuttDashNetEventsPerClient.Remove(clientId);
+            PerformBarrelDashNetEventsPerClient.Remove(clientId);
             HeadbuttHitEnemyNetEventsPerClient.Remove(clientId);
             DeactivateHeadbuttTalentNetEventsPerClient.Remove(clientId);
             LayChickenEggNetEventsPerClient.Remove(clientId);
@@ -1244,10 +1336,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
                 packet.SimulationState = simulationState;
                 
                 packet.Players.Clear();
+                packet.StageScorePerPlayerId.Clear();
                 for (int i = 0; i < playerStates.Count; i++)
                 {
                     packet.Players.AddAndGet();
                     packet.Players[i] = playerStates[i];
+                    packet.StageScorePerPlayerId[playerStates[i].Id] = simulationState.StageScorePerPlayerId[playerStates[i].Id];
                 }
             }
         }
@@ -2088,6 +2182,72 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 }
             }
 
+            if (MoleSpawnedNetEventsPerClient.TryGetValue(clientId, out var moleSpawnedNetEvents))
+            {
+                for (int i = moleSpawnedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (moleSpawnedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        moleSpawnedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (MoleKilledNetEventsPerClient.TryGetValue(clientId, out var moleKilledNetEvents))
+            {
+                for (int i = moleKilledNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (moleKilledNetEvents[i].OccuredOnTick < tick)
+                    {
+                        moleKilledNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (MoleExpiredNetEventsPerClient.TryGetValue(clientId, out var moleExpiredNetEvents))
+            {
+                for (int i = moleExpiredNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (moleExpiredNetEvents[i].OccuredOnTick < tick)
+                    {
+                        moleExpiredNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (GoldenMoleDamagedNetEventsPerClient.TryGetValue(clientId, out var goldenMoleDamagedNetEvents))
+            {
+                for (int i = goldenMoleDamagedNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (goldenMoleDamagedNetEvents[i].OccuredOnTick < tick)
+                    {
+                        goldenMoleDamagedNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PlayerPassedScoreGateNetEventsPerClient.TryGetValue(clientId, out var playerPassedScoreGateNetEvents))
+            {
+                for (int i = playerPassedScoreGateNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (playerPassedScoreGateNetEvents[i].OccuredOnTick < tick)
+                    {
+                        playerPassedScoreGateNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (GateTrapClosingNetEventsPerClient.TryGetValue(clientId, out var gateTrapClosingNetEvents))
+            {
+                for (int i = gateTrapClosingNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (gateTrapClosingNetEvents[i].OccuredOnTick < tick)
+                    {
+                        gateTrapClosingNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
             if (DeactivateFrozenTalentNetEventsPerClient.TryGetValue(clientId, out var deactivateFrozenTalentNetEvents))
             {
                 for (int i = deactivateFrozenTalentNetEvents.Count - 1; i >= 0; i--)
@@ -2161,6 +2321,17 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                     if (activateHeadbuttChargingNetEvents[i].OccuredOnTick < tick)
                     {
                         activateHeadbuttChargingNetEvents.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (PerformBarrelDashNetEventsPerClient.TryGetValue(clientId, out var performBarrelDashNetEvents))
+            {
+                for (int i = performBarrelDashNetEvents.Count - 1; i >= 0; i--)
+                {
+                    if (performBarrelDashNetEvents[i].OccuredOnTick < tick)
+                    {
+                        performBarrelDashNetEvents.RemoveAt(i);
                     }
                 }
             }
@@ -2663,12 +2834,13 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.FishingRodProjectile.Id = projectileId;
                 packet.FishingRodProjectile.PlayerCasterId = playerCasterId;
                 packet.FishingRodProjectile.Position = position;
-                packet.FishingRodProjectile.Phase = Core.Game.Domains.GamePlay.Shared.Scripts.Enums.FishingRodTipPhase.FlyingForward;
+                packet.FishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
                 packet.FishingRodProjectile.CaughtEnemyId = 0;
+                packet.FishingRodProjectile.CaughtEnemyType = FishingRodCaughtEnemyType.None;
             }
         }
 
-        public void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId)
+        public void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType)
         {
             foreach (var kvp in FishingRodCaughtEnemyNetEventsPerClient)
             {
@@ -2677,6 +2849,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.ProjectileId = projectileId;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.CaughtEnemyId = caughtEnemyId;
+                packet.CaughtEnemyType = caughtEnemyType;
             }
         }
 
@@ -2691,7 +2864,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
-        public void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, Vector2 throwDirection)
+        public void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, FishingRodCaughtEnemyType thrownEnemyType, Vector2 throwDirection)
         {
             foreach (var kvp in FishingRodThrowNetEventsPerClient)
             {
@@ -2699,6 +2872,7 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
                 packet.OccuredOnTick = onTick;
                 packet.CasterPlayerId = casterPlayerId;
                 packet.ThrownEnemyId = thrownEnemyId;
+                packet.ThrownEnemyType = thrownEnemyType;
                 packet.ThrowDirection = throwDirection;
             }
         }
@@ -2787,6 +2961,87 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
             }
         }
 
+        public void AddMoleSpawnedNetEvent(int onTick, ushort moleId, ushort moleHoleId, int emergeOnTick, bool isGolden, byte maxLives)
+        {
+            foreach (var kvp in MoleSpawnedNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.MoleId = moleId;
+                packet.MoleHoleId = moleHoleId;
+                packet.FinishEmergingOnTick = emergeOnTick;
+                packet.IsGolden = isGolden;
+                packet.MaxLives = maxLives;
+            }
+        }
+
+        public void AddMoleKilledNetEvent(int onTick, ushort moleId, ushort moleHoleId, ushort byPlayerId, byte scoreGained, ushort teamMolesKilledTotal, ushort byPlayerMolesKilledScoreTotal, bool isGolden)
+        {
+            foreach (var kvp in MoleKilledNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.MoleId = moleId;
+                packet.MoleHoleId = moleHoleId;
+                packet.ByPlayerId = byPlayerId;
+                packet.ScoreGained = scoreGained;
+                packet.TeamMolesKilledTotal = teamMolesKilledTotal;
+                packet.ByPlayerMolesKilledScoreTotal = byPlayerMolesKilledScoreTotal;
+                packet.IsGolden = isGolden;
+            }
+        }
+
+        public void AddPlayerPassedScoreGateNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, byte scoreGained, ushort newScoreMultiplier, ushort teamBonusScoreTotal, ushort byPlayerBonusScoreTotal)
+        {
+            foreach (var kvp in PlayerPassedScoreGateNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.ScoreGateId = scoreGateId;
+                packet.ByPlayerId = byPlayerId;
+                packet.ScoreGained = scoreGained;
+                packet.NextScoreMultiplier = newScoreMultiplier;
+                packet.TeamBonusScoreTotal = teamBonusScoreTotal;
+                packet.ByPlayerBonusScoreTotal = byPlayerBonusScoreTotal;
+            }
+        }
+
+        public void AddGateTrapClosingNetEvent(int onTick, ushort gateTrapId, int closedOnTick)
+        {
+            foreach (var kvp in GateTrapClosingNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.GateTrapId = gateTrapId;
+                packet.FinishClosingOnTick = closedOnTick;
+            }
+        }
+
+        public void AddMoleExpiredNetEvent(int onTick, ushort moleId, ushort moleHoleId, int hideOnTick)
+        {
+            foreach (var kvp in MoleExpiredNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.MoleId = moleId;
+                packet.MoleHoleId = moleHoleId;
+                packet.FinishHidingOnTick = hideOnTick;
+            }
+        }
+
+        public void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, ushort moleHoleId, byte remainingLives, byte maxLives)
+        {
+            foreach (var kvp in GoldenMoleDamagedNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.MoleId = moleId;
+                packet.MoleHoleId = moleHoleId;
+                packet.RemainingLives = remainingLives;
+                packet.MaxLives = maxLives;
+            }
+        }
+
         public void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in ActivateUmbrellaTalentNetEventsPerClient)
@@ -2842,6 +3097,16 @@ if (DeactivateKOTalentNetEventsPerClient.TryGetValue(clientId, out var deactivat
         public void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId)
         {
             foreach (var kvp in PerformHeadbuttDashNetEventsPerClient)
+            {
+                ref var packet = ref kvp.Value.AddAndGet();
+                packet.OccuredOnTick = onTick;
+                packet.CasterPlayerId = casterPlayerId;
+            }
+        }
+
+        public void AddPerformBarrelDashNetEvent(int onTick, ushort casterPlayerId)
+        {
+            foreach (var kvp in PerformBarrelDashNetEventsPerClient)
             {
                 ref var packet = ref kvp.Value.AddAndGet();
                 packet.OccuredOnTick = onTick;

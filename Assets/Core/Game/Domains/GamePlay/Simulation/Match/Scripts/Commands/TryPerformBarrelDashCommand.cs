@@ -1,5 +1,6 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using CoreDomain.Scripts.Services.CommandFactory;
 
@@ -9,6 +10,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
     {
         private IMatchDataService _matchDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
+        private INetEventsDataService _netEventsDataService;
         private TrySpinPlayerCommand _trySpinPlayerCommand;
         private TryAddForceToPlayerCommand _tryAddForceToPlayerCommand;
 
@@ -31,6 +33,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
+            _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             var commandFactory = _diContainer.Resolve<ICommandFactory>();
             _trySpinPlayerCommand = commandFactory.CreateCommandVoid<TrySpinPlayerCommand>();
             _tryAddForceToPlayerCommand = commandFactory.CreateCommandVoid<TryAddForceToPlayerCommand>();
@@ -45,9 +48,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             }
 
             var spaceshipConfig = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship;
-            
+            var dashDirection = spaceshipConfig.ShouldBarrelDashTowardsPlayerDirection ? playerSpaceship.Transform.Direction : playerSpaceship.AimDirection;
+
             _trySpinPlayerCommand.SetPlayer(_playerId).SetSpinAmount(spaceshipConfig.BarrelDashSpinAmount).SetTick(_processedTick).Execute();
-            _tryAddForceToPlayerCommand.SetPlayerId(_playerId).SetForce(playerSpaceship.AimDirection * spaceshipConfig.BarrelDashForce).ShouldTurnOffEngine(false).Execute();
+            _tryAddForceToPlayerCommand.SetPlayerId(_playerId).SetForce(dashDirection * spaceshipConfig.BarrelDashForce).ShouldTurnOffEngine(false).Execute();
+            _netEventsDataService.AddPerformBarrelDashNetEvent(_processedTick, _playerId);
         }
 
         private bool CanPlayerPerformBarrelDash(PlayerSpaceshipStateS2C playerSpaceship)

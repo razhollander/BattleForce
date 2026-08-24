@@ -1,0 +1,127 @@
+using System.Collections.Generic;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.ScriptableObjects;
+using UnityEngine;
+using Zenject;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
+
+namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc
+{
+    public class ScoreGatesControllers : IScoreGatesControllers
+    {
+        private const string PARENT_GAME_OBJECT_NAME = "ScoreGatesParent";
+
+        private readonly PresentationGamePlayConfig _gamePlayConfig;
+        private readonly IInterpolationDecayService _interpolationDecayService;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly ScoreGatePool _pool;
+        private readonly Dictionary<ushort, ScoreGateController> _controllers = new Dictionary<ushort, ScoreGateController>();
+        private Transform _parentTransform;
+
+        public ScoreGatesControllers(ScoreGateView prefab, DiContainer diContainer, PresentationGamePlayConfig gamePlayConfig, IInterpolationDecayService interpolationDecayService, SharedGamePlayConfig sharedGamePlayConfig)
+        {
+            _gamePlayConfig = gamePlayConfig;
+            _interpolationDecayService = interpolationDecayService;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
+            _pool = new ScoreGatePool(prefab, diContainer);
+        }
+
+        public void InitEntryPoint()
+        {
+            _parentTransform = new GameObject(PARENT_GAME_OBJECT_NAME).transform;
+            _pool.InitPool();
+        }
+
+        public void InitExitPoint()
+        {
+            if (_parentTransform == null)
+            {
+                return;
+            }
+
+            DestroyAll();
+            _pool.DisposePool();
+            Object.Destroy(_parentTransform.gameObject);
+            _parentTransform = null;
+        }
+
+        public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, ushort scoreMultiplier, float mapSizeMultiplier)
+        {
+            if (_controllers.ContainsKey(id))
+            {
+                return;
+            }
+
+            var postSize = _sharedGamePlayConfig.ScoreGatePostSize * mapSizeMultiplier;
+            var gapWidth = _sharedGamePlayConfig.ScoreGateGapWidth * mapSizeMultiplier;
+
+            var controller = new ScoreGateController(id, _pool, _parentTransform);
+            controller.CreateView(position, rotation, postSize, gapWidth);
+            _controllers.Add(id, controller);
+
+            ApplyTeamColor(controller, lastScoredTeamId);
+            controller.SetScoreMultiplier(scoreMultiplier, shouldPunchOnIncrease: false);
+        }
+
+        public void InterpolateScoreGateTransform(ushort id, Vector2 position, Quaternion rotation)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                controller.InterpolateTransform(position, rotation, _interpolationDecayService.CurrentDecay);
+            }
+        }
+
+        public void SetTeamColor(ushort id, ushort teamId)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                ApplyTeamColor(controller, teamId);
+            }
+        }
+
+        public void SetScoreMultiplier(ushort id, ushort scoreMultiplier)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                controller.SetScoreMultiplier(scoreMultiplier, shouldPunchOnIncrease: true);
+            }
+        }
+
+        public void PlayScoreGatePassedAnimation(ushort id)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                controller.PlayPassAnimation();
+            }
+        }
+
+        public bool TryGetScoreGatePosition(ushort id, out Vector2 position)
+        {
+            if (_controllers.TryGetValue(id, out var controller))
+            {
+                position = controller.Position;
+                return true;
+            }
+
+            position = default;
+            return false;
+        }
+
+        public void DestroyAll()
+        {
+            foreach (var controller in _controllers.Values)
+            {
+                controller.Destroy();
+            }
+
+            _controllers.Clear();
+        }
+
+        private void ApplyTeamColor(ScoreGateController controller, ushort teamId)
+        {
+            if (_gamePlayConfig.ColorPerTeamId.TryGetValue(teamId, out var color))
+            {
+                controller.SetTeamColor(color);
+            }
+        }
+    }
+}

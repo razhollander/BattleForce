@@ -20,6 +20,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private readonly FixedClassUnorderedList<EnvironmentWallS2C> _walls;
         private readonly FixedClassUnorderedList<EnvironmentRotatingWheelS2C> _rotatingWheels;
         private readonly FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> _fieldBarriers;
+        private readonly FixedClassUnorderedList<MatchEnvironmentGateTrapModel> _gateTraps;
 
         public FixedClassUnorderedList<EnvironmentRotatingWheelS2C> RotatingWheels => _rotatingWheels;
         public FixedClassUnorderedList<EnvironmentSpringS2C> Springs => _springs;
@@ -29,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         public FixedClassUnorderedList<EnvironmentWallS2C> StageBoundaries => _stageBoundaries;
         public FixedClassUnorderedList<EnvironmentWallS2C> Walls => _walls;
         public FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel> FieldBarriers => _fieldBarriers;
+        public FixedClassUnorderedList<MatchEnvironmentGateTrapModel> GateTraps => _gateTraps;
 
         public MatchEnvironmentDataService(NetworkConfig networkConfig)
         {
@@ -40,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _walls = new FixedClassUnorderedList<EnvironmentWallS2C>(networkConfig.MaxCap.ConcurrentEvironmentWalls, ()=> new EnvironmentWallS2C());
             _rotatingWheels = new FixedClassUnorderedList<EnvironmentRotatingWheelS2C>(networkConfig.MaxCap.ConcurrentEnvironmentRotatingWheels, ()=> new EnvironmentRotatingWheelS2C(networkConfig.MaxCap.EnvironmentRotatingWheelCap));
             _fieldBarriers = new FixedClassUnorderedList<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers, () => new MatchEnvironmentFieldBarrierModel());
+            _gateTraps = new FixedClassUnorderedList<MatchEnvironmentGateTrapModel>(networkConfig.MaxCap.ConcurrentEnvironmentGateTraps, () => new MatchEnvironmentGateTrapModel());
         }
 
         public void ClearData()
@@ -51,6 +54,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             _stageBoundaries.Clear();
             _walls.Clear();
             _fieldBarriers.Clear();
+            _gateTraps.Clear();
 
             foreach (var rotatingWheel in _rotatingWheels.AsSpan())
             {
@@ -116,6 +120,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             barrier.Position = position;
             barrier.Size = size;
             barrier.Shape = shape;
+        }
+
+        public MatchEnvironmentGateTrapModel AddGateTrap(ushort gateTrapId, ushort wallId)
+        {
+            var gateTrap = _gateTraps.AddAndGet();
+            gateTrap.Id = gateTrapId;
+            gateTrap.WallId = wallId;
+            return gateTrap;
+        }
+
+        public MatchEnvironmentGateTrapModel GetGateTrap(ushort gateTrapId)
+        {
+            return _gateTraps.FindWithId(gateTrapId);
         }
 
         public void RemoveAllFieldBarriers()

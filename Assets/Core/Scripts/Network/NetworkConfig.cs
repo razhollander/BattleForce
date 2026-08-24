@@ -24,7 +24,7 @@ namespace Core.Scripts.Network
     {
         public int ConcurrentPlayers = 8;
         public int ConcurrentEnemyPlayers => ConcurrentPlayers - 1;
-        public int ConcurrentLockOnTargets => ConcurrentEnemyPlayers + ConcurrentPowerUpBalls;
+        public int ConcurrentLockOnTargets => ConcurrentEnemyPlayers + ConcurrentPowerUpBalls + ConcurrentMoles;
         public int ConcurrentBullets = 256;
         public int ConcurrentTalentCards = 128;
         public int ConcurrentEvironmentWalls = 256;
@@ -110,6 +110,7 @@ namespace Core.Scripts.Network
         public int DeactivateWaterGunTalentNetEvents = 128;
         public int ActivateHeadbuttChargingNetEvents = 128;
         public int PerformHeadbuttDashNetEvents = 128;
+        public int PerformBarrelDashNetEvents = 128;
         public int HeadbuttHitEnemyNetEvents = 128;
         public int DeactivateHeadbuttTalentNetEvents = 128;
         public int CreateMagneticPullFieldNetEvents = 128;
@@ -141,6 +142,16 @@ namespace Core.Scripts.Network
         public int DeactivateRockTalentNetEvents = 128;
         public int ActivateFrozenTalentNetEvents = 128;
         public int DeactivateFrozenTalentNetEvents = 128;
+        public int ConcurrentMoles = 32;
+        public int MoleHoles = 64;
+        public int MoleSpawnedNetEvents = 64;
+        public int MoleKilledNetEvents = 64;
+        public int MoleExpiredNetEvents = 64;
+        public int GoldenMoleDamagedNetEvents = 64;
+        public int ConcurrentScoreGates = 4;
+        public int PlayerPassedScoreGateNetEvents = 64;
+        public int ConcurrentEnvironmentGateTraps = 16;
+        public int GateTrapClosingNetEvents = 32;
 
         [Serializable]
         public class EnvironmentRotatingWheel

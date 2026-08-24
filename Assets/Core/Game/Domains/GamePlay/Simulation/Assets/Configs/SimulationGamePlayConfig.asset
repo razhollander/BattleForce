@@ -32,8 +32,9 @@ MonoBehaviour:
       LockOnTargetHalfArcAngleDegrees: 45
       LockOnTargetHitDamage: 1
       CanBarrelDash: 1
-      BarrelDashForce: 30
+      BarrelDashForce: 25
       BarrelDashSpinAmount: 57
+      ShouldBarrelDashTowardsPlayerDirection: 1
     PlayerBullet:
       MoveSpeed: 10
       Radius: 0.14154
@@ -147,7 +148,6 @@ MonoBehaviour:
         ColliderRadiusMultiplier: 2.6
         BodyDensity: 1000
         Restitution: 1
-        EnemyPushRadius: 4
         EnemyPushForce: 20
         EnemySpinAmount: 50
       FrigidBlockTalentConfig:
@@ -201,9 +201,9 @@ MonoBehaviour:
       Damage: 1
       DamageIntervalInSeconds: 1
       Size: {x: 4.1362, y: 1.663131}
-    DeafultEnvironmentId: 0
-    ShouldChooseRandomStage: 0
-    ShouldChooseRandomTalentsForPlayer: 0
+    DeafultEnvironmentId: 3
+    ShouldChooseRandomStage: 1
+    ShouldChooseRandomTalentsForPlayer: 1
     RandomTalentsForPlayersAmount: 3
     StartMatchCountdownDuration: 3
     ShootCooldownMultiplierWhenDead: 1
@@ -217,6 +217,48 @@ MonoBehaviour:
     PreparationPhaseDuration: 4
     ShouldAddTalentEveryXStages: 0
     EveryXStages: 2
+    AreBonusStagesEnabled: 1
+    BonusStageEveryXStages: 1
+    EnabledBonusStageTypes: 03000000
+    DefaultWhacAMoleEnvironmentId: 22
+    DefaultGatePassEnvironmentId: 23
+    WhacAMole:
+      StageDurationSeconds: 45
+      MinMoleSpawnIntervalSeconds: 1
+      MaxMoleSpawnIntervalSeconds: 2
+      MaxConcurrentMoles: 8
+      MoleRadius: 0.8
+      MoleHoleReuseCooldownSeconds: 1
+      MinMoleLifetimeSeconds: 10
+      MaxMoleLifetimeSeconds: 13
+      ScorePerMoleKilled: 1
+      MinMolesUntilGoldenMole: 3
+      MaxMolesUntilGoldenMole: 6
+      GoldenMoleLives: 3
+      GoldenMoleScoreOnKill: 3
+    GatePass:
+      StageDurationSeconds: 45
+      ScorePerPass: 1
+      MaxGatePassMultiplier: 4
+      PassScoreCooldownSeconds: 0.4
+      TeleportDetectionSegmentLength: 8
+      ScoreGateMass: 2
+      ScoreGateDensity: 2
+      ScoreGateRestitution: 0.2
+      ScoreGateLinearDamping: 1.5
+      ScoreGateAngularDamping: 1.5
+      KOPushImpulse: 36
+      KOSpinImpulse: 10
+      HeadbuttPushImpulse: 42
+      HeadbuttSpinImpulse: 12
+      ChickenEggSpinImpulse: 4
+      GrapplingHookReactionImpulse: 24
+      MagneticPullImpulse: 72
+      YearsOfPainPushImpulse: 96
+      YearsOfPainSpinImpulse: 36
+      WaterGunPushImpulsePerSecond: 240
+      NukePushImpulse: 120
+      NukeSpinImpulse: 45
     StageSizeMultiplier: 1
     SpeedupSimulation: 1
     IsAutoShoot: 0

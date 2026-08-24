@@ -44,17 +44,22 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private TryDamagePlayersInLavaCommand _tryDamagePlayersInLavaCommand;
         private TryDamagePlayersTouchingSpikesCommand _tryDamagePlayersTouchingSpikesCommand;
         private TrySpawnPowerUpBallsCommand _trySpawnPowerUpBallsCommand;
+        private TryHideExpiredMolesCommand _tryHideExpiredMolesCommand;
+        private TryEmergeMolesCommand _tryEmergeMolesCommand;
+        private TrySpawnMolesCommand _trySpawnMolesCommand;
+        private TryEndBonusStageByTimerCommand _tryEndBonusStageByTimerCommand;
+        private TryScoreGatePassesCommand _tryScoreGatePassesCommand;
         private ApplyGalacticPullForcesCommand _applyGalacticPullForcesCommand;
         private TryDeactivateEndedGalacticFieldsCommand _tryDeactivateEndedGalacticFieldsCommand;
         private StepPhysiscsSimulationCommand _stepPhysiscsSimulationCommand;
-        private StepFrigidBlocksCommand _stepFrigidBlocksCommand;
+        private DestroyIdleFrigidBlocksCommand _destroyIdleFrigidBlocksCommand;
         private StepTimersCommand _stepTimersCommand;
         private TryEndPlayersSpinIfReachedZeroAngularVecityCommand _tryEndPlayersSpinIfReachedZeroAngularVecityCommand;
         private TryEndStagePreparationPhaseCommand _tryEndStagePreparationPhaseCommand;
         private StepAllPlayersTalentsCooldownsCommand _stepAllPlayersTalentsCooldownsCommand;
         private StepAllPlayersTalentsCommand _stepAllPlayersTalentsCommand;
         private TrySendPlayersLockOnTargetChangedCommand _trySendPlayersLockOnTargetChangedCommand;
-        
+
         private readonly MatchFullTickPacketS2C _fullTickPacket;
         private readonly StartMatchPacketS2C _cachedStartMatchPacket;
         private readonly StartStagePacketS2C _startStagePacket;
@@ -89,9 +94,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryDamagePlayersInLavaCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersInLavaCommand>();
             _tryDamagePlayersTouchingSpikesCommand = _commandFactory.CreateCommandVoid<TryDamagePlayersTouchingSpikesCommand>();
             _trySpawnPowerUpBallsCommand = _commandFactory.CreateCommandVoid<TrySpawnPowerUpBallsCommand>();
+            _tryHideExpiredMolesCommand = _commandFactory.CreateCommandVoid<TryHideExpiredMolesCommand>();
+            _tryEmergeMolesCommand = _commandFactory.CreateCommandVoid<TryEmergeMolesCommand>();
+            _trySpawnMolesCommand = _commandFactory.CreateCommandVoid<TrySpawnMolesCommand>();
+            _tryEndBonusStageByTimerCommand = _commandFactory.CreateCommandVoid<TryEndBonusStageByTimerCommand>();
+            _tryScoreGatePassesCommand = _commandFactory.CreateCommandVoid<TryScoreGatePassesCommand>();
             _stepTimersCommand = _commandFactory.CreateCommandVoid<StepTimersCommand>();
             _stepPhysiscsSimulationCommand = _commandFactory.CreateCommandVoid<StepPhysiscsSimulationCommand>();
-            _stepFrigidBlocksCommand = _commandFactory.CreateCommandVoid<StepFrigidBlocksCommand>();
+            _destroyIdleFrigidBlocksCommand = _commandFactory.CreateCommandVoid<DestroyIdleFrigidBlocksCommand>();
             _tryEndStagePreparationPhaseCommand = _commandFactory.CreateCommandVoid<TryEndStagePreparationPhaseCommand>();
             _stepAllPlayersTalentsCooldownsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCooldownsCommand>();
             _stepAllPlayersTalentsCommand = _commandFactory.CreateCommandVoid<StepAllPlayersTalentsCommand>();
@@ -105,7 +115,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         {
             _tickService.UnregisterObserver(this);
         }
-        
+
         public void OnTick(int currentTick)
         {
             try
@@ -117,18 +127,23 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 {
                     return;
                 }
-                
+
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
                 _playersPowerUpsManager.OnTick(currentTick);
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
+                _tryHideExpiredMolesCommand.SetProcessedTick(currentTick).Execute();
+                _tryEmergeMolesCommand.SetProcessedTick(currentTick).Execute();
+                _trySpawnMolesCommand.SetProcessedTick(currentTick).Execute();
+                _tryEndBonusStageByTimerCommand.SetProcessedTick(currentTick).Execute();
                 _tryDeactivateEndedGalacticFieldsCommand.SetTick(currentTick).Execute();
                 _applyGalacticPullForcesCommand.Execute();
                 _tryEndStagePreparationPhaseCommand.SetProcessedTick(currentTick).Execute();
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
-                _stepFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
+                _destroyIdleFrigidBlocksCommand.SetTick(currentTick).SetDeltaTime(stepDeltaTime).Execute();
+                _tryScoreGatePassesCommand.SetProcessedTick(currentTick).Execute(); // after the physics step, so gate and player positions are post-step
                 _tryEndPlayersSpinIfReachedZeroAngularVecityCommand.SetTick(currentTick).Execute();
                 _tryDamagePlayersInLavaCommand.SetProcessedTick(currentTick).Execute();
                 _tryDamagePlayersTouchingSpikesCommand.SetProcessedTick(currentTick).Execute();
@@ -171,21 +186,21 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             {
                 if (!kvp.Value.IsConnected)
                 {
-                    return;
+                    continue;
                 }
 
                 var clientId = kvp.Key;
                 SendStartStagePacketToClient(clientId, processedTick, DeliveryMethod.ReliableUnordered); // we don't send in a net event cause it can fill quickly our packet buffer
             }
         }
-        
+
         private void SendStartStagePacketToClient(long clientId, int processedTick, DeliveryMethod deliveryMethod)
         {
             _startStagePacket.InitialState = _matchDataService.SimulationState;
             _startStagePacket.OccuredOnTick = processedTick;
             _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.StartStage, _startStagePacket, deliveryMethod);
         }
-        
+
         private void SendStartMatchToNotAcknowledgedClients(int processedTick)
         {
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
@@ -237,12 +252,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _fullTickPacket.Tick = processedTick;
             _fullTickPacket.CurrentSimulationState = currentSimulationState;
 
-            //_fullTickPacket.PreviousSimulationState = _matchDataService.PreviousSimulationState;
             foreach (var kvp in _clientsNetworkDataService.ClientsNetworkDataDictionary)
             {
                 if (!kvp.Value.IsConnected)
                 {
-                    return;
+                    continue;
                 }
 
                 var clientId = kvp.Key;
@@ -287,6 +301,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateWaterGunTalentNetEvents = _netEventsDataService.DeactivateWaterGunTalentNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateHeadbuttChargingNetEvents = _netEventsDataService.ActivateHeadbuttChargingNetEventsPerClient[clientId];
                 _fullTickPacket.PerformHeadbuttDashNetEvents = _netEventsDataService.PerformHeadbuttDashNetEventsPerClient[clientId];
+                _fullTickPacket.PerformBarrelDashNetEvents = _netEventsDataService.PerformBarrelDashNetEventsPerClient[clientId];
                 _fullTickPacket.HeadbuttHitEnemyNetEvents = _netEventsDataService.HeadbuttHitEnemyNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateHeadbuttTalentNetEvents = _netEventsDataService.DeactivateHeadbuttTalentNetEventsPerClient[clientId];
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerClient[clientId];
@@ -318,6 +333,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.DeactivateRockTalentNetEvents = _netEventsDataService.DeactivateRockTalentNetEventsPerClient[clientId];
                 _fullTickPacket.ActivateFrozenTalentNetEvents = _netEventsDataService.ActivateFrozenTalentNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateFrozenTalentNetEvents = _netEventsDataService.DeactivateFrozenTalentNetEventsPerClient[clientId];
+                _fullTickPacket.MoleSpawnedNetEvents = _netEventsDataService.MoleSpawnedNetEventsPerClient[clientId];
+                _fullTickPacket.MoleKilledNetEvents = _netEventsDataService.MoleKilledNetEventsPerClient[clientId];
+                _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
+                _fullTickPacket.GoldenMoleDamagedNetEvents = _netEventsDataService.GoldenMoleDamagedNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerPassedScoreGateNetEvents = _netEventsDataService.PlayerPassedScoreGateNetEventsPerClient[clientId];
+                _fullTickPacket.GateTrapClosingNetEvents = _netEventsDataService.GateTrapClosingNetEventsPerClient[clientId];
                 _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.MatchFullTick, _fullTickPacket,
                     DeliveryMethod.Unreliable);
             }

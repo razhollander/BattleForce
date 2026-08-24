@@ -24,8 +24,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FrigidBlock = 18,
         FishingRodTip = 19,
         SoulGhost = 20,
+        Mole = 21,
+        ScoreGate = 22,
     }
     
+    // Each value is one bit of a fixture's categoryBits/maskBits, so the highest usable value is 31.
+    // Before adding a value, check whether an existing channel already expresses the same filtering
+    // relationship - AnyObjectThatCollidesOnlyWithPlayer is shared by seven different body types.
     public enum PhysicsCollisionType
     {
         None = 0,
@@ -43,5 +48,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         FrigidBlock = 12,
         FishingRodTip = 13,
         SoulGhost = 14,
+        Mole = 15,
+        ScoreGate = 16,
     }
 }

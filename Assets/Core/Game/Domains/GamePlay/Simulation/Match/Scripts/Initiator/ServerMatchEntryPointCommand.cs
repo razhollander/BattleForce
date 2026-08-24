@@ -6,6 +6,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.MatchInitData;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
+using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MolesSpawner;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.TickHandlers.PacketsObservers;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
@@ -35,10 +36,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private ITickService _tickService;
         private ICommandFactory _commandFactory;
-        private NetworkConfig _networkConfig;
         private IStageDataService _stageDataService;
+        private IBonusStageRotationService _bonusStageRotationService;
         private ISimulationInputService _simulationInputService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
+        private IMolesSpawnCooldownService _molesSpawnCooldownService;
         private SetRandomTalentsForPlayerCommand _setRandomTalentsForPlayerCommand;
         private IClientsNetworkDataService _clientsNetworkDataService;
         
@@ -63,10 +65,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             _gamePlayConfigService = _diContainer.Resolve<ISimulationGamePlayConfigService>();
             _tickService = _diContainer.Resolve<ITickService>();
             _commandFactory = _diContainer.Resolve<ICommandFactory>();
-            _networkConfig = _diContainer.Resolve<NetworkConfig>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _bonusStageRotationService = _diContainer.Resolve<IBonusStageRotationService>();
             _simulationInputService = _diContainer.Resolve<ISimulationInputService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
+            _molesSpawnCooldownService = _diContainer.Resolve<IMolesSpawnCooldownService>();
             _clientsNetworkDataService = _diContainer.Resolve<IClientsNetworkDataService>();
             _setRandomTalentsForPlayerCommand =  _commandFactory.CreateCommandVoid<SetRandomTalentsForPlayerCommand>();
         }
@@ -81,6 +84,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
             InitPlayers(_simulationMatchEnterData);
             _playerInputsPacketsHandler.InitEntryPoint();
             _stageDataService.InitEntryPoint();
+            _molesSpawnCooldownService.InitEntryPoint();
+            _bonusStageRotationService.ResetData(); // the bonus-stage rotation restarts fresh for each match
             _commandFactory.CreateCommandVoid<InitStageCommand>().Execute();
             _tickProcessor.InitEntryPoint();
         }
@@ -111,7 +116,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
         {
             if (_playbackRecorderService.IsPlaybackEnabled)
             {
-                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService, _networkConfig));
+                _networkManager.SwitchToNetManager(new NetManagerPlayback(_playbackRecorderService, _tickService));
             }
             else
             {
@@ -163,9 +168,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Initiator
                     _playersPowerUpsManager.AddPlayer(playerId);
                     _simulationInputService.AddPlayer(playerId);
                     _lockOnTargetTimerService.AddPlayer(playerId);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Headbutt, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Frozen, playerId, 0, out _, out _);
-                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Rock, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Chicken, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Soul, playerId, 0, out _, out _);
+                    _playersTalentsManager.TryAddTalentToPlayer(TalentType.Swap, playerId, 0, out _, out _);
                 
                     if (_gamePlayConfigService.GamePlayConfig.ShouldChooseRandomTalentsForPlayer)
                     {

@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents;
@@ -65,12 +66,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<DeactivateRockTalentNetEventS2C>> DeactivateRockTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<MoleKilledNetEventS2C>> MoleKilledNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>> PlayerPassedScoreGateNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<GateTrapClosingNetEventS2C>> GateTrapClosingNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<GoldenMoleDamagedNetEventS2C>> GoldenMoleDamagedNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateUmbrellaTalentNetEventS2C>> ActivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateUmbrellaTalentNetEventS2C>> DeactivateUmbrellaTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateWaterGunTalentNetEventS2C>> ActivateWaterGunTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateWaterGunTalentNetEventS2C>> DeactivateWaterGunTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>> PerformBarrelDashNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
@@ -137,9 +145,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddGrapplingHookHitWallNetEvent(int onTick, ushort projectileId, ushort hitWallId, Vector2 hitPosition);
         void AddDeactivateGrapplingHookTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);
         void AddCreateFishingRodProjectileNetEvent(int onTick, ushort projectileId, ushort playerCasterId, Vector2 position);
-        void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId);
+        void AddFishingRodCaughtEnemyNetEvent(int onTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType);
         void AddFishingRodTipHitWallNetEvent(int onTick, ushort projectileId, Vector2 hitPosition);
-        void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, Vector2 throwDirection);
+        void AddFishingRodThrowNetEvent(int onTick, ushort casterPlayerId, ushort thrownEnemyId, FishingRodCaughtEnemyType thrownEnemyType, Vector2 throwDirection);
         void AddDeactivateFishingRodTalentNetEvent(int onTick, ushort casterPlayerId, ushort projectileId, int talentCooldownEndTick);
         void AddCreateSoulGhostNetEvent(int onTick, ushort ghostId, ushort playerCasterId, Vector2 position, Vector2 direction);
         void AddDeactivateSoulTalentNetEvent(int onTick, ushort ghostId, ushort casterPlayerId, int talentCooldownEndTick, bool didTeleport, Vector2 teleportPosition, Vector2 teleportDirection);
@@ -147,6 +155,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDeactivateRockTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
+        void AddMoleSpawnedNetEvent(int onTick, ushort moleId, ushort moleHoleId, int emergeOnTick, bool isGolden, byte maxLives);
+        void AddMoleKilledNetEvent(int onTick, ushort moleId, ushort moleHoleId, ushort byPlayerId, byte scoreGained, ushort teamMolesKilledTotal, ushort byPlayerMolesKilledScoreTotal, bool isGolden);
+        void AddPlayerPassedScoreGateNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, byte scoreGained, ushort newScoreMultiplier, ushort teamBonusScoreTotal, ushort byPlayerBonusScoreTotal);
+        void AddGateTrapClosingNetEvent(int onTick, ushort gateTrapId, int closedOnTick);
+        void AddMoleExpiredNetEvent(int onTick, ushort moleId, ushort moleHoleId, int hideOnTick);
+        void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, ushort moleHoleId, byte remainingLives, byte maxLives);
         void AddActivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateUmbrellaTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddActivateWaterGunTalentNetEvent(int onTick, ushort casterPlayerId);
@@ -171,6 +185,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddDestroyFrigidBlockNetEvent(int onTick, ushort blockId);
         void AddActivateHeadbuttChargingNetEvent(int onTick, ushort casterPlayerId);
         void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId);
+        void AddPerformBarrelDashNetEvent(int onTick, ushort casterPlayerId);
         void AddHeadbuttHitEnemyNetEvent(int onTick, ushort casterPlayerId, ushort enemyPlayerId);
         void AddDeactivateHeadbuttTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
     }

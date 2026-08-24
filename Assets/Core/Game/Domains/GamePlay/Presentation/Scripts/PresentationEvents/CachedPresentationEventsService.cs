@@ -21,6 +21,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PlayerEndedExposedToLavaNetEventS2C> PlayerEndedExposedToLavaNetEvents { get; } = new();
         public List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; } = new();
         public List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; } = new();
+        public List<MoleSpawnedNetEventS2C> MoleSpawnedNetEvents { get; } = new();
+        public List<MoleKilledNetEventS2C> MoleKilledNetEvents { get; } = new();
+        public List<MoleExpiredNetEventS2C> MoleExpiredNetEvents { get; } = new();
+        public List<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents { get; } = new();
+        public List<PlayerPassedScoreGateNetEventS2C> PlayerPassedScoreGateNetEvents { get; } = new();
         public List<PlayerSwitchTeamNetEventS2C> PlayerSwitchTeamNetEvents { get; } = new();
         public List<StageEndNetEventS2C> StageEndNetEvents { get; } = new();
         public List<TeamLostNetEventS2C> TeamLostNetEvents { get; } = new();
@@ -62,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<DeactivateWaterGunTalentNetEventS2C> DeactivateWaterGunTalentNetEvents { get; } = new();
         public List<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents { get; } = new();
         public List<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents { get; } = new();
+        public List<PerformBarrelDashNetEventS2C> PerformBarrelDashNetEvents { get; } = new();
         public List<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents { get; } = new();
         public List<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents { get; } = new();
         public List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; } = new();

@@ -1,12 +1,9 @@
 using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Features.StartMatchButton.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.DataService;
-using Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.TickProcessor;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.TickProcessors;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents;
@@ -14,14 +11,13 @@ using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.MatchMaking.PacketEvents.NetEvents;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEvents;
 using Core.Scripts.Extensions;
-using Core.Scripts.Extensions.Linq;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
 using CoreDomain.Scripts.Services.CommandFactory;
 using CoreDomain.Scripts.Services.Logger.Base;
 using LiteNetLib.Utils;
-using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.PacketsHandlers
 {
@@ -44,17 +40,20 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
         private readonly CapacityList<PlayerLockedOnTargetHitNetEventS2C> _cachedUnprocessedPlayerLockedOnTargetHitEvents;
         private readonly ConcurrentPool<MatchMakingFullTickPacketS2C> _fullTickPacketsPool;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
+        private readonly IInterpolationDecayService _interpolationDecayService;
         public PacketTypeS2C PacketType => PacketTypeS2C.MatchMakingFullTick;
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchMakingFullTickPacketsHandler(NetworkConfig networkConfig, IClientNetworkManager networkManager,
             IMatchMakingDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory,
-            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService, SharedGamePlayConfig sharedGamePlayConfig)
+            IStartMatchButtonController startMatchButtonController, ILastFullSyncTickDataService lastFullSyncTickDataService, SharedGamePlayConfig sharedGamePlayConfig,
+            IInterpolationDecayService interpolationDecayService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
+            _interpolationDecayService = interpolationDecayService;
 
             _presentationNetEventsHandler = new PresentationMatchMakingNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory, startMatchButtonController);
 
@@ -86,7 +85,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestTickReceivedFromServer = GetLatestTickReceivedFromServer();
             var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
 
             if (latestTickReceivedFromServer <= LastProcessedTickFromServer)
@@ -100,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
 
             ProcessLogicOfPacket(latestFullTickPacket, ignoreEventsNotAboveTick);
 
+            _interpolationDecayService.UpdateDecayBasedOnTicks(latestTickReceivedFromServer - LastProcessedTickFromServer);
             LastProcessedTickFromServer = latestTickReceivedFromServer;
 
             foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
@@ -117,6 +117,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             }
 
             _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private int GetLatestTickReceivedFromServer()
+        {
+            var latestTick = int.MinValue;
+
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                if (kvp.Key > latestTick)
+                {
+                    latestTick = kvp.Key;
+                }
+            }
+
+            return latestTick;
         }
 
         private void ProcessLogicOfPacket(MatchMakingFullTickPacketS2C latestFullTickPacket, int ignoreEventsNotAboveTick)
@@ -338,11 +353,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.MatchMaking.Scripts.Network.Pa
             OnFullTickReceived(newPacket);
         }
 
+        // UDP can deliver the same tick twice, and an already buffered tick has nothing new to tell us,
+        // so the duplicate goes straight back to the pool instead of throwing out of PollEvents.
         private void OnFullTickReceived(MatchMakingFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
+
+            if (!_fullTickPacketsUnprocessedByLogic.TryAdd(tick, fullTickPacket))
+            {
+                _fullTickPacketsPool.Return(fullTickPacket);
+            }
         }
 
         public void InitExitPoint()

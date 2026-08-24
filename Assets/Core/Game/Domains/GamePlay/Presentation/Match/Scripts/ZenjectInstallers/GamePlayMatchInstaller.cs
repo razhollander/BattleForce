@@ -14,12 +14,16 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Springs
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.EnvironmentTeleportGate;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.TeleportGate.Scripts.Mvcs.PlayerTeleportEffect;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.GateTraps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Walls.Scripts.Mvcs;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GainBoltEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PowerUps.Scripts.ObtainedEffect;
@@ -30,6 +34,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.FishingRod.Scripts.
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
@@ -62,6 +67,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private MatchPlayerUIControllersView _matchPlayerUIControllersView;
         [SerializeField] private BulletView _bulletViewPrefab;
         [SerializeField] private EnvironmentWallView _environmentWallViewPrefab;
+        [SerializeField] private GateTrapView _gateTrapViewPrefab;
         [SerializeField] private EnvironmentSpringView _environmentSpringViewPrefab;
         [SerializeField] private Core.Game.Domains.GamePlay.Presentation.Match.Features.Environment.Spikes.Scripts.EnvironmentSpikeView _environmentSpikeViewPrefab;
         [SerializeField] private EnvironmentTeleportGateView _environmentTeleportGateViewPrefab;
@@ -69,7 +75,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private TeamsBoardContainerView _teamsBoardContainerView;
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
+        [SerializeField] private ScoreGainedEffectView _scoreGainedEffectViewPrefab;
         [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
+        [SerializeField] private MatchTimerCountdownView _matchTimerCountdownView;
+        [SerializeField] private MoleView _moleViewPrefab;
         [SerializeField] private PlayerTeleportEffectView playerTeleportEffectViewPrefab;
         [SerializeField] private HeadbuttHitEffectView _headbuttHitEffectViewPrefab;
         [SerializeField] private EnvironmentFieldBarrierView _environmentFieldBarrierViewPrefab;
@@ -80,6 +89,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private SecondCastAimArrowView _secondCastAimArrowViewPrefab;
         [SerializeField] private SoulGhostView _soulGhostViewPrefab;
         [SerializeField] private FrigidBlockView _frigidBlockViewPrefab;
+        [SerializeField] private ScoreGateView _scoreGateViewPrefab;
         [SerializeField] private DashPulseGustEffectView _dashPulseGustEffectViewPrefab;
         [SerializeField] private NukeShockwaveEffectView _nukeShockwaveEffectViewPrefab;
         [SerializeField] private MagneticPullFieldView _magneticPullFieldViewPrefab;
@@ -123,13 +133,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<MatchChickenEggsControllers>().AsSingle().WithArguments(_chickenEggViewPrefab).NonLazy();
             Container.BindInterfacesTo<GalacticPullStarEffectControllers>().AsSingle().WithArguments(_galacticPullStarEffectViewPrefab, _galacticStarsVisualData).NonLazy();
             Container.BindInterfacesTo<MatchEnvironmentWallsControllers>().AsSingle().WithArguments(_environmentWallViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MatchEnvironmentGateTrapsControllers>().AsSingle().WithArguments(_gateTrapViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpringControllers>().AsSingle().WithArguments(_environmentSpringViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentSpikeControllers>().AsSingle().WithArguments(_environmentSpikeViewPrefab).NonLazy();
             Container.BindInterfacesTo<StageEndedUiController>().AsSingle().WithArguments(_stageEndedUiView).NonLazy();
             Container.BindInterfacesTo<TeamsBoardUIController>().AsSingle().WithArguments(_teamsBoardContainerView).NonLazy();
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<ScoreGainedEffectController>().AsSingle().WithArguments(_scoreGainedEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
+            Container.BindInterfacesTo<MatchTimerCountdownController>().AsSingle().WithArguments(_matchTimerCountdownView).NonLazy();
+            Container.BindInterfacesTo<MoleControllers>().AsSingle().WithArguments(_moleViewPrefab).NonLazy();
             Container.BindInterfacesTo<EnvironmentTeleportGateControllers>().AsSingle().WithArguments(_environmentTeleportGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<PlayerTeleportEffectController>().AsSingle().WithArguments(playerTeleportEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HeadbuttHitEffectController>().AsSingle().WithArguments(_headbuttHitEffectViewPrefab).NonLazy();
@@ -140,6 +154,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<SecondCastAimArrowControllers>().AsSingle().WithArguments(_secondCastAimArrowViewPrefab).NonLazy();
             Container.BindInterfacesTo<SoulGhostControllers>().AsSingle().WithArguments(_soulGhostViewPrefab).NonLazy();
             Container.BindInterfacesTo<FrigidBlocksControllers>().AsSingle().WithArguments(_frigidBlockViewPrefab).NonLazy();
+            Container.BindInterfacesTo<ScoreGatesControllers>().AsSingle().WithArguments(_scoreGateViewPrefab).NonLazy();
             Container.BindInterfacesTo<DashPulseGustEffectController>().AsSingle().WithArguments(_dashPulseGustEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<NukeShockwaveEffectController>().AsSingle().WithArguments(_nukeShockwaveEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<MagneticPullEffectController>().AsSingle().WithArguments(_magneticPullFieldViewPrefab, _magneticPullHitEffectViewPrefab).NonLazy();

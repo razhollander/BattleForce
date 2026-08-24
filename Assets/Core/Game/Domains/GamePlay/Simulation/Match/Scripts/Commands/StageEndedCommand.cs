@@ -1,4 +1,5 @@
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Stage;
@@ -17,14 +18,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private INetEventsDataService _netEventsDataService;
         private IStageDataService _stageDataService;
         private ISimulationGamePlayConfigService _gamePlayConfigService;
-        
-        private ushort _playerIdDoingWinningBlow;
-
-        public StageEndedCommand PlayerIdDoingWinningBlow(ushort playerId)
-        {
-            _playerIdDoingWinningBlow = playerId;
-            return this;
-        }
         
         public StageEndedCommand SetWinningTeamId(ushort winningTeamId)
         {
@@ -59,9 +52,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private PlayerStateS2C GetPlayerToFocusOn()
         {
+            if (_matchDataService.SimulationState.StageType.IsBonusStage())
+            {
+                return GetTopScoringPlayerInWinningTeam();
+            }
+
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
             {
-                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId && _playerIdDoingWinningBlow == player.Id)
+                if (player.Spaceship.IsAlive && player.TeamId == _winningTeamId)
                 {
                     return player;
                 }
@@ -85,6 +83,42 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             LogService.LogError("Somehow didnt find player to focus on");
             return null;
+        }
+
+        private PlayerStateS2C GetTopScoringPlayerInWinningTeam()
+        {
+            var stageScorePerPlayerId = _matchDataService.SimulationState.StageScorePerPlayerId;
+            PlayerStateS2C topScoringPlayer = null;
+
+            foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
+            {
+                if (player.TeamId != _winningTeamId)
+                {
+                    continue;
+                }
+
+                if (topScoringPlayer == null)
+                {
+                    topScoringPlayer = player;
+                    continue;
+                }
+                
+                
+                ushort scoreOfPlayer = stageScorePerPlayerId[player.Id];
+                ushort scoreOfTopScoringPlayer = stageScorePerPlayerId[topScoringPlayer.Id];
+
+                if (scoreOfPlayer > scoreOfTopScoringPlayer || (scoreOfPlayer == scoreOfTopScoringPlayer && player.Id < topScoringPlayer.Id)) // Deterministic tie-break: keep the lowest player id when scores are equal
+                {
+                    topScoringPlayer = player;
+                }
+            }
+
+            if (topScoringPlayer == null)
+            {
+                LogService.LogError("Somehow didnt find player to focus on");
+            }
+
+            return topScoringPlayer;
         }
     }
 }

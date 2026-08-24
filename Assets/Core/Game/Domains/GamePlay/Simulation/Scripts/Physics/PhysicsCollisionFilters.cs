@@ -8,9 +8,9 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
         // GetCollisionsCategory builds a fixture's categoryBits: the SET of collision bits this body
         // exposes, i.e. "which other bodies' masks are allowed to see me". It ORs several single bits
         // together, so it returns a compound mask (e.g. a Wall is seen by players, bullets, powerups...).
-        public static ushort GetCollisionsCategory(this PhysicsBodyType type)
+        public static uint GetCollisionsCategory(this PhysicsBodyType type)
         {
-            int collisionMask;
+            uint collisionMask;
 
             switch (type)
             {
@@ -22,6 +22,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet);
                     break;
                 case PhysicsBodyType.PlayerHeart:
@@ -34,6 +36,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.TalentCard)
                                     | GetCollisionMask(PhysicsCollisionType.PowerUpBall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.StartMatchWall);
                     break;
                 case PhysicsBodyType.Wall:
@@ -44,7 +48,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
                                     | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
-                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost);
+                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate);
                     break;
                 case PhysicsBodyType.FrigidBlock:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
@@ -55,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
                                     | GetCollisionMask(PhysicsCollisionType.SoulGhost)
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.TalentCard:
@@ -86,6 +92,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg);
                     break;
                 case PhysicsBodyType.SwapField:
@@ -96,35 +104,57 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                     break;
                 case PhysicsBodyType.GrapplingHookProjectile:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.FishingRodTip:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.Mole)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship);
                     break;
                 case PhysicsBodyType.SoulGhost:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.Wall)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.FrigidBlock);
                     break;
                 case PhysicsBodyType.ChickenEgg:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
                     break;
+                case PhysicsBodyType.ScoreGate:
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FrigidBlock)
+                                    | GetCollisionMask(PhysicsCollisionType.GrapplingHookProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip)
+                                    | GetCollisionMask(PhysicsCollisionType.SoulGhost)
+                                    | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
+                                    | GetCollisionMask(PhysicsCollisionType.Wall);
+                    break;
+                case PhysicsBodyType.Mole: // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnEmergedMoleCommand and TryBreakLaidChickenEggOnMolesCommand resolve that overlap instead, each at the moment one of the two is created.
+                    collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet)
+                                    | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
+                                    | GetCollisionMask(PhysicsCollisionType.KOProjectile)
+                                    | GetCollisionMask(PhysicsCollisionType.FishingRodTip);
+                    break;
                 default:
-                    collisionMask = 0xFFFF;
+                    collisionMask = 0xFFFFFFFF;
                     break;
             }
 
-            return (ushort) collisionMask;
+            return collisionMask;
         }
 
         // GetCollisionMask builds a SINGLE collision bit from one PhysicsCollisionType.
         // Used to set a fixture's maskBits ("who I collide with") and to OR individual
-        // bits into the category set above. 
-        public static ushort GetCollisionMask(this PhysicsCollisionType type)
+        // bits into the category set above.
+        public static uint GetCollisionMask(this PhysicsCollisionType type)
         {
-            return (ushort) (1 << (int) type);
+            return 1u << (int) type;
         }
     }
 }

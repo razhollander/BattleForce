@@ -52,7 +52,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.FrigidBlock
             _netEventsDataService.AddShootFrigidBlockNetEvent(tick, block, cooldownEndTick);
         }
 
-        public void OnTick(int tick, float deltaTime)
+        public void DestroyIdleBlocks(int tick, float deltaTime)
         {
             for (int i = _activeControllers.Count - 1; i >= 0; i--)
             {

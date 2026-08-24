@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.Network.PacketsHandlers;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
-using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents;
@@ -23,6 +21,7 @@ using CoreDomain.Scripts.Services.Logger.Base;
 using CoreDomain.Scripts.Services.UpdateService;
 using LiteNetLib.Utils;
 using UnityEngine;
+using Core.Game.Domains.GamePlay.Presentation.Scripts.DataService;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsHandlers
 {
@@ -33,6 +32,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly IMatchDataService _matchDataService;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly ILastFullSyncTickDataService _lastFullSyncTickDataService;
+        private readonly IInterpolationDecayService _interpolationDecayService;
+        private readonly INetworkDiagnosticsService _networkDiagnosticsService;
 
         private readonly PresentationMatchNetEventsHandler _presentationNetEventsHandler;
         private readonly CapacityDict<int, MatchFullTickPacketS2C> _fullTickPacketsUnprocessedByLogic;
@@ -51,6 +52,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PlayerEndedExposedToLavaNetEventS2C> _cachedUnprocessedPlayerEndedExposedToLavaEvents;
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
+        private readonly CapacityList<MoleSpawnedNetEventS2C> _cachedUnprocessedMoleSpawnedEvents;
+        private readonly CapacityList<MoleKilledNetEventS2C> _cachedUnprocessedMoleKilledEvents;
+        private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
+        private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
+        private readonly CapacityList<PlayerPassedScoreGateNetEventS2C> _cachedUnprocessedPlayerPassedScoreGateEvents;
+        private readonly CapacityList<GateTrapClosingNetEventS2C> _cachedUnprocessedGateTrapClosingEvents;
         private readonly CapacityList<StageEndNetEventS2C> _cachedUnprocessedStageEndEvents;
         private readonly CapacityList<TeamLostNetEventS2C> _cachedUnprocessedTeamLostEvents;
         private readonly CapacityList<TalentSwitchNetEventS2C> _cachedUnprocessedTalentSwitchEvents;
@@ -92,6 +99,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<DeactivateWaterGunTalentNetEventS2C> _cachedUnprocessedDeactivateWaterGunTalentEvents;
         private readonly CapacityList<ActivateHeadbuttChargingNetEventS2C> _cachedUnprocessedActivateHeadbuttChargingEvents;
         private readonly CapacityList<PerformHeadbuttDashNetEventS2C> _cachedUnprocessedPerformHeadbuttDashEvents;
+        private readonly CapacityList<PerformBarrelDashNetEventS2C> _cachedUnprocessedPerformBarrelDashEvents;
         private readonly CapacityList<HeadbuttHitEnemyNetEventS2C> _cachedUnprocessedHeadbuttHitEnemyEvents;
         private readonly CapacityList<DeactivateHeadbuttTalentNetEventS2C> _cachedUnprocessedDeactivateHeadbuttTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
@@ -125,13 +133,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         public int LastProcessedTickFromServer { get; private set; }
 
         public MatchFullTickPacketsHandler(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig, IClientNetworkManager networkManager,
-            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService, ILastFullSyncTickDataService lastFullSyncTickDataService)
+            IMatchDataService matchDataService, ICachedPresentationEventsService cachedPresentationEventsService, ICommandFactory commandFactory, IUpdateSubscriptionService updateSubscriptionService, ILastFullSyncTickDataService lastFullSyncTickDataService,
+            IInterpolationDecayService interpolationDecayService, INetworkDiagnosticsService networkDiagnosticsService)
         {
             _networkConfig = networkConfig;
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _updateSubscriptionService = updateSubscriptionService;
             _lastFullSyncTickDataService = lastFullSyncTickDataService;
+            _interpolationDecayService = interpolationDecayService;
+            _networkDiagnosticsService = networkDiagnosticsService;
             _presentationNetEventsHandler = new PresentationMatchNetEventsHandler(matchDataService, cachedPresentationEventsService, commandFactory);
             _fullTickPacketsUnprocessedByLogic = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
             _fullTickPacketsUnprocessedByView = new CapacityDict<int, MatchFullTickPacketS2C>(networkConfig.MaxCap.FullTickPacketsNetEvents);
@@ -149,6 +160,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPlayerEndedExposedToLavaEvents = new CapacityList<PlayerEndedExposedToLavaNetEventS2C>(networkConfig.MaxCap.PlayerEndedExposedToLavaNetEvents);
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
+            _cachedUnprocessedMoleSpawnedEvents = new CapacityList<MoleSpawnedNetEventS2C>(networkConfig.MaxCap.MoleSpawnedNetEvents);
+            _cachedUnprocessedMoleKilledEvents = new CapacityList<MoleKilledNetEventS2C>(networkConfig.MaxCap.MoleKilledNetEvents);
+            _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
+            _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
+            _cachedUnprocessedPlayerPassedScoreGateEvents = new CapacityList<PlayerPassedScoreGateNetEventS2C>(networkConfig.MaxCap.PlayerPassedScoreGateNetEvents);
+            _cachedUnprocessedGateTrapClosingEvents = new CapacityList<GateTrapClosingNetEventS2C>(networkConfig.MaxCap.GateTrapClosingNetEvents);
             _cachedUnprocessedStageEndEvents = new CapacityList<StageEndNetEventS2C>(networkConfig.MaxCap.StageEndNetEvents);
             _cachedUnprocessedTeamLostEvents = new CapacityList<TeamLostNetEventS2C>(sharedGamePlayConfig.MaxTeamsAmount);
             _cachedUnprocessedTalentSwitchEvents = new CapacityList<TalentSwitchNetEventS2C>(networkConfig.MaxCap.TalentSwitchNetEvents);
@@ -190,6 +207,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedDeactivateWaterGunTalentEvents = new CapacityList<DeactivateWaterGunTalentNetEventS2C>(networkConfig.MaxCap.DeactivateWaterGunTalentNetEvents);
             _cachedUnprocessedActivateHeadbuttChargingEvents = new CapacityList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents);
             _cachedUnprocessedPerformHeadbuttDashEvents = new CapacityList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents);
+            _cachedUnprocessedPerformBarrelDashEvents = new CapacityList<PerformBarrelDashNetEventS2C>(networkConfig.MaxCap.PerformBarrelDashNetEvents);
             _cachedUnprocessedHeadbuttHitEnemyEvents = new CapacityList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents);
             _cachedUnprocessedDeactivateHeadbuttTalentEvents = new CapacityList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents);
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
@@ -225,7 +243,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 return;
             }
 
-            var latestTickReceivedFromServer = _fullTickPacketsUnprocessedByLogic.Keys.Max();
+            var latestTickReceivedFromServer = GetLatestTickReceivedFromServer();
             var latestFullTickPacket = _fullTickPacketsUnprocessedByLogic[latestTickReceivedFromServer];
             var ignoreEventsNotAboveTick = Mathf.Max(LastProcessedTickFromServer, _lastFullSyncTickDataService.LastFullSyncTick);
 
@@ -237,8 +255,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             
             ProcessLogicOfPacket(latestFullTickPacket, latestTickReceivedFromServer, ignoreEventsNotAboveTick);
 
+            var ticksAdvancedSinceLastProcessedState = latestTickReceivedFromServer - LastProcessedTickFromServer;
+            _interpolationDecayService.UpdateDecayBasedOnTicks(ticksAdvancedSinceLastProcessedState);
+            _networkDiagnosticsService.OnStateProcessed(ticksAdvancedSinceLastProcessedState);
             LastProcessedTickFromServer = latestTickReceivedFromServer;
-            
+
             foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
             {
                 var packetTick = kvp.Key;
@@ -254,6 +275,21 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
 
             _fullTickPacketsUnprocessedByLogic.Clear();
+        }
+
+        private int GetLatestTickReceivedFromServer()
+        {
+            var latestTick = int.MinValue;
+
+            foreach (var kvp in _fullTickPacketsUnprocessedByLogic)
+            {
+                if (kvp.Key > latestTick)
+                {
+                    latestTick = kvp.Key;
+                }
+            }
+
+            return latestTick;
         }
 
         private void ProcessLogicOfPacket(MatchFullTickPacketS2C latestFullTickPacket, int latestTickReceivedFromServer, int ignoreEventsNotAboveTick)
@@ -272,6 +308,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessTalentCardObtainedEvents(latestFullTickPacket.TalentCardObtainedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleSpawnedEvents(latestFullTickPacket.MoleSpawnedNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleKilledEvents(latestFullTickPacket.MoleKilledNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
+            ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerPassedScoreGateEvents(latestFullTickPacket.PlayerPassedScoreGateNetEvents, ignoreEventsNotAboveTick);
+            ProcessGateTrapClosingEvents(latestFullTickPacket.GateTrapClosingNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerDiedEvents(latestFullTickPacket.PlayerDiedNetEvents, ignoreEventsNotAboveTick);
             ProcessStageEndEvents(latestFullTickPacket.StageEndNetEvents, ignoreEventsNotAboveTick);
             ProcessTeamLostEvents(latestFullTickPacket.TeamLostNetEvents, ignoreEventsNotAboveTick);
@@ -300,6 +342,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessDeactivateWaterGunTalentEvents(latestFullTickPacket.DeactivateWaterGunTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessActivateHeadbuttChargingEvents(latestFullTickPacket.ActivateHeadbuttChargingNetEvents, ignoreEventsNotAboveTick);
             ProcessPerformHeadbuttDashEvents(latestFullTickPacket.PerformHeadbuttDashNetEvents, ignoreEventsNotAboveTick);
+            ProcessPerformBarrelDashEvents(latestFullTickPacket.PerformBarrelDashNetEvents, ignoreEventsNotAboveTick);
             ProcessHeadbuttHitEnemyEvents(latestFullTickPacket.HeadbuttHitEnemyNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateHeadbuttTalentEvents(latestFullTickPacket.DeactivateHeadbuttTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents, ignoreEventsNotAboveTick);
@@ -336,11 +379,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             UpdateBulletsTransform();
             UpdatePowerUpBallsTransform(simulationState);
             UpdateRotatingWheels(latestTickReceivedFromServer);
+            UpdateGateTraps(latestTickReceivedFromServer);
             UpdateKOProjectilesTransform(simulationState);
             UpdateGrapplingHookProjectilesTransform(simulationState);
             UpdateFishingRodTipsTransform(simulationState);
             UpdateSoulGhostsTransform(simulationState);
             UpdateFrigidBlocksTransform(simulationState);
+            ReconcileScoreGatesFromState(simulationState);
         }
 
         /// <summary>
@@ -1061,6 +1106,25 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        // The GateTrapClosing event is what starts a swing on the exact tick, and the rest of the cycle - staying closed,
+        // opening and the open cooldown - is played out here from the same authored durations the server used. A client
+        // that lost the event is put back in line by ReconcileGateTrapsFromState instead of staying wrong all stage.
+        private void UpdateGateTraps(int tick)
+        {
+            if (_matchDataService.GateTraps.Count == 0)
+            {
+                return;
+            }
+
+            var wheelCalculationTick = _matchDataService.IsInPreparationPhase ? 0 : tick - _matchDataService.PreperationPhaseEndedOnTick;
+            var deltaTime = _networkConfig.DeltaTime;
+
+            foreach (var gateTrap in _matchDataService.GateTraps)
+            {
+                gateTrap.StepToTick(tick, wheelCalculationTick, deltaTime, _matchDataService.GetRotatingWheelOfGateTrap(gateTrap));
+            }
+        }
+
         private void UpdatePowerUpBallsTransform(MatchSimulationStateS2C simulationState)
         {
             foreach (var powerUpBallModel in _matchDataService.PowerUpBalls)
@@ -1334,6 +1398,120 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPowerUpBallObtainedEvents.Sort();
                 _presentationNetEventsHandler.ProcessPowerUpObtainedEvents(_cachedUnprocessedPowerUpBallObtainedEvents);
+            }
+        }
+
+        private void ProcessMoleSpawnedEvents(FixedUnorderedList<MoleSpawnedNetEventS2C> moleSpawnedNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleSpawnedEvents.Clear();
+
+            foreach (var netEvent in moleSpawnedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleSpawnedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleSpawnedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleSpawnedEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleSpawnedEvents(_cachedUnprocessedMoleSpawnedEvents);
+            }
+        }
+
+        private void ProcessMoleKilledEvents(FixedUnorderedList<MoleKilledNetEventS2C> moleKilledNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleKilledEvents.Clear();
+
+            foreach (var netEvent in moleKilledNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleKilledEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleKilledEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleKilledEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleKilledEvents(_cachedUnprocessedMoleKilledEvents);
+            }
+        }
+
+        private void ProcessPlayerPassedScoreGateEvents(FixedUnorderedList<PlayerPassedScoreGateNetEventS2C> playerPassedScoreGateNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerPassedScoreGateEvents.Clear();
+
+            foreach (var netEvent in playerPassedScoreGateNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerPassedScoreGateEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedPlayerPassedScoreGateEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerPassedScoreGateEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerPassedScoreGateEvents(_cachedUnprocessedPlayerPassedScoreGateEvents);
+            }
+        }
+
+        private void ProcessGateTrapClosingEvents(FixedUnorderedList<GateTrapClosingNetEventS2C> gateTrapClosingNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedGateTrapClosingEvents.Clear();
+
+            foreach (var netEvent in gateTrapClosingNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedGateTrapClosingEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedGateTrapClosingEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedGateTrapClosingEvents.Sort();
+                _presentationNetEventsHandler.ProcessGateTrapClosingEvents(_cachedUnprocessedGateTrapClosingEvents);
+            }
+        }
+
+        private void ProcessMoleExpiredEvents(FixedUnorderedList<MoleExpiredNetEventS2C> moleExpiredNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedMoleExpiredEvents.Clear();
+
+            foreach (var netEvent in moleExpiredNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedMoleExpiredEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedMoleExpiredEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedMoleExpiredEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleExpiredEvents(_cachedUnprocessedMoleExpiredEvents);
+            }
+        }
+
+        private void ProcessGoldenMoleDamagedEvents(FixedUnorderedList<GoldenMoleDamagedNetEventS2C> goldenMoleDamagedNetEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedGoldenMoleDamagedEvents.Clear();
+
+            foreach (var netEvent in goldenMoleDamagedNetEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedGoldenMoleDamagedEvents.Add(netEvent);
+                }
+            }
+
+            if (!_cachedUnprocessedGoldenMoleDamagedEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedGoldenMoleDamagedEvents.Sort();
+                _presentationNetEventsHandler.ProcessGoldenMoleDamagedEvents(_cachedUnprocessedGoldenMoleDamagedEvents);
             }
         }
 
@@ -1641,6 +1819,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 }
             }
         }
+
+        // Score gates come from the layout (no spawn event). Both the model and the view are built by the full-state
+        // sync (SyncMatchSimulationStateCommand); here we only keep the transform of an already-created gate in sync as
+        // it is shoved around. A gate not found yet just hasn't been synced this session, so we skip it rather than add a
+        // viewless model - the next full sync creates both halves together.
+        private void ReconcileScoreGatesFromState(MatchSimulationStateS2C simulationState)
+        {
+            foreach (var scoreGateState in simulationState.ScoreGates.AsSpan())
+            {
+                if (_matchDataService.TryGetScoreGate(scoreGateState.Id, out var scoreGateModel))
+                {
+                    scoreGateModel.Position = scoreGateState.Position.ToUnityVector2();
+                    scoreGateModel.Rotation = scoreGateState.Rotation.ToUnityVector2();
+                }
+            }
+        }
         
         public void OnPacketReceived(NetDataReader reader)
         {
@@ -1660,6 +1854,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 _largestPacketSizeInLast5Seconds = packetSize;
             }
 
+            _networkDiagnosticsService.OnFullTickPacketReceived();
+
             var newPacket = _fullTickPacketsPool.Get();
             newPacket.Deserialize(reader);
             OnFullTickReceived(newPacket);
@@ -1675,11 +1871,17 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _fullTickPacketsUnprocessedByView.Clear();
         }
         
+        // UDP can deliver the same tick twice, and an already buffered tick has nothing new to tell us,
+        // so the duplicate goes straight back to the pool instead of throwing out of PollEvents.
         private void OnFullTickReceived(MatchFullTickPacketS2C fullTickPacket)
         {
             LogService.LogTopic("FullTickPacket accepted received", LogTopicType.ClientNetwork);
             var tick = fullTickPacket.Tick;
-            _fullTickPacketsUnprocessedByLogic.Add(tick, fullTickPacket);
+
+            if (!_fullTickPacketsUnprocessedByLogic.TryAdd(tick, fullTickPacket))
+            {
+                _fullTickPacketsPool.Return(fullTickPacket);
+            }
         }
 
         public void InitExitPoint()
@@ -1733,6 +1935,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         {
             InitStyles();
             GUILayout.Box($"Ping: {_networkManager.Ping}, Last packet: {_lastPacketSize}b, Average: {_averagePacketSizeReceived}b, largest in last 5 seconds: {_largestPacketSizeInLast5Seconds}b", _highVisStyle);
+            GUILayout.Box($"Interpolation decay: {_interpolationDecayService.CurrentDecay:0.0} (drops below the configured value while state packets arrive in bursts)", _highVisStyle);
+            GUILayout.Box(_networkDiagnosticsService.LastReportText, _highVisStyle);
         }
         
         private void InitStyles()
@@ -1915,6 +2119,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPerformHeadbuttDashEvents.Sort();
                 _presentationNetEventsHandler.ProcessPerformHeadbuttDashEvents(_cachedUnprocessedPerformHeadbuttDashEvents);
+            }
+        }
+
+        private void ProcessPerformBarrelDashEvents(FixedUnorderedList<PerformBarrelDashNetEventS2C> netEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPerformBarrelDashEvents.Clear();
+            foreach (var netEvent in netEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPerformBarrelDashEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPerformBarrelDashEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPerformBarrelDashEvents.Sort();
+                _presentationNetEventsHandler.ProcessPerformBarrelDashEvents(_cachedUnprocessedPerformBarrelDashEvents);
             }
         }
 

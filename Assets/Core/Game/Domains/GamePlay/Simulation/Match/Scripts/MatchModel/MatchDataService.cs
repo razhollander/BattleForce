@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Shared.Scripts.Enums;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels;
+using Core.Scripts.Extensions;
 using Core.Scripts.Network;
 using Vector2 = System.Numerics.Vector2;
 
@@ -21,7 +22,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
         private ushort _lastFrigidBlockCreatedId = 0;
         private ushort _lastChickenEggCreatedId = 0;
         private ushort _lastGalacticForceFieldCreatedId = 0;
-        public List<int> DidntPlayYetStageIndexes { get; } = new List<int>();
+        private ushort _lastMoleCreatedId = 0;
+
+        private readonly Dictionary<StageType, List<int>> _didntPlayYetStageIndexesPerStageType = new Dictionary<StageType, List<int>>
+        {
+            { StageType.DeathMatch, new List<int>() },
+            { StageType.WhacAMole, new List<int>() },
+            { StageType.GatePass, new List<int>() },
+        };
+
         public MatchEnvironmentDataService EnvironmentData { get; private set; }
         public HashSet<ushort> TeamIds { get; private set; }
 
@@ -39,7 +48,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
                 sharedGamePlayConfig.MaxTeamsAmount,
                 maxCap.ConcurrentChickenEggs,
                 maxCap.ConcurrentGalacticForceFields,
-                maxCap.ConcurrentFrigidBlocks);
+                maxCap.ConcurrentFrigidBlocks,
+                maxCap.ConcurrentMoles,
+                maxCap.ConcurrentScoreGates,
+                maxCap.ConcurrentEnvironmentGateTraps);
 
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             _simulationState.GemsPerTeamId = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
@@ -64,7 +76,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             TeamIds.Add(teamId);
             _simulationState.GemsPerTeamId.TryAdd(teamId, 0);
             _simulationState.BoltsPerTeam.TryAdd(teamId, 0);
+            _simulationState.StageScorePerTeamId.TryAdd(teamId, 0);
+            _simulationState.StageScorePerPlayerId.TryAdd(playerId, 0);
             return newPlayer;
+        }
+
+        public List<int> GetDidntPlayYetStageIndexes(StageType stageType)
+        {
+            return _didntPlayYetStageIndexesPerStageType[stageType];
         }
 
         public PlayerBulletS2C AddBullet(ushort belongToPlayerId, Vector2 position, Vector2 direction, float moveSpeed, float radius, int createdOnTick)
@@ -99,6 +118,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             powerUpBall.Position = position;
             powerUpBall.Velocity = velocity;
             return powerUpBall;
+        }
+
+        public MoleStateS2C AddMole(ushort moleHoleId, Vector2 position, int emergeOnTick, int disappearOnTick, bool isGolden, byte lives)
+        {
+            ref var mole = ref _simulationState.Moles.AddAndGet();
+            var moleId = (ushort)(++_lastMoleCreatedId % byte.MaxValue);
+            mole.Id = moleId;
+            mole.MoleHoleId = moleHoleId;
+            mole.Position = position;
+            mole.EmergeOnTick = emergeOnTick;
+            mole.IsEmerged = false;
+            mole.DisappearOnTick = disappearOnTick;
+            mole.HideOnTick = MoleStateS2C.NOT_HIDING_TICK;
+            mole.IsGolden = isGolden;
+            mole.RemainingLives = lives;
+            mole.MaxLives = lives;
+            return mole;
+        }
+        
+        public ScoreGateStateS2C AddScoreGate(ushort id, Vector2 position, float rotationDegrees)
+        {
+            ref var scoreGate = ref _simulationState.ScoreGates.AddAndGet();
+            scoreGate.Id = id;
+            scoreGate.Position = position;
+            scoreGate.Rotation = rotationDegrees.ToRadians().AngleToVector();
+            scoreGate.LastScoredTeamId = 0;
+            scoreGate.ScoreMultiplier = 1;
+            return scoreGate;
         }
 
         public TalentSwapFieldS2C AddSwapField(ushort casterPlayerId, int tick, int fieldEndTick)
@@ -149,6 +196,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             fishingRodProjectile.Velocity = velocity;
             fishingRodProjectile.Phase = FishingRodTipPhase.FlyingForward;
             fishingRodProjectile.CaughtEnemyId = 0;
+            fishingRodProjectile.CaughtEnemyType = FishingRodCaughtEnemyType.None;
             fishingRodProjectile.EnemyCaughtArrowDirection = Vector2.Zero;
             return fishingRodProjectile;
         }
