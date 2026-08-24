@@ -8,9 +8,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public Vector2 Position;
         public Vector2 Rotation;
         public ushort LastScoredTeamId; // 0 = never scored; drives the gate tint
-        public byte ScoreMultiplier; // multiplier the next pass will award; drives the x2/x3/x4 indicator
+        public ushort ScoreMultiplier; // multiplier the next pass will award; drives the x2/x3/x4 indicator
 
-        public MatchScoreGateModel(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, byte scoreMultiplier)
+        public MatchScoreGateModel(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, ushort scoreMultiplier)
         {
             Id = id;
             Position = position;

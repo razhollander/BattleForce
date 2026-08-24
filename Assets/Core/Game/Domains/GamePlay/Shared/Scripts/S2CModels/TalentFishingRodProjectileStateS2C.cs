@@ -15,7 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public Vector2 Velocity;
         public FishingRodTipPhase Phase;
         public ushort CaughtEnemyId;
-        public FishingRodCaughtEnemyType CaughtEnemyType; // whether CaughtEnemyId is a player id or a mole id
+        public FishingRodCaughtEnemyType CaughtEnemyType;
         public Vector2 EnemyCaughtArrowDirection;
 
         public void Serialize(NetDataWriter writer)

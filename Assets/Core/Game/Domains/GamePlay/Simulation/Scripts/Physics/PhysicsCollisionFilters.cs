@@ -124,9 +124,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.ScoreGate)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile);
                     break;
-                // The gate is a heavy free body: everything that can shove a wall-like object should be able to shove it,
-                // bullets must stop on it instead of flying through the posts, and its own posts must stop on walls/rocks
-                // instead of being shoved through them.
                 case PhysicsBodyType.ScoreGate:
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerBullet)
@@ -138,9 +135,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Physics
                                     | GetCollisionMask(PhysicsCollisionType.ChickenEgg)
                                     | GetCollisionMask(PhysicsCollisionType.Wall);
                     break;
-                // A mole is a sensor that only needs to notice the things that can whack it: bullets, spaceships carrying a talent that spins whatever it touches, and the projectiles of such talents.
-                // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnEmergedMoleCommand and TryBreakLaidChickenEggOnMolesCommand resolve that overlap instead, each at the moment one of the two is created.
-                case PhysicsBodyType.Mole:
+                case PhysicsBodyType.Mole: // A chicken egg is missing here on purpose - both it and the mole are static bodies, so Box2D never pairs them. TryBreakChickenEggsOnEmergedMoleCommand and TryBreakLaidChickenEggOnMolesCommand resolve that overlap instead, each at the moment one of the two is created.
                     collisionMask = GetCollisionMask(PhysicsCollisionType.PlayerBullet)
                                     | GetCollisionMask(PhysicsCollisionType.PlayerSpaceship)
                                     | GetCollisionMask(PhysicsCollisionType.KOProjectile)

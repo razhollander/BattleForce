@@ -7,15 +7,15 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Models
         public ushort PlayerId;
         public string PlayerName;
         public ushort TeamId;
-        public int MolesHitScore; // this player's contribution to his team's WhacAMole score
+        public int StageScore;
         public PlayerSpaceshipStateS2C Spaceship;
 
-        public MatchPlayerModel(ushort playerId, string playerName, ushort teamId, int molesHitScore, PlayerSpaceshipStateS2C spaceship)
+        public MatchPlayerModel(ushort playerId, string playerName, ushort teamId, int stageScore, PlayerSpaceshipStateS2C spaceship)
         {
             PlayerId = playerId;
             PlayerName = playerName;
             TeamId = teamId;
-            MolesHitScore = molesHitScore;
+            StageScore = stageScore;
             Spaceship = spaceship.GetClone();
         }
     }

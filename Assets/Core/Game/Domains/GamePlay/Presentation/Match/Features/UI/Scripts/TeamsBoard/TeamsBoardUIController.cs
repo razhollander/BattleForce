@@ -31,9 +31,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamBolts(teamId, teamBolts, _stageCancellationTokenProvider.CancellationTokenSource);
         }
 
-        public void UpdateTeamMolesHit(ushort teamId, int molesHit)
+        public void UpdateTeamMolesKilled(ushort teamId, int molesKilled)
         {
-            _view.UpdateTeamMolesHit(teamId, molesHit);
+            _view.UpdateTeamMolesKilled(teamId, molesKilled);
         }
 
         public void UpdateTeamGatePassScore(ushort teamId, int gatePassScore)
@@ -41,9 +41,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _view.UpdateTeamGatePassScore(teamId, gatePassScore);
         }
 
-        public void SetIsMolesHitShown(bool isShown)
+        public void SetIsMolesKilledShown(bool isShown)
         {
-            _view.SetIsMolesHitShown(isShown);
+            _view.SetIsMolesKilledShown(isShown);
         }
 
         public void SetIsGatePassScoreShown(bool isShown)

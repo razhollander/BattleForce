@@ -145,7 +145,7 @@ namespace Core.Scripts.Network
         public int ConcurrentMoles = 32;
         public int MoleHoles = 64;
         public int MoleSpawnedNetEvents = 64;
-        public int MoleHitNetEvents = 64;
+        public int MoleKilledNetEvents = 64;
         public int MoleExpiredNetEvents = 64;
         public int GoldenMoleDamagedNetEvents = 64;
         public int ConcurrentScoreGates = 4;

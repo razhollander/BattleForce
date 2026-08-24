@@ -113,7 +113,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
         private readonly UpdateMatchTimerCountdownCommand _updateMatchTimerCountdownCommand;
         private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
-        private readonly HandleMoleHitNetEventsCommand _handleMoleHitNetEventsCommand;
+        private readonly HandleMoleKilledNetEventsCommand _handleMoleKilledNetEventsCommand;
         private readonly HandleMoleExpiredNetEventsCommand _handleMoleExpiredNetEventsCommand;
         private readonly HandleGoldenMoleDamagedNetEventsCommand _handleGoldenMoleDamagedNetEventsCommand;
         private readonly HandlePlayerPassedScoreGateNetEventsCommand _handlePlayerPassedScoreGateNetEventsCommand;
@@ -214,7 +214,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
             _updateMatchTimerCountdownCommand = commandFactory.CreateCommandVoid<UpdateMatchTimerCountdownCommand>();
             _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
-            _handleMoleHitNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleHitNetEventsCommand>();
+            _handleMoleKilledNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleKilledNetEventsCommand>();
             _handleMoleExpiredNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleExpiredNetEventsCommand>();
             _handleGoldenMoleDamagedNetEventsCommand = commandFactory.CreateCommandVoid<HandleGoldenMoleDamagedNetEventsCommand>();
             _handlePlayerPassedScoreGateNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerPassedScoreGateNetEventsCommand>();
@@ -266,7 +266,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _updateMatchTimerCountdownCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleMoleSpawnedNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleGoldenMoleDamagedNetEventsCommand.Execute();
-            _handleMoleHitNetEventsCommand.Execute();
+            _handleMoleKilledNetEventsCommand.Execute();
             _handlePlayerPassedScoreGateNetEventsCommand.Execute();
             _handleMoleExpiredNetEventsCommand.SetTick(lastProcessedTickFromServer).Execute();
             _handleKOProjectHitPlayerNetEventsCommand.Execute();

@@ -96,33 +96,25 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             LogService.LogTopic("init stage on server side", LogTopicType.ClientNetwork);
             RestartStageData();
             _stageDataService.IncrementStagesEnteredAmount();
-            var stageType = ResolveStageTypeForCurrentStage();
+            var stageType = ResolveStageTypeForStageNumber(_stageDataService.AmountOfStagesEntered);
             _matchDataService.SimulationState.StageType = stageType;
             SetupBonusStageData(stageType);
             var mapSizeMultiplier = _matchDataService.SimulationState.MapSizeMultiplier = _gamePlayConfigService.GamePlayConfig.StageSizeMultiplier;
             CreateEnvironmentLayout(stageType, mapSizeMultiplier);
             SetupPlayers(mapSizeMultiplier);
         }
-
-        // A match opens on a DeathMatch unless the cadence lands a bonus stage on the very first stage
-        // (BonusStageEveryXStages == 1), which is intentionally allowed.
-        private StageType ResolveStageTypeForCurrentStage()
+        
+        private StageType ResolveStageTypeForStageNumber(int stageNumber)
         {
             var gamePlayConfig = _gamePlayConfigService.GamePlayConfig;
-            var currentStageNumber = _stageDataService.AmountOfStagesEntered;
             var isRotationConfigured = gamePlayConfig.AreBonusStagesEnabled && gamePlayConfig.BonusStageEveryXStages > 0;
-            var didReachBonusStage = isRotationConfigured && currentStageNumber % gamePlayConfig.BonusStageEveryXStages == 0;
-
+            var didReachBonusStage = isRotationConfigured && stageNumber % gamePlayConfig.BonusStageEveryXStages == 0;
             return didReachBonusStage ? _bonusStageRotationService.ResolveNextBonusStageType() : StageType.DeathMatch;
         }
-
-        // The bonus score fields (per team + per player) and the countdown end tick are shared by every bonus stage.
-        // The end tick already covers the preparation phase, so a rejoining client can always derive the countdown from it.
+        
         private void SetupBonusStageData(StageType stageType)
         {
             var simulationState = _matchDataService.SimulationState;
-            simulationState.ResetMolesHitPerTeam(_matchDataService.TeamIds);
-            simulationState.ResetMolesHitScoreForAllPlayers();
 
             if (!stageType.IsBonusStage())
             {
@@ -219,11 +211,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             _playersInLavaTrackerService.ClearAllData();
             _teleportGateService.ClearData();
             ClearStageObjectsInSimulationState();
-            _matchDataService.SimulationState.IsInPreparationPhase = true;
-            _matchDataService.SimulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
-            _matchDataService.SimulationState.PreperationPhaseEndedOnTick = 0;
-            _matchDataService.SimulationState.IsInShowoffWinners = false;
-            _matchDataService.SimulationState.CurrentStageWinnerTeamId = 0;
+            var simulationState = _matchDataService.SimulationState;
+            simulationState.IsInPreparationPhase = true;
+            simulationState.PreperationPhaseStartedOnTick = _tickService.CurrentTick;
+            simulationState.PreperationPhaseEndedOnTick = 0;
+            simulationState.IsInShowoffWinners = false;
+            simulationState.CurrentStageWinnerTeamId = 0;
+            simulationState.ResetStageScorePerTeam();
+            simulationState.ResetStageScoreForAllPlayers();
             _playersTalentsManager.ResetAllTalentsData();
             _frigidBlocksController.ResetData();
             _playersPowerUpsManager.RemoveAllPowerUps();

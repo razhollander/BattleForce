@@ -76,7 +76,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel
             TeamIds.Add(teamId);
             _simulationState.GemsPerTeamId.TryAdd(teamId, 0);
             _simulationState.BoltsPerTeam.TryAdd(teamId, 0);
-            _simulationState.MolesHitPerTeamId.TryAdd(teamId, 0);
+            _simulationState.StageScorePerTeamId.TryAdd(teamId, 0);
+            _simulationState.StageScorePerPlayerId.TryAdd(playerId, 0);
             return newPlayer;
         }
 

@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort ProjectileId;
         public ushort CasterPlayerId;
         public ushort CaughtEnemyId;
-        public FishingRodCaughtEnemyType CaughtEnemyType; // whether CaughtEnemyId is a player id or a mole id
+        public FishingRodCaughtEnemyType CaughtEnemyType;
 
         public FishingRodCaughtEnemyNetEventS2C(int occuredOnTick, ushort projectileId, ushort casterPlayerId, ushort caughtEnemyId, FishingRodCaughtEnemyType caughtEnemyType)
         {

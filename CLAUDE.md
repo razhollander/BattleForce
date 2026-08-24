@@ -149,7 +149,7 @@ All network types implement `INetSerializable` with `Serialize(NetDataWriter)` /
 * **Casing:** `ALL_CAPS` (Constants), `PascalCase` (Properties/Enums), `camelCase` (Locals).  
 * **Booleans:** Prefix with question words (`is`, `can`, `has`).  
 * **Specificity:** No abbreviations (`Pref`, `GO`, `Pos`). Include time units in names (e.g., `cooldownInSeconds`).  
-* **Comments:** Code must self-document via long/clear names. Avoid comments, if you have no choice then use Comments to explain *why*, not *what*.
+* **Comments:** Code must self-document via long/clear names. Avoid comments!!! If you have no choice then use Comments to explain *why*, not *what*.
 
 ---
 

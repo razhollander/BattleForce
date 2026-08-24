@@ -334,7 +334,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateFrozenTalentNetEvents = _netEventsDataService.ActivateFrozenTalentNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateFrozenTalentNetEvents = _netEventsDataService.DeactivateFrozenTalentNetEventsPerClient[clientId];
                 _fullTickPacket.MoleSpawnedNetEvents = _netEventsDataService.MoleSpawnedNetEventsPerClient[clientId];
-                _fullTickPacket.MoleHitNetEvents = _netEventsDataService.MoleHitNetEventsPerClient[clientId];
+                _fullTickPacket.MoleKilledNetEvents = _netEventsDataService.MoleKilledNetEventsPerClient[clientId];
                 _fullTickPacket.MoleExpiredNetEvents = _netEventsDataService.MoleExpiredNetEventsPerClient[clientId];
                 _fullTickPacket.GoldenMoleDamagedNetEvents = _netEventsDataService.GoldenMoleDamagedNetEventsPerClient[clientId];
                 _fullTickPacket.PlayerPassedScoreGateNetEvents = _netEventsDataService.PlayerPassedScoreGateNetEventsPerClient[clientId];

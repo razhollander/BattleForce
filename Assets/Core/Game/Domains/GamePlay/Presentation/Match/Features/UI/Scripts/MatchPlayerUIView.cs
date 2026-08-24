@@ -14,8 +14,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private SimpleHealthBar _healthBar;
         [SerializeField] private GameObject _healthBarGameObject;
-        [SerializeField] private TextMeshProUGUI _molesHitScoreText;
-        [SerializeField] private GameObject _molesHitScoreContainer;
+        [SerializeField] private TextMeshProUGUI _molesKilledScoreText;
+        [SerializeField] private GameObject _molesKilledScoreContainer;
         [SerializeField] private TextMeshProUGUI _gatePassScoreText;
         [SerializeField] private GameObject _gatePassScoreContainer;
         [SerializeField]private CanvasGroup _canvasGroup;
@@ -66,14 +66,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _healthBarGameObject.SetActive(false);
         }
         
-        public void ShowMolesHitScore()
+        public void ShowMolesKilledScore()
         {
-            _molesHitScoreContainer.SetActive(true);
+            _molesKilledScoreContainer.SetActive(true);
         }
 
-        public void UpdateMolesHitScore(int molesHitScore)
+        public void UpdateMolesKilledScore(int molesKilledScore)
         {
-            _molesHitScoreText.text = molesHitScore.ToString();
+            _molesKilledScoreText.text = molesKilledScore.ToString();
         }
 
         public void ShowGatePassScore()

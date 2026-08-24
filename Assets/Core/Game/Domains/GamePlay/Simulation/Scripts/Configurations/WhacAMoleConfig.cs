@@ -11,10 +11,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
         public float MoleHoleReuseCooldownSeconds = 1f;
         public float MinMoleLifetimeSeconds = 3f;
         public float MaxMoleLifetimeSeconds = 5f; // zero or negative max means moles never expire on their own
-        public int ScorePerMoleHit = 1;
+        public ushort ScorePerMoleKilled = 1;
         public int MinMolesUntilGoldenMole = 3;
         public int MaxMolesUntilGoldenMole = 6;
         public int GoldenMoleLives = 3;
-        public int GoldenMoleScoreOnKill = 3;
+        public ushort GoldenMoleScoreOnKill = 3;
     }
 }

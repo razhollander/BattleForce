@@ -11,8 +11,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
         [SerializeField] private TextMeshProUGUI _gemCountText;
         [SerializeField] private CountableTextView _boltsCountText;
         [SerializeField] private Image _backgroundImage;
-        [SerializeField] private GameObject _molesHitContainer;
-        [SerializeField] private TextMeshProUGUI _molesHitCountText;
+        [SerializeField] private GameObject _molesKilledContainer;
+        [SerializeField] private TextMeshProUGUI _molesKilledCountText;
         [SerializeField] private GameObject _gatePassScoreContainer;
         [SerializeField] private TextMeshProUGUI _gatePassScoreCountText;
 
@@ -23,14 +23,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
             _boltsCountText.SetNumber(teamBolts);
         }
 
-        public void SetIsMolesHitShown(bool isShown)
+        public void SetIsMolesKilledShown(bool isShown)
         {
-            _molesHitContainer.SetActive(isShown);
+            _molesKilledContainer.SetActive(isShown);
         }
 
-        public void UpdateMolesHit(int molesHit)
+        public void UpdateMolesKilled(int molesKilled)
         {
-            _molesHitCountText.text = molesHit.ToString();
+            _molesKilledCountText.text = molesKilled.ToString();
         }
 
         public void SetIsGatePassScoreShown(bool isShown)

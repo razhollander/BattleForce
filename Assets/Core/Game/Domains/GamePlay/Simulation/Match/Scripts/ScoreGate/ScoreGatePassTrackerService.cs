@@ -42,16 +42,16 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.ScoreGate
 
         public bool IsPassScoreOnCooldown(ushort playerId, ushort scoreGateId, int currentTick)
         {
-            var key = BuildKey(playerId, scoreGateId);
+            var key = BuildPlayIdAndScoreGateIdKey(playerId, scoreGateId);
             return _cooldownEndTickPerPlayerGate.TryGetValue(key, out var cooldownEndTick) && currentTick < cooldownEndTick;
         }
 
         public void StartPassScoreCooldown(ushort playerId, ushort scoreGateId, int cooldownEndTick)
         {
-            _cooldownEndTickPerPlayerGate[BuildKey(playerId, scoreGateId)] = cooldownEndTick;
+            _cooldownEndTickPerPlayerGate[BuildPlayIdAndScoreGateIdKey(playerId, scoreGateId)] = cooldownEndTick;
         }
 
-        private static int BuildKey(ushort playerId, ushort scoreGateId)
+        private static int BuildPlayIdAndScoreGateIdKey(ushort playerId, ushort scoreGateId)
         {
             return (playerId << PLAYER_ID_KEY_SHIFT) | scoreGateId;
         }

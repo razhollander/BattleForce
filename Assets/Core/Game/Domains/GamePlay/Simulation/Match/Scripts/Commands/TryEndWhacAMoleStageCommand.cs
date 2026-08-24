@@ -50,8 +50,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             HideAllMoles();
 
-            var highestMolesHit = GetHighestMolesHit();
-            var winningTeamId = GetLowestTeamIdWithMolesHit(highestMolesHit);
+            var highestMolesKilled = GetHighestMolesKilled();
+            var winningTeamId = GetLowestTeamIdWithMolesKilled(highestMolesKilled);
             AwardGemsByRank();
             _stageEndedCommand
                 .SetWinningTeamId(winningTeamId)
@@ -78,29 +78,29 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             moles.Clear();
         }
 
-        private int GetHighestMolesHit()
+        private int GetHighestMolesKilled()
         {
-            var highestMolesHit = 0;
+            var highestMolesKilled = 0;
 
-            foreach (var kvp in _matchDataService.SimulationState.MolesHitPerTeamId)
+            foreach (var kvp in _matchDataService.SimulationState.StageScorePerTeamId)
             {
-                if (kvp.Value > highestMolesHit)
+                if (kvp.Value > highestMolesKilled)
                 {
-                    highestMolesHit = kvp.Value;
+                    highestMolesKilled = kvp.Value;
                 }
             }
 
-            return highestMolesHit;
+            return highestMolesKilled;
         }
 
         // The stage end event carries a single winner, so ties resolve to the lowest team id to stay deterministic.
-        private ushort GetLowestTeamIdWithMolesHit(int molesHit)
+        private ushort GetLowestTeamIdWithMolesKilled(int molesKilled)
         {
             var winningTeamId = ushort.MaxValue;
 
-            foreach (var kvp in _matchDataService.SimulationState.MolesHitPerTeamId)
+            foreach (var kvp in _matchDataService.SimulationState.StageScorePerTeamId)
             {
-                if (kvp.Value == molesHit && kvp.Key < winningTeamId)
+                if (kvp.Value == molesKilled && kvp.Key < winningTeamId)
                 {
                     winningTeamId = kvp.Key;
                 }
@@ -115,13 +115,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void AwardGemsByRank()
         {
             var simulationState = _matchDataService.SimulationState;
-            var molesHitPerTeamId = simulationState.MolesHitPerTeamId;
+            var stageScorePerTeamId = simulationState.StageScorePerTeamId;
 
-            foreach (var team in molesHitPerTeamId)
+            foreach (var team in stageScorePerTeamId)
             {
                 var teamsStrictlyBelow = 0;
 
-                foreach (var otherTeam in molesHitPerTeamId)
+                foreach (var otherTeam in stageScorePerTeamId)
                 {
                     if (otherTeam.Value < team.Value)
                     {

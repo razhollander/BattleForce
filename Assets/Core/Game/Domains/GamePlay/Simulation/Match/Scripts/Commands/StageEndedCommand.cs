@@ -97,6 +97,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
         private PlayerStateS2C GetTopScoringPlayerInWinningTeam()
         {
+            var stageScorePerPlayerId = _matchDataService.SimulationState.StageScorePerPlayerId;
             PlayerStateS2C topScoringPlayer = null;
 
             foreach (var player in _matchDataService.SimulationState.Players.AsSpan())
@@ -107,8 +108,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
                 }
 
                 // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
-                if (topScoringPlayer == null || player.MolesHitScore > topScoringPlayer.MolesHitScore ||
-                    (player.MolesHitScore == topScoringPlayer.MolesHitScore && player.Id < topScoringPlayer.Id))
+                if (topScoringPlayer == null || stageScorePerPlayerId[player.Id] > stageScorePerPlayerId[topScoringPlayer.Id] ||
+                    (stageScorePerPlayerId[player.Id] == stageScorePerPlayerId[topScoringPlayer.Id] && player.Id < topScoringPlayer.Id))
                 {
                     topScoringPlayer = player;
                 }

@@ -29,7 +29,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public FixedUnorderedList<EnvironmentGateTrapStateS2C> GateTraps;
         public Dictionary<ushort, int> GemsPerTeamId;
         public Dictionary<ushort, int> BoltsPerTeam;
-        public Dictionary<ushort, int> MolesHitPerTeamId;
+        public Dictionary<ushort, ushort> StageScorePerTeamId;
+        public Dictionary<ushort, ushort> StageScorePerPlayerId;
         public FixedOrderedList<ushort> FieldBarriersOrderedByTeamId;
         public int EnvironmentLayoutId;
         public StageType StageType;
@@ -62,7 +63,8 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             GateTraps = new FixedUnorderedList<EnvironmentGateTrapStateS2C>(maxGateTraps);
             GemsPerTeamId = new Dictionary<ushort, int>(maxTeams);
             BoltsPerTeam = new Dictionary<ushort, int>(maxTeams);
-            MolesHitPerTeamId = new Dictionary<ushort, int>(maxTeams);
+            StageScorePerTeamId = new Dictionary<ushort, ushort>(maxTeams);
+            StageScorePerPlayerId = new Dictionary<ushort, ushort>(maxPlayers);
             FieldBarriersOrderedByTeamId = new FixedOrderedList<ushort>(maxTeams);
         }
 
@@ -132,7 +134,13 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 writer.Put(kvp.Value);
             }
 
-            foreach (var kvp in MolesHitPerTeamId)
+            foreach (var kvp in StageScorePerTeamId)
+            {
+                writer.Put(kvp.Key);
+                writer.Put(kvp.Value);
+            }
+
+            foreach (var kvp in StageScorePerPlayerId)
             {
                 writer.Put(kvp.Key);
                 writer.Put(kvp.Value);
@@ -286,12 +294,20 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 BoltsPerTeam.Add(teamId, bolts);
             }
 
-            MolesHitPerTeamId.Clear();
+            StageScorePerTeamId.Clear();
             for (int i = 0; i < amountOfTeams; i++)
             {
                 var teamId = reader.GetUShort();
-                var molesHit = reader.GetInt();
-                MolesHitPerTeamId.Add(teamId, molesHit);
+                var stageScore = reader.GetUShort();
+                StageScorePerTeamId.Add(teamId, stageScore);
+            }
+
+            StageScorePerPlayerId.Clear();
+            for (int i = 0; i < playersCount; i++)
+            {
+                var playerId = reader.GetUShort();
+                var stageScore = reader.GetUShort();
+                StageScorePerPlayerId.Add(playerId, stageScore);
             }
 
             var swapFieldsCount = reader.GetByte();
@@ -1230,31 +1246,30 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             throw new System.Exception($"No gate trap for id {gateTrapId}!");
         }
 
-        public void AddMolesHitForTeam(ushort teamId, int molesHitDelta)
+        public void AddStageScoreForTeam(ushort teamId, ushort stageScoreDelta)
         {
-            MolesHitPerTeamId[teamId] += molesHitDelta;
+            StageScorePerTeamId[teamId] += stageScoreDelta;
         }
 
-        public void ResetMolesHitPerTeam(HashSet<ushort> teamIds)
+        public void ResetStageScorePerTeam()
         {
-            foreach (var teamId in teamIds)
+            foreach (var key in StageScorePerTeamId.Keys)
             {
-                MolesHitPerTeamId[teamId] = 0;
+                StageScorePerTeamId[key] = 0;
             }
         }
 
-        public int AddMolesHitScoreForPlayer(ushort playerId, int scoreDelta)
+        public ushort AddStageScoreForPlayer(ushort playerId, ushort scoreDelta)
         {
-            var player = GetPlayerById(playerId);
-            player.MolesHitScore += scoreDelta;
-            return player.MolesHitScore;
+            StageScorePerPlayerId[playerId] += scoreDelta;
+            return StageScorePerPlayerId[playerId];
         }
 
-        public void ResetMolesHitScoreForAllPlayers()
+        public void ResetStageScoreForAllPlayers()
         {
             foreach (var player in Players.AsSpan())
             {
-                player.MolesHitScore = 0;
+                StageScorePerPlayerId[player.Id] = 0;
             }
         }
 

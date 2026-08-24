@@ -55,7 +55,7 @@ namespace Core.Scripts.Services.AudioService
         WaterGunLoop = 54,
         FishingRodHitWall = 55,
         MoleSpawned = 56,
-        MoleHit = 57,
+        MoleKilled = 57,
         MoleDespawned = 58,
         ScoreGatePassed = 59,
         BarrelDash = 60,

@@ -18,9 +18,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
         public SerializableDictionary<int, EnvironmentLayoutConfig> Configs => _environmentLayoutConfigs;
         
 #endif
-
-        // The DeathMatch layout pool. Kept under its original name so existing assets keep working.
-        public List<int> AvailableLayoutIndexes;
+        
+        public List<int> DeathMatchLayoutIndexes;
         public List<int> WhacAMoleLayoutIndexes;
         public List<int> GatePassLayoutIndexes;
 
@@ -35,7 +34,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.Configs
             {
                 case StageType.WhacAMole: return WhacAMoleLayoutIndexes;
                 case StageType.GatePass: return GatePassLayoutIndexes;
-                default: return AvailableLayoutIndexes;
+                default: return DeathMatchLayoutIndexes;
             }
         }
         

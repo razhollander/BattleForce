@@ -67,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ActivateFrozenTalentNetEventS2C>> ActivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateFrozenTalentNetEventS2C>> DeactivateFrozenTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleSpawnedNetEventS2C>> MoleSpawnedNetEventsPerClient { get; }
-        CapacityDict<long, FixedUnorderedList<MoleHitNetEventS2C>> MoleHitNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<MoleKilledNetEventS2C>> MoleKilledNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PlayerPassedScoreGateNetEventS2C>> PlayerPassedScoreGateNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<GateTrapClosingNetEventS2C>> GateTrapClosingNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<MoleExpiredNetEventS2C>> MoleExpiredNetEventsPerClient { get; }
@@ -156,8 +156,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId);
         void AddDeactivateFrozenTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
         void AddMoleSpawnedNetEvent(int onTick, ushort moleId, ushort moleHoleId, int emergeOnTick, bool isGolden, byte maxLives);
-        void AddMoleHitNetEvent(int onTick, ushort moleId, ushort moleHoleId, ushort byPlayerId, ushort byTeamId, byte scoreGained, int teamMolesHitTotal, int byPlayerMolesHitScoreTotal, bool isGolden);
-        void AddPlayerPassedScoreGateNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, byte scoreGained, byte newScoreMultiplier, ushort teamBonusScoreTotal, ushort byPlayerBonusScoreTotal);
+        void AddMoleKilledNetEvent(int onTick, ushort moleId, ushort moleHoleId, ushort byPlayerId, byte scoreGained, ushort teamMolesKilledTotal, ushort byPlayerMolesKilledScoreTotal, bool isGolden);
+        void AddPlayerPassedScoreGateNetEvent(int onTick, ushort scoreGateId, ushort byPlayerId, byte scoreGained, ushort newScoreMultiplier, ushort teamBonusScoreTotal, ushort byPlayerBonusScoreTotal);
         void AddGateTrapClosingNetEvent(int onTick, ushort gateTrapId, int closedOnTick);
         void AddMoleExpiredNetEvent(int onTick, ushort moleId, ushort moleHoleId, int hideOnTick);
         void AddGoldenMoleDamagedNetEvent(int onTick, ushort moleId, ushort moleHoleId, byte remainingLives, byte maxLives);

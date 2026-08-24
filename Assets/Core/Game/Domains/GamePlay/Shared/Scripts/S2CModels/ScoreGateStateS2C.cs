@@ -12,7 +12,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public Vector2 Position;
         public Vector2 Rotation; // unit facing vector; the gap axis is perpendicular to it
         public ushort LastScoredTeamId; // 0 = never scored; drives the gate tint, survives rejoin
-        public byte ScoreMultiplier; // multiplier the NEXT pass through this gate will award (1 = no bonus); survives rejoin
+        public ushort ScoreMultiplier; // multiplier the NEXT pass through this gate will award (1 = no bonus); survives rejoin
 
         public void Serialize(NetDataWriter writer)
         {
@@ -21,7 +21,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             writer.PutFloat16(Rotation.X);
             writer.PutFloat16(Rotation.Y);
             writer.Put((byte)LastScoredTeamId);
-            writer.Put(ScoreMultiplier);
+            writer.Put((byte)ScoreMultiplier);
         }
 
         public void Deserialize(NetDataReader reader)

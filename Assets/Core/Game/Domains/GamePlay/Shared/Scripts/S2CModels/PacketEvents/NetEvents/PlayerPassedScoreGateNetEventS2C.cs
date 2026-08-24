@@ -10,7 +10,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public ushort ScoreGateId;
         public ushort ByPlayerId;
         public byte ScoreGained;
-        public byte NextScoreMultiplier;
+        public ushort NextScoreMultiplier;
         public ushort TeamBonusScoreTotal;
         public ushort ByPlayerBonusScoreTotal;
 
@@ -20,7 +20,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put((byte)ScoreGateId);
             writer.Put((byte)ByPlayerId);
             writer.Put(ScoreGained);
-            writer.Put(NextScoreMultiplier);
+            writer.Put((byte)NextScoreMultiplier);
             writer.Put(TeamBonusScoreTotal);
             writer.Put(ByPlayerBonusScoreTotal);
         }

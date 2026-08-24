@@ -9,7 +9,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort MoleId;
         public ushort MoleHoleId;
-        public int EmergeOnTick;
+        public int FinishEmergingOnTick;
         public bool IsGolden;
         public byte MaxLives;
 
@@ -18,7 +18,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
             writer.Put((byte)MoleHoleId);
-            writer.Put(EmergeOnTick);
+            writer.Put(FinishEmergingOnTick);
             writer.Put(IsGolden);
             writer.Put(MaxLives);
         }
@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
             MoleHoleId = reader.GetByte();
-            EmergeOnTick = reader.GetInt();
+            FinishEmergingOnTick = reader.GetInt();
             IsGolden = reader.GetBool();
             MaxLives = reader.GetByte();
         }

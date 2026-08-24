@@ -4,6 +4,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.S
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Player.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.TeamsBoard;
+using Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService;
 using Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents;
 using Core.Scripts.Extensions;
 using Core.Scripts.Services.AudioService;
@@ -11,11 +12,12 @@ using CoreDomain.Scripts.Services.CommandFactory;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEvents
 {
-    public class HandleMoleHitNetEventsCommand : BaseCommand, ICommandVoid
+    public class HandleMoleKilledNetEventsCommand : BaseCommand, ICommandVoid
     {
         private const ushort GOLDEN_MOLE_DAMAGE_PER_HIT = 1; // a golden mole loses one life per hit, shown on its damage indicator
 
         private ICachedPresentationEventsService _cachedPresentationEventsService;
+        private IMatchDataService _matchDataService;
         private IMoleControllers _moleControllers;
         private ITeamsBoardUIController _teamsBoardUIController;
         private IAudioService _audioService;
@@ -27,6 +29,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         public override void ResolveDependencies()
         {
             _cachedPresentationEventsService = _diContainer.Resolve<ICachedPresentationEventsService>();
+            _matchDataService = _diContainer.Resolve<IMatchDataService>();
             _moleControllers = _diContainer.Resolve<IMoleControllers>();
             _teamsBoardUIController = _diContainer.Resolve<ITeamsBoardUIController>();
             _audioService = _diContainer.Resolve<IAudioService>();
@@ -38,30 +41,31 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
         public void Execute()
         {
-            var moleHitNetEvents = _cachedPresentationEventsService.MoleHitNetEvents;
+            var moleKilledNetEvents = _cachedPresentationEventsService.MoleKilledNetEvents;
 
-            if (moleHitNetEvents.IsNullOrEmpty())
+            if (moleKilledNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var moleHitNetEvent in moleHitNetEvents)
+            foreach (var moleKilledNetEvent in moleKilledNetEvents)
             {
-                if (moleHitNetEvent.IsGolden && _moleControllers.TryGetMoleHolePosition(moleHitNetEvent.MoleHoleId, out var molePosition))
+                if (moleKilledNetEvent.IsGolden && _moleControllers.TryGetMoleHolePosition(moleKilledNetEvent.MoleHoleId, out var molePosition))
                 {
                     _hitDamageIndicatorEffectController.PlayEffect(GOLDEN_MOLE_DAMAGE_PER_HIT, molePosition);
                 }
                 
-                var playerPosition = _playerControllers.GetPlayerPosition(moleHitNetEvent.ByPlayerId);
-                _scoreGainedEffectController.PlayEffect(moleHitNetEvent.ScoreGained, playerPosition);
+                var playerPosition = _playerControllers.GetPlayerPosition(moleKilledNetEvent.ByPlayerId);
+                _scoreGainedEffectController.PlayEffect(moleKilledNetEvent.ScoreGained, playerPosition);
 
-                _moleControllers.SetMoleHit(moleHitNetEvent.MoleId, moleHitNetEvent.MoleHoleId);
-                _teamsBoardUIController.UpdateTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
-                _playerUIControllers.UpdatePlayerMolesHitScore(moleHitNetEvent.ByPlayerId, moleHitNetEvent.ByPlayerMolesHitScoreTotal);
+                _moleControllers.SetMoleKilled(moleKilledNetEvent.MoleId, moleKilledNetEvent.MoleHoleId);
+                var byTeamId = _matchDataService.GetPlayerTeamId(moleKilledNetEvent.ByPlayerId);
+                _teamsBoardUIController.UpdateTeamMolesKilled(byTeamId, moleKilledNetEvent.TeamMolesKilledTotal);
+                _playerUIControllers.UpdatePlayerMolesKilledScore(moleKilledNetEvent.ByPlayerId, moleKilledNetEvent.ByPlayerMolesKilledScoreTotal);
             }
 
-            _audioService.PlayAudio(AudioClipType.MoleHit);
-            moleHitNetEvents.Clear();
+            _audioService.PlayAudio(AudioClipType.MoleKilled);
+            moleKilledNetEvents.Clear();
         }
     }
 }

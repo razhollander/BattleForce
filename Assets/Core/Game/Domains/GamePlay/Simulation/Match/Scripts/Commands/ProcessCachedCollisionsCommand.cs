@@ -222,9 +222,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             powerUpBallModel.Velocity = relativeVelocity.ReflectFromWall(collisionNormal);
         }
-
-        // The gate is solid, so the solver already shoves it; we only have to reflect the player's velocity because the
-        // player body's velocity is overwritten from state each tick. Also covers a Rock caster, whose body is a PlayerSpaceship.
+        
         private void HandlePlayerScoreGateCollision(PhysicsBodyData objectA, PhysicsBodyData objectB, Contact contact)
         {
             var isPlayerToGate = objectA.PhysicsBodyType == PhysicsBodyType.PlayerSpaceship && objectB.PhysicsBodyType == PhysicsBodyType.ScoreGate;

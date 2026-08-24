@@ -6,10 +6,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
     {
         void InitEntryPoint();
         void InitExitPoint();
-        void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, byte scoreMultiplier, float mapSizeMultiplier);
+        void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, ushort scoreMultiplier, float mapSizeMultiplier);
         void InterpolateScoreGateTransform(ushort id, Vector2 position, Quaternion rotation);
         void SetTeamColor(ushort id, ushort teamId);
-        void SetScoreMultiplier(ushort id, byte scoreMultiplier);
+        void SetScoreMultiplier(ushort id, ushort scoreMultiplier);
         void PlayScoreGatePassedAnimation(ushort id);
         bool TryGetScoreGatePosition(ushort id, out Vector2 position);
         void DestroyAll();

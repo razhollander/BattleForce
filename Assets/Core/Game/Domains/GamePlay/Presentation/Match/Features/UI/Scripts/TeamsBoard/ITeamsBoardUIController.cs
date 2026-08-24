@@ -4,9 +4,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts.Team
     {
         void UpdateTeamGems(ushort teamId, int gems);
         void UpdateTeamBolts(ushort teamId, int teamBolts);
-        void UpdateTeamMolesHit(ushort teamId, int molesHit);
+        void UpdateTeamMolesKilled(ushort teamId, int molesKilled);
         void UpdateTeamGatePassScore(ushort teamId, int gatePassScore);
-        void SetIsMolesHitShown(bool isShown);
+        void SetIsMolesKilledShown(bool isShown);
         void SetIsGatePassScoreShown(bool isShown);
         void CreateTeamBoard(ushort teamId, int teamGems, int teamBolts);
         void DestroyAll();

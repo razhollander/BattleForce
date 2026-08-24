@@ -12,11 +12,13 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
         public int OccuredOnTick;
         public bool IsLocal;
         public FixedClassUnorderedList<PlayerStateS2C> Players;
+        public Dictionary<ushort, int> StageScorePerPlayerId;
         public MatchSimulationStateS2C SimulationState;
 
         public PlayerRejoinAcceptPacketS2C(MaxCap maxCap, int maxTalentsPerPlayer, int maxTeams)
         {
             Players = new FixedClassUnorderedList<PlayerStateS2C>(maxCap.ConcurrentPlayers, ()=>new PlayerStateS2C(maxTalentsPerPlayer, maxCap.ConcurrentLockOnTargets));
+            StageScorePerPlayerId = new Dictionary<ushort, int>(maxCap.ConcurrentPlayers);
             SimulationState = new MatchSimulationStateS2C(maxCap.ConcurrentPlayers, maxCap.ConcurrentBullets, maxTalentsPerPlayer, maxCap.ConcurrentTalentCards, maxCap.ConcurrentPowerUpBalls, maxTeams, maxCap.ConcurrentChickenEggs, maxCap.ConcurrentGalacticForceFields, maxCap.ConcurrentFrigidBlocks, maxCap.ConcurrentMoles, maxCap.ConcurrentScoreGates, maxCap.ConcurrentEnvironmentGateTraps);
         }
 
@@ -29,6 +31,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
             foreach (var player in Players.AsSpan())
             {
                 player.Serialize(writer);
+                writer.Put(StageScorePerPlayerId[player.Id]);
             }
 
             if (IsLocal)
@@ -44,10 +47,12 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
 
             var playersCount = reader.GetByte();
             Players.Clear();
+            StageScorePerPlayerId.Clear();
             for (var i = 0; i < playersCount; i++)
             {
                 var player = Players.AddAndGet();
-                player.Deserialize(reader);;
+                player.Deserialize(reader);
+                StageScorePerPlayerId[player.Id] = reader.GetInt();
             }
 
             if (IsLocal)
@@ -66,6 +71,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents
             OccuredOnTick = 0;
             IsLocal = false;
             Players.Clear();
+            StageScorePerPlayerId.Clear();
         }
     }
 }

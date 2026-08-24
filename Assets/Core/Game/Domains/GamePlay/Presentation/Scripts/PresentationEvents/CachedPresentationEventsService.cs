@@ -22,7 +22,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         public List<PowerUpBallSpawnedNetEventS2C> PowerUpBallSpawnedNetEvents { get; } = new();
         public List<PowerUpBallObtainedNetEventS2C> PowerUpBallObtainedNetEvents { get; } = new();
         public List<MoleSpawnedNetEventS2C> MoleSpawnedNetEvents { get; } = new();
-        public List<MoleHitNetEventS2C> MoleHitNetEvents { get; } = new();
+        public List<MoleKilledNetEventS2C> MoleKilledNetEvents { get; } = new();
         public List<MoleExpiredNetEventS2C> MoleExpiredNetEvents { get; } = new();
         public List<GoldenMoleDamagedNetEventS2C> GoldenMoleDamagedNetEvents { get; } = new();
         public List<PlayerPassedScoreGateNetEventS2C> PlayerPassedScoreGateNetEvents { get; } = new();

@@ -41,11 +41,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
                 case StageType.DeathMatch:
                     break;
                 case StageType.WhacAMole:
-                    newPlayerController.ShowMolesHitScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
+                    newPlayerController.ShowMolesKilledScore(_matchDataService.GetPlayer(playerId).StageScore);
                     newPlayerController.HideHealthBar();
                     break;
                 case StageType.GatePass:
-                    newPlayerController.ShowGatePassScore(_matchDataService.GetPlayer(playerId).MolesHitScore);
+                    newPlayerController.ShowGatePassScore(_matchDataService.GetPlayer(playerId).StageScore);
                     newPlayerController.HideHealthBar();
                     break;
                 default:
@@ -68,9 +68,9 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.UI.Scripts
             _playerControllers[playerId].HideHealthBar();
         }
 
-        public void UpdatePlayerMolesHitScore(ushort playerId, int molesHitScore)
+        public void UpdatePlayerMolesKilledScore(ushort playerId, int molesKilledScore)
         {
-            _playerControllers[playerId].UpdateMolesHitScore(molesHitScore);
+            _playerControllers[playerId].UpdateMolesKilledScore(molesKilledScore);
         }
 
         public void UpdatePlayerGatePassScore(ushort playerId, int gatePassScore)

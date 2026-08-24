@@ -53,7 +53,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<PowerUpBallSpawnedNetEventS2C> _cachedUnprocessedPowerUpBallSpawnedEvents;
         private readonly CapacityList<PowerUpBallObtainedNetEventS2C> _cachedUnprocessedPowerUpBallObtainedEvents;
         private readonly CapacityList<MoleSpawnedNetEventS2C> _cachedUnprocessedMoleSpawnedEvents;
-        private readonly CapacityList<MoleHitNetEventS2C> _cachedUnprocessedMoleHitEvents;
+        private readonly CapacityList<MoleKilledNetEventS2C> _cachedUnprocessedMoleKilledEvents;
         private readonly CapacityList<MoleExpiredNetEventS2C> _cachedUnprocessedMoleExpiredEvents;
         private readonly CapacityList<GoldenMoleDamagedNetEventS2C> _cachedUnprocessedGoldenMoleDamagedEvents;
         private readonly CapacityList<PlayerPassedScoreGateNetEventS2C> _cachedUnprocessedPlayerPassedScoreGateEvents;
@@ -161,7 +161,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedPowerUpBallSpawnedEvents = new CapacityList<PowerUpBallSpawnedNetEventS2C>(networkConfig.MaxCap.PowerUpSpawnedNetEvents);
             _cachedUnprocessedPowerUpBallObtainedEvents = new CapacityList<PowerUpBallObtainedNetEventS2C>(networkConfig.MaxCap.PowerUpObtainedNetEvents);
             _cachedUnprocessedMoleSpawnedEvents = new CapacityList<MoleSpawnedNetEventS2C>(networkConfig.MaxCap.MoleSpawnedNetEvents);
-            _cachedUnprocessedMoleHitEvents = new CapacityList<MoleHitNetEventS2C>(networkConfig.MaxCap.MoleHitNetEvents);
+            _cachedUnprocessedMoleKilledEvents = new CapacityList<MoleKilledNetEventS2C>(networkConfig.MaxCap.MoleKilledNetEvents);
             _cachedUnprocessedMoleExpiredEvents = new CapacityList<MoleExpiredNetEventS2C>(networkConfig.MaxCap.MoleExpiredNetEvents);
             _cachedUnprocessedGoldenMoleDamagedEvents = new CapacityList<GoldenMoleDamagedNetEventS2C>(networkConfig.MaxCap.GoldenMoleDamagedNetEvents);
             _cachedUnprocessedPlayerPassedScoreGateEvents = new CapacityList<PlayerPassedScoreGateNetEventS2C>(networkConfig.MaxCap.PlayerPassedScoreGateNetEvents);
@@ -309,7 +309,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessPowerUpBallSpawnedEvents(latestFullTickPacket.PowerUpSpawnedNetEvents, ignoreEventsNotAboveTick);
             ProcessPowerUpBallObtainedEvents(latestFullTickPacket.PowerUpObtainedNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleSpawnedEvents(latestFullTickPacket.MoleSpawnedNetEvents, ignoreEventsNotAboveTick);
-            ProcessMoleHitEvents(latestFullTickPacket.MoleHitNetEvents, ignoreEventsNotAboveTick);
+            ProcessMoleKilledEvents(latestFullTickPacket.MoleKilledNetEvents, ignoreEventsNotAboveTick);
             ProcessMoleExpiredEvents(latestFullTickPacket.MoleExpiredNetEvents, ignoreEventsNotAboveTick);
             ProcessGoldenMoleDamagedEvents(latestFullTickPacket.GoldenMoleDamagedNetEvents, ignoreEventsNotAboveTick);
             ProcessPlayerPassedScoreGateEvents(latestFullTickPacket.PlayerPassedScoreGateNetEvents, ignoreEventsNotAboveTick);
@@ -1420,22 +1420,22 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        private void ProcessMoleHitEvents(FixedUnorderedList<MoleHitNetEventS2C> moleHitNetEvents, int ignoreEventsNotAboveTick)
+        private void ProcessMoleKilledEvents(FixedUnorderedList<MoleKilledNetEventS2C> moleKilledNetEvents, int ignoreEventsNotAboveTick)
         {
-            _cachedUnprocessedMoleHitEvents.Clear();
+            _cachedUnprocessedMoleKilledEvents.Clear();
 
-            foreach (var netEvent in moleHitNetEvents.AsSpan())
+            foreach (var netEvent in moleKilledNetEvents.AsSpan())
             {
                 if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
                 {
-                    _cachedUnprocessedMoleHitEvents.Add(netEvent);
+                    _cachedUnprocessedMoleKilledEvents.Add(netEvent);
                 }
             }
 
-            if (!_cachedUnprocessedMoleHitEvents.IsNullOrEmpty())
+            if (!_cachedUnprocessedMoleKilledEvents.IsNullOrEmpty())
             {
-                _cachedUnprocessedMoleHitEvents.Sort();
-                _presentationNetEventsHandler.ProcessMoleHitEvents(_cachedUnprocessedMoleHitEvents);
+                _cachedUnprocessedMoleKilledEvents.Sort();
+                _presentationNetEventsHandler.ProcessMoleKilledEvents(_cachedUnprocessedMoleKilledEvents);
             }
         }
 

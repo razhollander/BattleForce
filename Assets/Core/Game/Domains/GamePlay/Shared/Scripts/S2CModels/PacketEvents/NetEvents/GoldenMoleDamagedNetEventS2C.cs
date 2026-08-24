@@ -8,7 +8,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
     {
         public int OccuredOnTick;
         public ushort MoleId;
-        public ushort MoleHoleId; // the hole the damaged mole popped out of, the client redraws that exact hole
+        public ushort MoleHoleId;
         public byte RemainingLives;
         public byte MaxLives;
 

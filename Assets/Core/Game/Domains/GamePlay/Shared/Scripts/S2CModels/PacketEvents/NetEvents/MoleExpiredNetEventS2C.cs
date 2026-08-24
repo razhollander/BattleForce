@@ -9,14 +9,14 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
         public int OccuredOnTick;
         public ushort MoleId;
         public ushort MoleHoleId;
-        public int HideOnTick;
+        public int FinishHidingOnTick;
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(OccuredOnTick);
             writer.Put((byte)MoleId);
             writer.Put((byte)MoleHoleId);
-            writer.Put(HideOnTick);
+            writer.Put(FinishHidingOnTick);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.PacketEvents.NetEv
             OccuredOnTick = reader.GetInt();
             MoleId = reader.GetByte();
             MoleHoleId = reader.GetByte();
-            HideOnTick = reader.GetInt();
+            FinishHidingOnTick = reader.GetInt();
         }
 
         public int CompareTo(MoleExpiredNetEventS2C other)

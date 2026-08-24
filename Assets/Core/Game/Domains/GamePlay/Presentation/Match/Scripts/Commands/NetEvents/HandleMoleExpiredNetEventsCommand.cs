@@ -38,7 +38,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleExpiredNetEvent in moleExpiredNetEvents)
             {
-                var remainingShakeSeconds = (moleExpiredNetEvent.HideOnTick - _tick) * _networkConfig.DeltaTime;
+                var remainingShakeSeconds = (moleExpiredNetEvent.FinishHidingOnTick - _tick) * _networkConfig.DeltaTime;
                 _moleControllers.SetMoleExpiring(moleExpiredNetEvent.MoleId, moleExpiredNetEvent.MoleHoleId, remainingShakeSeconds);
             }
 

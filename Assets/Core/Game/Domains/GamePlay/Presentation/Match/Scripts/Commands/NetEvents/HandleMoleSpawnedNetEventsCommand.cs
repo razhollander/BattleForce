@@ -41,7 +41,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var moleSpawnedNetEvent in moleSpawnedNetEvents)
             {
-                var remainingShakeSeconds = (moleSpawnedNetEvent.EmergeOnTick - _tick) * _networkConfig.DeltaTime;
+                var remainingShakeSeconds = (moleSpawnedNetEvent.FinishEmergingOnTick - _tick) * _networkConfig.DeltaTime;
                 _moleControllers.SetMoleEmergingFromHole(moleSpawnedNetEvent.MoleId, moleSpawnedNetEvent.MoleHoleId, remainingShakeSeconds,
                     moleSpawnedNetEvent.IsGolden, moleSpawnedNetEvent.MaxLives, moleSpawnedNetEvent.MaxLives);
             }

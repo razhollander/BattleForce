@@ -89,13 +89,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var whacAMoleConfig = _gamePlayConfigService.GamePlayConfig.WhacAMole;
             var isGolden = mole.IsGolden;
             var moleHoleId = mole.MoleHoleId;
-            var score = isGolden ? whacAMoleConfig.GoldenMoleScoreOnKill : whacAMoleConfig.ScorePerMoleHit;
+            var score = isGolden ? whacAMoleConfig.GoldenMoleScoreOnKill : whacAMoleConfig.ScorePerMoleKilled;
             simulationState.RemoveMoleById(_moleId);
             _molesSpawnCooldownService.RegisterMoleHoleToBeOnCooldown(moleHoleId, _processedTick);
             _physicsSimulator.RemoveMole(_moleId);
-            simulationState.AddMolesHitForTeam(_byTeamId, score);
-            var byPlayerMolesHitScoreTotal = simulationState.AddMolesHitScoreForPlayer(_byPlayerId, score);
-            _netEventsDataService.AddMoleHitNetEvent(_processedTick, _moleId, moleHoleId, _byPlayerId, _byTeamId, (byte)score, simulationState.MolesHitPerTeamId[_byTeamId], byPlayerMolesHitScoreTotal, isGolden);
+            simulationState.AddStageScoreForTeam(_byTeamId, score);
+            var byPlayerMolesKilledScoreTotal = simulationState.AddStageScoreForPlayer(_byPlayerId, score);
+            _netEventsDataService.AddMoleKilledNetEvent(_processedTick, _moleId, moleHoleId, _byPlayerId, (byte)score, simulationState.StageScorePerTeamId[_byTeamId], byPlayerMolesKilledScoreTotal, isGolden);
         }
     }
 }

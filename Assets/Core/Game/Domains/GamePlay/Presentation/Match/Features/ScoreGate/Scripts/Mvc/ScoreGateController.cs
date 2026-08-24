@@ -11,7 +11,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
         private readonly ScoreGatePool _pool;
         private readonly Transform _parent;
         private ScoreGateView _view;
-        private byte _lastScoreMultiplier;
+        private ushort _lastScoreMultiplier;
 
         public Vector2 Position => _view.Transform.position;
 
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
 
         // The indicator shows what the next pass will award. x1 carries no bonus, so it is left blank and only x2+ shows.
         // A live climb pops the indicator; the initial create/rejoin seed just sets the value without animating.
-        public void SetScoreMultiplier(byte scoreMultiplier, bool shouldPunchOnIncrease)
+        public void SetScoreMultiplier(ushort scoreMultiplier, bool shouldPunchOnIncrease)
         {
             _view.SetMultiplierText(scoreMultiplier > 1 ? $"x{scoreMultiplier}" : string.Empty);
 

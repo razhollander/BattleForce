@@ -235,7 +235,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             var isBonusStage = _simulationState.StageType.IsBonusStage();
             var isWhacAMoleStage = _simulationState.StageType == StageType.WhacAMole;
-            _teamsBoardUIController.SetIsMolesHitShown(isWhacAMoleStage);
+            _teamsBoardUIController.SetIsMolesKilledShown(isWhacAMoleStage);
             bool isGatePassStage = _simulationState.StageType == StageType.GatePass;
             _teamsBoardUIController.SetIsGatePassScoreShown(isGatePassStage);
 
@@ -302,10 +302,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 _matchDataService.AddTeamIdIfDoesntExist(playerTeamId);
                 var teamGems = _simulationState.GemsPerTeamId[playerTeamId];
                 var teamBolts = _simulationState.BoltsPerTeam[playerTeamId];
-                var teamMolesHit = _simulationState.MolesHitPerTeamId[playerTeamId];
+                var teamMolesKilled = _simulationState.StageScorePerTeamId[playerTeamId];
                 _matchDataService.SetTeamBolts(playerTeamId, teamBolts);
                 _matchDataService.SetTeamGems(playerTeamId, teamGems);
-                _matchDataService.SetTeamMolesHit(playerTeamId, teamMolesHit);
+                _matchDataService.SetStageScoreOfTeam(playerTeamId, teamMolesKilled);
             }
         }
 
@@ -343,10 +343,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
                 switch (_simulationState.StageType)
                 {
                     case StageType.WhacAMole:
-                        _teamsBoardUIController.UpdateTeamMolesHit(teamId, _matchDataService.MolesHitPerTeam[teamId]);
+                        _teamsBoardUIController.UpdateTeamMolesKilled(teamId, _matchDataService.StageScorePerTeam[teamId]);
                         break;
                     case StageType.GatePass:
-                        _teamsBoardUIController.UpdateTeamGatePassScore(teamId, _matchDataService.MolesHitPerTeam[teamId]);
+                        _teamsBoardUIController.UpdateTeamGatePassScore(teamId, _matchDataService.StageScorePerTeam[teamId]);
                         break;
                 }
             }
@@ -507,7 +507,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
         {
             foreach (var playerState in _simulationState.Players.AsSpan())
             {
-                _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(_fullTickPacketsHandler.LastProcessedTickFromServer).Execute();
+                var stageScore = _simulationState.StageScorePerPlayerId[playerState.Id];
+                _addMatchPlayerCommand.SetPlayerState(playerState).SetStageScore(stageScore).SetCurrentServerTick(_fullTickPacketsHandler.LastProcessedTickFromServer).Execute();
             }
         }
 

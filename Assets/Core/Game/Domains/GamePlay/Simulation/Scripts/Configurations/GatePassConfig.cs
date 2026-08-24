@@ -4,7 +4,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations
     public class GatePassConfig
     {
         public float StageDurationSeconds = 60f;
-        public int ScorePerPass = 1;
+        public ushort ScorePerPass = 1;
         // Consecutive passes by the same team through a gate multiply the score (x1, x2, ...) up to this cap. A pass by a
         // different team resets that gate's streak back to x1.
         public int MaxGatePassMultiplier = 4;

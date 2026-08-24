@@ -54,14 +54,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
 
             // Previous positions are refreshed even during preparation so the first live tick has a sane baseline,
             // but a crossing only scores once the stage is live.
-            var isLive = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
+            var canScoreInStagePhase = !simulationState.IsInPreparationPhase && !_stageDataService.IsStageEnded;
             var gapHalfWidth = _sharedGamePlayConfig.ScoreGateGapWidth * simulationState.MapSizeMultiplier * 0.5f;
 
             foreach (var player in simulationState.Players.AsSpan())
             {
                 var currentPosition = player.Spaceship.Transform.Position;
 
-                if (isLive && player.Spaceship.IsAlive && _scoreGatePassTrackerService.TryGetPreviousPosition(player.Id, out var previousPosition))
+                if (canScoreInStagePhase && _scoreGatePassTrackerService.TryGetPreviousPosition(player.Id, out var previousPosition))
                 {
                     TryScorePlayerAgainstAllGates(player, previousPosition, currentPosition, gapHalfWidth);
                 }
@@ -74,11 +74,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         {
             // A teleport (Swap, Soul respawn, teleport gate) is an arena-scale one-tick jump; treating its segment as a
             // pass would award a free point, so any implausibly long movement is skipped this tick.
-            var teleportThreshold = _gamePlayConfigService.GamePlayConfig.GatePass.TeleportDetectionSegmentLength * _matchDataService.SimulationState.MapSizeMultiplier;
-            if (Vector2.Distance(previousPosition, currentPosition) > teleportThreshold)
-            {
-                return;
-            }
+            // var teleportThreshold = _gamePlayConfigService.GamePlayConfig.GatePass.TeleportDetectionSegmentLength * _matchDataService.SimulationState.MapSizeMultiplier;
+            // if (Vector2.Distance(previousPosition, currentPosition) > teleportThreshold)
+            // {
+            //     return;
+            // }
 
             var scoreGates = _matchDataService.SimulationState.ScoreGates;
 
@@ -106,20 +106,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var gatePassConfig = _gamePlayConfigService.GamePlayConfig.GatePass;
 
             ref var scoreGate = ref simulationState.GetScoreGateById(scoreGateId);
-
-            // A streak of same-team passes multiplies the score up to the configured cap; a pass by any other team (or the
-            // very first pass on a fresh gate) starts the streak over at x1.
+            
             var isSameTeamStreak = scoreGate.LastScoredTeamId == player.TeamId;
-            var multiplier = isSameTeamStreak ? scoreGate.ScoreMultiplier : (byte)1;
-            var score = gatePassConfig.ScorePerPass * multiplier;
+            var multiplier = isSameTeamStreak ? scoreGate.ScoreMultiplier : (ushort)1;
+            var score =(ushort)(gatePassConfig.ScorePerPass * multiplier);
 
-            simulationState.AddMolesHitForTeam(player.TeamId, score);
-            var teamBonusScoreTotal = simulationState.MolesHitPerTeamId[player.TeamId];
-            var byPlayerBonusScoreTotal = simulationState.AddMolesHitScoreForPlayer(player.Id, score);
+            simulationState.AddStageScoreForTeam(player.TeamId, score);
+            var teamBonusScoreTotal = simulationState.StageScorePerTeamId[player.TeamId];
+            var byPlayerBonusScoreTotal = simulationState.AddStageScoreForPlayer(player.Id, score);
 
             // The stored multiplier is what the NEXT pass will award, so it ratchets up after each scored pass and drives
             // the client's x2/x3/x4 indicator.
-            var nextMultiplier = (byte)Math.Min(multiplier + 1, gatePassConfig.MaxGatePassMultiplier);
+            var nextMultiplier = (ushort) Math.Min(multiplier + 1, gatePassConfig.MaxGatePassMultiplier);
             scoreGate.LastScoredTeamId = player.TeamId;
             scoreGate.ScoreMultiplier = nextMultiplier;
 

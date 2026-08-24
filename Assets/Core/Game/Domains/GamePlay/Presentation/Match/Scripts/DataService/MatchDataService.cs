@@ -46,7 +46,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         public StageType StageType { get; set; }
         public Dictionary<ushort, int> BoltsPerTeam  {get; private set; }
         public Dictionary<ushort, int> GemsPerTeam  {get; private set; }
-        public Dictionary<ushort, int> MolesHitPerTeam  {get; private set; }
+        public Dictionary<ushort, int> StageScorePerTeam  {get; private set; }
         public int WhacAMoleEndTick { get; set; }
 
         public MatchDataService(NetworkConfig networkConfig, SharedGamePlayConfig sharedGamePlayConfig)
@@ -64,7 +64,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TeamIds = new HashSet<ushort>(sharedGamePlayConfig.MaxTeamsAmount);
             BoltsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             GemsPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
-            MolesHitPerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
+            StageScorePerTeam = new Dictionary<ushort, int>(sharedGamePlayConfig.MaxTeamsAmount);
             EnvironmentTeleportPairs = new List<MatchEnvironmentTeleportPairModel>(networkConfig.MaxCap.ConcurrentEvironmentTeleportPairs);
             FieldBarriers = new List<MatchEnvironmentFieldBarrierModel>(networkConfig.MaxCap.ConcurrentFieldBarriers);
             SwapFields = new List<MatchSwapFieldModel>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -201,10 +201,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             return Players.Find(x => x.PlayerId == playerId).TeamId;
         }
 
-        public MatchPlayerModel AddPlayer(PlayerStateS2C playerState)
+        public MatchPlayerModel AddPlayer(PlayerStateS2C playerState, int stageScore)
         {
             var playerTeamId = playerState.TeamId;
-            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, playerState.MolesHitScore, playerState.Spaceship);
+            var newPlayer = new MatchPlayerModel(playerState.Id, playerState.Name, playerTeamId, stageScore, playerState.Spaceship);
             Players.Add(newPlayer);
             return newPlayer;
         }
@@ -214,7 +214,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             TeamIds.Add(teamId);
             BoltsPerTeam.TryAdd(teamId, 0);
             GemsPerTeam.TryAdd(teamId, 0);
-            MolesHitPerTeam.TryAdd(teamId, 0);
+            StageScorePerTeam.TryAdd(teamId, 0);
         }
 
         public MatchEnvironmentGateTrapModel AddGateTrap(MatchEnvironmentGateTrapModel gateTrap)
@@ -327,7 +327,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             Moles.Clear();
             BoltsPerTeam.Clear();
             GemsPerTeam.Clear();
-            MolesHitPerTeam.Clear();
+            StageScorePerTeam.Clear();
             EnvironmentTeleportPairs.Clear();
             FieldBarriers.Clear();
             SwapFields.Clear();
@@ -351,14 +351,14 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             GemsPerTeam[teamId] = totalTeamGems;
         }
 
-        public void SetTeamMolesHit(ushort teamId, int totalTeamMolesHit)
+        public void SetStageScoreOfTeam(ushort teamId, int totalStageScore)
         {
-            MolesHitPerTeam[teamId] = totalTeamMolesHit;
+            StageScorePerTeam[teamId] = totalStageScore;
         }
 
-        public void SetPlayerMolesHitScore(ushort playerId, int totalPlayerMolesHitScore)
+        public void SetPlayerStageScore(ushort playerId, int totalStageScore)
         {
-            GetPlayer(playerId).MolesHitScore = totalPlayerMolesHitScore;
+            GetPlayer(playerId).StageScore = totalStageScore;
         }
 
         public bool IsTeamLeadingInGems(ushort teamId)
@@ -560,7 +560,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
-        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, byte scoreMultiplier)
+        public MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, ushort scoreMultiplier)
         {
             var model = new MatchScoreGateModel(id, position.ToUnityVector2(), rotation.ToUnityVector2(), lastScoredTeamId, scoreMultiplier);
             ScoreGates.Add(model);
@@ -591,7 +591,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
             }
         }
 
-        public void SetScoreGateMultiplier(ushort id, byte scoreMultiplier)
+        public void SetScoreGateMultiplier(ushort id, ushort scoreMultiplier)
         {
             if (TryGetScoreGate(id, out var scoreGate))
             {
@@ -697,8 +697,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
                 }
 
                 // Deterministic tie-break: keep the lowest player id when scores are equal, so server and client agree.
-                if (topScoringPlayer == null || player.MolesHitScore > topScoringPlayer.MolesHitScore ||
-                    (player.MolesHitScore == topScoringPlayer.MolesHitScore && player.PlayerId < topScoringPlayer.PlayerId))
+                if (topScoringPlayer == null || player.StageScore > topScoringPlayer.StageScore ||
+                    (player.StageScore == topScoringPlayer.StageScore && player.PlayerId < topScoringPlayer.PlayerId))
                 {
                     topScoringPlayer = player;
                 }

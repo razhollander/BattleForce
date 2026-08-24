@@ -39,11 +39,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         List<MatchFrigidBlockModel> FrigidBlocks { get; }
         Dictionary<ushort, int> BoltsPerTeam  {get; }
         Dictionary<ushort, int> GemsPerTeam  {get; }
-        Dictionary<ushort, int> MolesHitPerTeam  {get; }
+        Dictionary<ushort, int> StageScorePerTeam  {get; }
         void AddTeamIdIfDoesntExist(ushort teamId);
         MatchPlayerModel GetPlayer(ushort playerId);
         ushort GetPlayerTeamId(ushort playerId);
-        MatchPlayerModel AddPlayer(PlayerStateS2C playerState);
+        MatchPlayerModel AddPlayer(PlayerStateS2C playerState, int stageScore);
         MatchEnvironmentWallModel AddWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentLavaWallModel AddLavalWall(ushort id, Vector2[] points, Vector2 localPosition, Vector2 worldPosition, float worldRotationAngle);
         MatchEnvironmentFieldBarrierModel AddFieldBarrier(ushort id, ushort teamId, Vector2 position, Vector2 size, FieldBarrierShape shape);
@@ -73,8 +73,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         void ClearAll();
         void SetTeamBolts(ushort teamId, int totalTeamBolts);
         void SetTeamGems(ushort teamId, int totalTeamGems);
-        void SetTeamMolesHit(ushort teamId, int totalTeamMolesHit);
-        void SetPlayerMolesHitScore(ushort playerId, int totalPlayerMolesHitScore);
+        void SetStageScoreOfTeam(ushort teamId, int totalStageScore);
+        void SetPlayerStageScore(ushort playerId, int totalStageScore);
         bool IsTeamLeadingInGems(ushort teamId);
         void AddTeleportPair(ushort teleportPairId, ushort gateAId, Vector2 gateAPosition, float gateANormalRotation, ushort gateBId, Vector2 gateBPosition,
             float gateBNormalRotation, Vector2 gateAWorldPosition, float gateAWorldRotation, Vector2 gateBWorldPosition, float gateBWorldRotation, Vector2 size);
@@ -96,10 +96,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.DataService
         MatchFrigidBlockModel AddFrigidBlock(ushort id, ushort casterPlayerId, Vector2 position, Vector2 rotation);
         void RemoveFrigidBlock(ushort id);
         List<MatchScoreGateModel> ScoreGates { get; }
-        MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, byte scoreMultiplier);
+        MatchScoreGateModel AddScoreGate(ushort id, Vector2 position, Vector2 rotation, ushort lastScoredTeamId, ushort scoreMultiplier);
         bool TryGetScoreGate(ushort id, out MatchScoreGateModel scoreGate);
         void SetScoreGateLastScoredTeam(ushort id, ushort teamId);
-        void SetScoreGateMultiplier(ushort id, byte scoreMultiplier);
+        void SetScoreGateMultiplier(ushort id, ushort scoreMultiplier);
         MatchKOProjectileModel GetKOProjectile(ushort id);
         void RemoveKOProjectile(ushort id);
         MatchChickenEggModel GetChickenEgg(ushort id);

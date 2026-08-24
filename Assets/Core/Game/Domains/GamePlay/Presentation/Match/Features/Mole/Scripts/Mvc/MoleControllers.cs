@@ -52,11 +52,11 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mv
             {
                 return;
             }
-
+            
             controller.SetGoldenMoleDamaged(remainingLives, maxLives);
         }
 
-        public void SetMoleHit(ushort moleId, ushort moleHoleId)
+        public void SetMoleKilled(ushort moleId, ushort moleHoleId)
         {
             if (!TryGetHoleOfActiveMole(moleId, moleHoleId, out var controller))
             {

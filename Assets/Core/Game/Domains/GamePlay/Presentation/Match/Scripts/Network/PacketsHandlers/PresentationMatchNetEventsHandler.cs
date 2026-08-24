@@ -45,7 +45,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
 
                     if (!isLocalPlayer)
                     {
-                        _addMatchPlayerCommand.SetPlayerState(playerState).SetCurrentServerTick(currentServerTick).Execute();
+                        var stageScore = playerRejoinAcceptNetEvent.StageScorePerPlayerId[playerState.Id];
+                        _addMatchPlayerCommand.SetPlayerState(playerState).SetStageScore(stageScore).SetCurrentServerTick(currentServerTick).Execute();
                     }
                 }
             }
@@ -284,24 +285,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
-        public void ProcessMoleHitEvents(CapacityList<MoleHitNetEventS2C> moleHitNetEvents)
+        public void ProcessMoleKilledEvents(CapacityList<MoleKilledNetEventS2C> moleKilledNetEvents)
         {
-            if (moleHitNetEvents.IsNullOrEmpty())
+            if (moleKilledNetEvents.IsNullOrEmpty())
             {
                 return;
             }
 
-            foreach (var moleHitNetEvent in moleHitNetEvents)
+            foreach (var moleKilledNetEvent in moleKilledNetEvents)
             {
-                _matchDataService.RemoveMole(moleHitNetEvent.MoleId);
-                _matchDataService.SetTeamMolesHit(moleHitNetEvent.ByTeamId, moleHitNetEvent.TeamMolesHitTotal);
-                _matchDataService.SetPlayerMolesHitScore(moleHitNetEvent.ByPlayerId, moleHitNetEvent.ByPlayerMolesHitScoreTotal);
-                _cachedPresentationEventsService.MoleHitNetEvents.Add(moleHitNetEvent);
+                _matchDataService.RemoveMole(moleKilledNetEvent.MoleId);
+                var byTeamId = _matchDataService.GetPlayerTeamId(moleKilledNetEvent.ByPlayerId);
+                _matchDataService.SetStageScoreOfTeam(byTeamId, moleKilledNetEvent.TeamMolesKilledTotal);
+                _matchDataService.SetPlayerStageScore(moleKilledNetEvent.ByPlayerId, moleKilledNetEvent.ByPlayerMolesKilledScoreTotal);
+                _cachedPresentationEventsService.MoleKilledNetEvents.Add(moleKilledNetEvent);
             }
         }
-
-        // Bonus-score storage is shared with Whac-A-Mole (SetTeamMolesHit / SetPlayerMolesHitScore), so a GatePass pass
-        // updates the same team board and per-player UI. The gate tint uses the client gate model, updated here too.
+        
         public void ProcessPlayerPassedScoreGateEvents(CapacityList<PlayerPassedScoreGateNetEventS2C> playerPassedScoreGateNetEvents)
         {
             if (playerPassedScoreGateNetEvents.IsNullOrEmpty())
@@ -312,8 +312,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             foreach (var playerPassedScoreGateNetEvent in playerPassedScoreGateNetEvents)
             {
                 var byTeamId = _matchDataService.GetPlayerTeamId(playerPassedScoreGateNetEvent.ByPlayerId);
-                _matchDataService.SetTeamMolesHit(byTeamId, playerPassedScoreGateNetEvent.TeamBonusScoreTotal);
-                _matchDataService.SetPlayerMolesHitScore(playerPassedScoreGateNetEvent.ByPlayerId, playerPassedScoreGateNetEvent.ByPlayerBonusScoreTotal);
+                _matchDataService.SetStageScoreOfTeam(byTeamId, playerPassedScoreGateNetEvent.TeamBonusScoreTotal);
+                _matchDataService.SetPlayerStageScore(playerPassedScoreGateNetEvent.ByPlayerId, playerPassedScoreGateNetEvent.ByPlayerBonusScoreTotal);
                 _matchDataService.SetScoreGateLastScoredTeam(playerPassedScoreGateNetEvent.ScoreGateId, byTeamId);
                 _matchDataService.SetScoreGateMultiplier(playerPassedScoreGateNetEvent.ScoreGateId, playerPassedScoreGateNetEvent.NextScoreMultiplier);
                 _cachedPresentationEventsService.PlayerPassedScoreGateNetEvents.Add(playerPassedScoreGateNetEvent);
@@ -336,13 +336,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
                 }
 
                 gateTrapModel.State = GateTrapState.Closing;
-                gateTrapModel.StateEndTick = gateTrapClosingNetEvent.ClosedOnTick;
+                gateTrapModel.StateEndTick = gateTrapClosingNetEvent.FinishClosingOnTick;
                 gateTrapModel.IsWaitingForOpenCooldown = false;
             }
         }
 
         // An expired mole is not gone yet, it only starts its pre-hide shake and stays hittable until it goes into its
-        // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleHitEvents, and one
+        // hole, so the model keeps it here. A mole caught during that shake is dropped by ProcessMoleKilledEvents, and one
         // that hides on its own leaves no event, so its stale model entry is cleared with the rest on the next full sync.
         public void ProcessMoleExpiredEvents(CapacityList<MoleExpiredNetEventS2C> moleExpiredNetEvents)
         {

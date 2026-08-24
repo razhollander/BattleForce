@@ -44,7 +44,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             _parentTransform = null;
         }
 
-        public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, byte scoreMultiplier, float mapSizeMultiplier)
+        public void CreateScoreGate(ushort id, Vector2 position, Quaternion rotation, ushort lastScoredTeamId, ushort scoreMultiplier, float mapSizeMultiplier)
         {
             if (_controllers.ContainsKey(id))
             {
@@ -78,7 +78,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scrip
             }
         }
 
-        public void SetScoreMultiplier(ushort id, byte scoreMultiplier)
+        public void SetScoreMultiplier(ushort id, ushort scoreMultiplier)
         {
             if (_controllers.TryGetValue(id, out var controller))
             {
