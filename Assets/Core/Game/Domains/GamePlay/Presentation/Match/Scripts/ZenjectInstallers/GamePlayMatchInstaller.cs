@@ -21,6 +21,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Sc
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.GalacticPullStar.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HitDamageIndicatorEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Mole.Scripts.Mvc;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoveDestinationPointIndicator.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGainedEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.PreparationPhaseCountdown.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MatchTimerCountdown.Scripts;
@@ -76,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
         [SerializeField] private GainBoltEffectView gainBoltEffectViewPrefab;
         [SerializeField] private HitDamageIndicatorEffectView _hitDamageIndicatorEffectViewPrefab;
         [SerializeField] private ScoreGainedEffectView _scoreGainedEffectViewPrefab;
+        [SerializeField] private MoveDestinationPointIndicatorView _moveDestinationPointIndicatorViewPrefab;
         [SerializeField] private PreparationPhaseCountdownView _preparationPhaseCountdownView;
         [SerializeField] private MatchTimerCountdownView _matchTimerCountdownView;
         [SerializeField] private MoleView _moleViewPrefab;
@@ -141,6 +143,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.ZenjectInstaller
             Container.BindInterfacesTo<GainBoltEffectController>().AsSingle().WithArguments(gainBoltEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<HitDamageIndicatorEffectController>().AsSingle().WithArguments(_hitDamageIndicatorEffectViewPrefab).NonLazy();
             Container.BindInterfacesTo<ScoreGainedEffectController>().AsSingle().WithArguments(_scoreGainedEffectViewPrefab).NonLazy();
+            Container.BindInterfacesTo<MoveDestinationPointIndicatorController>().AsSingle().WithArguments(_moveDestinationPointIndicatorViewPrefab).NonLazy();
             Container.BindInterfacesTo<PreparationPhaseCountdownController>().AsSingle().WithArguments(_preparationPhaseCountdownView).NonLazy();
             Container.BindInterfacesTo<MatchTimerCountdownController>().AsSingle().WithArguments(_matchTimerCountdownView).NonLazy();
             Container.BindInterfacesTo<MoleControllers>().AsSingle().WithArguments(_moleViewPrefab).NonLazy();

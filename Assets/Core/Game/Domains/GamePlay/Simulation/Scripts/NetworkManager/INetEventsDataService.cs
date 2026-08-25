@@ -79,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         CapacityDict<long, FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>> ActivateHeadbuttChargingNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PerformHeadbuttDashNetEventS2C>> PerformHeadbuttDashNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<PerformBarrelDashNetEventS2C>> PerformBarrelDashNetEventsPerClient { get; }
+        CapacityDict<long, FixedUnorderedList<PlayerSetMoveDestinationPointNetEventS2C>> PlayerSetMoveDestinationPointNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>> HeadbuttHitEnemyNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>> DeactivateHeadbuttTalentNetEventsPerClient { get; }
         CapacityDict<long, FixedUnorderedList<LayChickenEggNetEventS2C>> LayChickenEggNetEventsPerClient { get; }
@@ -186,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager
         void AddActivateHeadbuttChargingNetEvent(int onTick, ushort casterPlayerId);
         void AddPerformHeadbuttDashNetEvent(int onTick, ushort casterPlayerId);
         void AddPerformBarrelDashNetEvent(int onTick, ushort casterPlayerId);
+        void AddPlayerSetMoveDestinationPointNetEvent(int onTick, ushort playerId, Vector2 destinationPoint, long clientId);
         void AddHeadbuttHitEnemyNetEvent(int onTick, ushort casterPlayerId, ushort enemyPlayerId);
         void AddDeactivateHeadbuttTalentNetEvent(int onTick, ushort casterPlayerId, int talentCooldownEndTick);
     }

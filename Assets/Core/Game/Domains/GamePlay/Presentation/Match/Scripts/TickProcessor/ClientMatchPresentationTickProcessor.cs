@@ -87,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleActivateHeadbuttChargingNetEventsCommand _handleActivateHeadbuttChargingNetEventsCommand;
         private readonly HandlePerformHeadbuttDashNetEventsCommand _handlePerformHeadbuttDashNetEventsCommand;
         private readonly HandlePerformBarrelDashNetEventsCommand _handlePerformBarrelDashNetEventsCommand;
+        private readonly HandlePlayerSetMoveDestinationPointNetEventsCommand _handlePlayerSetMoveDestinationPointNetEventsCommand;
         private readonly HandleDeactivateHeadbuttTalentNetEventsCommand _handleDeactivateHeadbuttTalentNetEventsCommand;
         private readonly HandleHeadbuttHitEnemyNetEventsCommand _handleHeadbuttHitEnemyNetEventsCommand;
         private readonly HandleLayChickenEggNetEventsCommand _handleLayChickenEggNetEventsCommand;
@@ -187,6 +188,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateHeadbuttChargingNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateHeadbuttChargingNetEventsCommand>();
             _handlePerformHeadbuttDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformHeadbuttDashNetEventsCommand>();
             _handlePerformBarrelDashNetEventsCommand = commandFactory.CreateCommandVoid<HandlePerformBarrelDashNetEventsCommand>();
+            _handlePlayerSetMoveDestinationPointNetEventsCommand = commandFactory.CreateCommandVoid<HandlePlayerSetMoveDestinationPointNetEventsCommand>();
             _handleDeactivateHeadbuttTalentNetEventsCommand = commandFactory.CreateCommandVoid<HandleDeactivateHeadbuttTalentNetEventsCommand>();
             _handleHeadbuttHitEnemyNetEventsCommand = commandFactory.CreateCommandVoid<HandleHeadbuttHitEnemyNetEventsCommand>();
             _handleLayChickenEggNetEventsCommand = commandFactory.CreateCommandVoid<HandleLayChickenEggNetEventsCommand>();
@@ -296,6 +298,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateHeadbuttChargingNetEventsCommand.Execute();
             _handlePerformHeadbuttDashNetEventsCommand.Execute();
             _handlePerformBarrelDashNetEventsCommand.Execute();
+            _handlePlayerSetMoveDestinationPointNetEventsCommand.Execute();
             _handleDeactivateHeadbuttTalentNetEventsCommand.Execute();
             _handleHeadbuttHitEnemyNetEventsCommand.Execute();
             _handleLayChickenEggNetEventsCommand.Execute(); // must be after _handleTalentSwitchNetEventsCommand.Execute();

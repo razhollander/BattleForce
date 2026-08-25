@@ -9,6 +9,9 @@ public class SharedGamePlayConfig : ScriptableObject
 {
     [EditableRef] public DefaultMatchEnterDataConfig DefaultMatchEnterDataConfig;
     public int MaxConcurrentTalentsForPlayer = 3;
+
+    public bool ShouldMoveWithMouse; // keyboard players only - a gamepad player keeps steering with the stick
+
     public int MaxTeamsAmount = 4;
     [EditableRef] public EnvironmentConfig Environment; 
     public MatchMakingEnvironmentLayoutConfig MatchMakingEnvironment;

@@ -72,6 +72,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
                 playerInputDataC2S.IsTalentCInputPressed = calculatedInputs.IsTalentCInputPressed;
                 playerInputDataC2S.IsPowerUpInputPressed = calculatedInputs.IsPowerUpInputPressed;
                 playerInputDataC2S.IsBarrelDashInputPressed = calculatedInputs.IsBarrelDashInputPressed;
+                playerInputDataC2S.IsMoveToPointInputPressed = calculatedInputs.IsMoveToPointInputPressed;
                 playerInputDataC2S.AimDirection = calculatedInputs.AimDirection;
                 playerInputDataC2S.IsUsingMouseAim = calculatedInputs.IsUsingMouseAim;
                 playerInputDataC2S.MouseWorldPosition = calculatedInputs.MouseWorldPosition;

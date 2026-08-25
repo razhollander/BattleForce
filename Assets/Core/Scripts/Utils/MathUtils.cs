@@ -8,6 +8,7 @@ namespace CoreDomain.Scripts.Utils
     {
         // Threshold in radians (e.g., 45 degrees is ~0.785 radians)
         private const float TurnThresholdRad = 0.1f;
+        private const float DIRECTION_DEADZONE_LENGTH_SQUARED = 0.01f;
         private const float TwoPI = MathF.PI * 2f;
 
         public static Vector3 GetPerpendicularDirection(Vector2 startPoint, Vector2 endPoint)
@@ -151,33 +152,38 @@ namespace CoreDomain.Scripts.Utils
                 return p1 + t * (p2 - p1);
             }
             
+            /// <summary>
+            /// The shortest turn that takes fromDirection onto toDirection. Positive is counter-clockwise, matching the
+            /// direction Vector2.Rotate turns by.
+            /// </summary>
+            public static float GetSignedShortestAngleRadians(System.Numerics.Vector2 fromDirection, System.Numerics.Vector2 toDirection)
+            {
+                var from = fromDirection.NormalizeSafe();
+                var to = toDirection.NormalizeSafe();
+                var dot = System.Numerics.Vector2.Dot(from, to);
+                var determinant = from.X * to.Y - from.Y * to.X;
+
+                return (float) Math.Atan2(determinant, dot);
+            }
+
+            public static float GetSignedShortestAngleDegrees(System.Numerics.Vector2 fromDirection, System.Numerics.Vector2 toDirection)
+            {
+                return GetSignedShortestAngleRadians(fromDirection, toDirection) * Mathf.Rad2Deg;
+            }
+
             public static (bool shouldChangeDirectionLocalRight, bool shouldChangeDirectionLocalLeft) GetDirectionChangeInputs(
                 System.Numerics.Vector2 currentMovementDirection,
                 System.Numerics.Vector2 desiredMovementDiretion)
             {
-                // 1. Deadzone check: avoid jitter or NaN errors when stick is barely touched
-                if (currentMovementDirection.LengthSquared() < 0.01f || desiredMovementDiretion.LengthSquared() < 0.01f)
+                // A barely touched stick would otherwise jitter the ship or normalize into a NaN
+                var isEitherDirectionInDeadzone = currentMovementDirection.LengthSquared() < DIRECTION_DEADZONE_LENGTH_SQUARED
+                                                 || desiredMovementDiretion.LengthSquared() < DIRECTION_DEADZONE_LENGTH_SQUARED;
+                if (isEitherDirectionInDeadzone)
                 {
                     return (false, false);
                 }
 
-                // 2. Normalize to treat these as pure directions
-                var v1 = currentMovementDirection.NormalizeSafe();
-                var v2 = desiredMovementDiretion.NormalizeSafe();
-
-                // 3. The Math:
-                // Dot product = cos(theta)
-                // Determinant (Perp-Dot) = sin(theta)
-                float dot = System.Numerics.Vector2.Dot(v1, v2);
-                float det = v1.X * v2.Y - v1.Y * v2.X;
-
-                // Atan2 returns the signed angle in radians (-PI to PI).
-                // This is inherently the shortest arc between the two vectors.
-                float shortestAngleInRadians = (float) Math.Atan2(det, dot);
-
-                // 4. Threshold Comparison
-                // Positive result means the target is to the "Left" (Counter-Clockwise)
-                // Negative result means the target is to the "Right" (Clockwise)
+                var shortestAngleInRadians = GetSignedShortestAngleRadians(currentMovementDirection, desiredMovementDiretion);
                 bool shouldChangeLeft = shortestAngleInRadians > TurnThresholdRad;
                 bool shouldChangeRight = shortestAngleInRadians < -TurnThresholdRad;
 

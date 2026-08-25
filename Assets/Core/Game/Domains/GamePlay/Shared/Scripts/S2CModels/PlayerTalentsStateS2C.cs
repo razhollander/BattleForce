@@ -117,6 +117,18 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return true;
         }
 
+        public bool IsSelectedTalentBlockingRotation()
+        {
+            if (!TryGetCurrentSelectedTalent(out var selectedTalent))
+            {
+                return false;
+            }
+
+            return selectedTalent.IsCurrentlyAiming
+                   || selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true}
+                   || selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true};
+        }
+
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)SelectedTalentIndex);

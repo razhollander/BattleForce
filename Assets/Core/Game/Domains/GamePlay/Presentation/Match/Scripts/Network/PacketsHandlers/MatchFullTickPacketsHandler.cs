@@ -100,6 +100,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
         private readonly CapacityList<ActivateHeadbuttChargingNetEventS2C> _cachedUnprocessedActivateHeadbuttChargingEvents;
         private readonly CapacityList<PerformHeadbuttDashNetEventS2C> _cachedUnprocessedPerformHeadbuttDashEvents;
         private readonly CapacityList<PerformBarrelDashNetEventS2C> _cachedUnprocessedPerformBarrelDashEvents;
+        private readonly CapacityList<PlayerSetMoveDestinationPointNetEventS2C> _cachedUnprocessedPlayerSetMoveDestinationPointEvents;
         private readonly CapacityList<HeadbuttHitEnemyNetEventS2C> _cachedUnprocessedHeadbuttHitEnemyEvents;
         private readonly CapacityList<DeactivateHeadbuttTalentNetEventS2C> _cachedUnprocessedDeactivateHeadbuttTalentEvents;
         private readonly CapacityList<CreateMagneticPullFieldNetEventS2C> _cachedUnprocessedCreateMagenticPullFieldEvents;
@@ -208,6 +209,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             _cachedUnprocessedActivateHeadbuttChargingEvents = new CapacityList<ActivateHeadbuttChargingNetEventS2C>(networkConfig.MaxCap.ActivateHeadbuttChargingNetEvents);
             _cachedUnprocessedPerformHeadbuttDashEvents = new CapacityList<PerformHeadbuttDashNetEventS2C>(networkConfig.MaxCap.PerformHeadbuttDashNetEvents);
             _cachedUnprocessedPerformBarrelDashEvents = new CapacityList<PerformBarrelDashNetEventS2C>(networkConfig.MaxCap.PerformBarrelDashNetEvents);
+            _cachedUnprocessedPlayerSetMoveDestinationPointEvents = new CapacityList<PlayerSetMoveDestinationPointNetEventS2C>(networkConfig.MaxCap.PlayerSetMoveDestinationPointNetEvents);
             _cachedUnprocessedHeadbuttHitEnemyEvents = new CapacityList<HeadbuttHitEnemyNetEventS2C>(networkConfig.MaxCap.HeadbuttHitEnemyNetEvents);
             _cachedUnprocessedDeactivateHeadbuttTalentEvents = new CapacityList<DeactivateHeadbuttTalentNetEventS2C>(networkConfig.MaxCap.DeactivateHeadbuttTalentNetEvents);
             _cachedUnprocessedCreateMagenticPullFieldEvents = new CapacityList<CreateMagneticPullFieldNetEventS2C>(networkConfig.MaxCap.CreateMagneticPullFieldNetEvents);
@@ -343,6 +345,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             ProcessActivateHeadbuttChargingEvents(latestFullTickPacket.ActivateHeadbuttChargingNetEvents, ignoreEventsNotAboveTick);
             ProcessPerformHeadbuttDashEvents(latestFullTickPacket.PerformHeadbuttDashNetEvents, ignoreEventsNotAboveTick);
             ProcessPerformBarrelDashEvents(latestFullTickPacket.PerformBarrelDashNetEvents, ignoreEventsNotAboveTick);
+            ProcessPlayerSetMoveDestinationPointEvents(latestFullTickPacket.PlayerSetMoveDestinationPointNetEvents, ignoreEventsNotAboveTick);
             ProcessHeadbuttHitEnemyEvents(latestFullTickPacket.HeadbuttHitEnemyNetEvents, ignoreEventsNotAboveTick);
             ProcessDeactivateHeadbuttTalentEvents(latestFullTickPacket.DeactivateHeadbuttTalentNetEvents, ignoreEventsNotAboveTick);
             ProcessCreateMagenticPullFieldEvents(latestFullTickPacket.CreateMagneticPullFieldNetEvents, ignoreEventsNotAboveTick);
@@ -2136,6 +2139,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             {
                 _cachedUnprocessedPerformBarrelDashEvents.Sort();
                 _presentationNetEventsHandler.ProcessPerformBarrelDashEvents(_cachedUnprocessedPerformBarrelDashEvents);
+            }
+        }
+
+        private void ProcessPlayerSetMoveDestinationPointEvents(FixedUnorderedList<PlayerSetMoveDestinationPointNetEventS2C> netEvents, int ignoreEventsNotAboveTick)
+        {
+            _cachedUnprocessedPlayerSetMoveDestinationPointEvents.Clear();
+            foreach (var netEvent in netEvents.AsSpan())
+            {
+                if (netEvent.OccuredOnTick > ignoreEventsNotAboveTick)
+                {
+                    _cachedUnprocessedPlayerSetMoveDestinationPointEvents.Add(netEvent);
+                }
+            }
+            if (!_cachedUnprocessedPlayerSetMoveDestinationPointEvents.IsNullOrEmpty())
+            {
+                _cachedUnprocessedPlayerSetMoveDestinationPointEvents.Sort();
+                _presentationNetEventsHandler.ProcessPlayerSetMoveDestinationPointEvents(_cachedUnprocessedPlayerSetMoveDestinationPointEvents);
             }
         }
 

@@ -1206,6 +1206,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Network.PacketsH
             }
         }
 
+        public void ProcessPlayerSetMoveDestinationPointEvents(CapacityList<PlayerSetMoveDestinationPointNetEventS2C> netEvents)
+        {
+            if (netEvents.IsNullOrEmpty()) return;
+
+            foreach (var netEvent in netEvents)
+            {
+                _cachedPresentationEventsService.PlayerSetMoveDestinationPointNetEvents.Add(netEvent);
+            }
+        }
+
         public void ProcessHeadbuttHitEnemyEvents(CapacityList<HeadbuttHitEnemyNetEventS2C> netEvents)
         {
             if (netEvents.IsNullOrEmpty()) return;

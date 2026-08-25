@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultMatchEnterDataConfig: {fileID: 11400000, guid: 5dfa3e6aacc604fef8e276345990f64b, type: 2}
   MaxConcurrentTalentsForPlayer: 3
+  ShouldMoveWithMouse: 1
   MaxTeamsAmount: 4
   Environment: {fileID: 11400000, guid: c491afc827cee4afbac25f4ed3b7c5b8, type: 2}
   MatchMakingEnvironment:
@@ -37,6 +38,7 @@ MonoBehaviour:
   LockOnTargetDurationInSeconds: 0.65
   HeadbuttMaxChargeDurationSeconds: 2
   MoleHoleShakeDurationSeconds: 0.6
+  GoldenMoleDamagePerHit: 1
   MoleHideShakeDurationSeconds: 1
   ScoreGatePostSize: {x: 1.5, y: 1.5}
   ScoreGateGapWidth: 4

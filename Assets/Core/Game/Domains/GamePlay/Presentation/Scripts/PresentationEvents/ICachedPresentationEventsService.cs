@@ -69,6 +69,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.PresentationEvents
         List<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents { get; }
         List<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents { get; }
         List<PerformBarrelDashNetEventS2C> PerformBarrelDashNetEvents { get; }
+        List<PlayerSetMoveDestinationPointNetEventS2C> PlayerSetMoveDestinationPointNetEvents { get; }
         List<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents { get; }
         List<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents { get; }
         List<CreateMagneticPullFieldNetEventS2C> CreateMagenticPullFieldNetEvents { get; }

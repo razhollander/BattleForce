@@ -4,10 +4,8 @@ using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.MatchModel;
-using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PowerUp;
 using Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Talent;
-using Core.Game.Domains.GamePlay.Simulation.Scripts.Configurations;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -34,6 +32,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IMatchDataService _matchDataService;
         private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
+        private readonly SharedGamePlayConfig _sharedGamePlayConfig;
 
         private readonly INetEventsDataService _netEventsDataService;
         private readonly IPhysicsSimulator _physicsSimulator;
@@ -47,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly CapacityDict<long, FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsPerClient;
         private readonly CapacityDict<long, int> _heighestProcessedTickPerClient;
         private readonly CapacityDict<long, MatchPlayersInputPacketC2S> _lastProcessedInputPerClient;
+        private readonly CapacityDict<long, int> _lastProcessedInputTickPerClient;
         private readonly ConcurrentPool<MatchPlayersInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<MatchPlayersInputPacketC2S> _earliestInputPacketsPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>> _inputsListsPool;
@@ -56,6 +56,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         private readonly IPlaybackRecorderService _playerbackRecorderService;
         private TryShootLockedOnTargetsCommand _tryShootLockedOnTargetsCommand;
         private TryPerformBarrelDashCommand _tryPerformBarrelDashCommand;
+        private TrySetPlayerMoveDestinationPointCommand _trySetPlayerMoveDestinationPointCommand;
+        private RotatePlayerTowardsMoveDestinationPointCommand _rotatePlayerTowardsMoveDestinationPointCommand;
 
         public bool DidReceiveAnyInputFromClient(long clientId)
         {
@@ -65,12 +67,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
         public MatchPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchDataService matchDataService,
             ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, ICommandFactory commandFactory,
             IPlayersTalentsManager playersTalentsManager, IPlaybackRecorderService playerbackRecorderService, ISimulationInputService simulationInputService, IClientsNetworkDataService clientsNetworkDataService,
-            IPlayersPowerUpsManager playersPowerUpsManager, IPlayersMouseDataService playersMouseDataService, IRandomPlayersInputService randomPlayersInputService)
+            IPlayersPowerUpsManager playersPowerUpsManager, IPlayersMouseDataService playersMouseDataService, IRandomPlayersInputService randomPlayersInputService, SharedGamePlayConfig sharedGamePlayConfig)
         {
             _networkManager = networkManager;
             _matchDataService = matchDataService;
             _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
+            _sharedGamePlayConfig = sharedGamePlayConfig;
             _netEventsDataService = netEventsDataService;
             _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
@@ -84,6 +87,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _clientsNetworkDataService = clientsNetworkDataService;
             _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
+            _lastProcessedInputTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _inputsPerClient = new CapacityDict<long, FixedClassUnorderedList<MatchPlayersInputPacketC2S>>(networkConfig.MaxCap.ConcurrentPlayers);
             var inputPacketsSavedPerPlayer = networkConfig.MaxCap.PlayersInputsPackets / networkConfig.MaxCap.ConcurrentPlayers;
             _inputsListsPool = new ConcurrentPool<FixedClassUnorderedList<MatchPlayersInputPacketC2S>>(() => new FixedClassUnorderedList<MatchPlayersInputPacketC2S>(inputPacketsSavedPerPlayer, () => new MatchPlayersInputPacketC2S(networkConfig.MaxCap.ConcurrentPlayers)), networkConfig.MaxCap.ConcurrentPlayers);
@@ -99,6 +103,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _updateSubscriptionService.RegisterGuiUpdatable(this);
             _tryShootLockedOnTargetsCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnTargetsCommand>();
             _tryPerformBarrelDashCommand = _commandFactory.CreateCommandVoid<TryPerformBarrelDashCommand>();
+            _trySetPlayerMoveDestinationPointCommand = _commandFactory.CreateCommandVoid<TrySetPlayerMoveDestinationPointCommand>();
+            _rotatePlayerTowardsMoveDestinationPointCommand = _commandFactory.CreateCommandVoid<RotatePlayerTowardsMoveDestinationPointCommand>();
         }
 
         public void InitExitPoint()
@@ -109,11 +115,39 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
         public ProcessPlayersInputsResult ProcessInputs(int processedTick, float deltaTime)
         {
+            DiscardInputPacketsAlreadyProcessed();
             KeepLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
             _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
             _cachedProcessPlayersInputsResult.EarliestInputsPerClient = ProcessEarliestInputsPacketPerClient(processedTick, deltaTime); // todo move to a new command?
 
             return _cachedProcessPlayersInputsResult;
+        }
+
+        // Applying a packet the server already moved past walks every held button back down and then up again on the next
+        // packet, which reads as a fresh press. The jitter buffer still runs deliberately behind.
+        private void DiscardInputPacketsAlreadyProcessed()
+        {
+            foreach (var kvp in _inputsPerClient)
+            {
+                if (!_lastProcessedInputTickPerClient.TryGetValue(kvp.Key, out var lastProcessedInputTick))
+                {
+                    continue;
+                }
+
+                DiscardInputPacketsNotNewerThanTick(kvp.Value, lastProcessedInputTick);
+            }
+        }
+
+        private void DiscardInputPacketsNotNewerThanTick(FixedClassUnorderedList<MatchPlayersInputPacketC2S> inputsOfClient, int lastProcessedInputTick)
+        {
+            for (var i = inputsOfClient.Count - 1; i >= 0; i--)
+            {
+                var isPacketAlreadySuperseded = inputsOfClient[i].Tick <= lastProcessedInputTick;
+                if (isPacketAlreadySuperseded)
+                {
+                    inputsOfClient.RemoveAt(i);
+                }
+            }
         }
 
         private void KeepLatestPacketsForBuffer(int bufferAmount)
@@ -153,6 +187,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 }
                 
                 lastProcessedClientInsputs.CopyFrom(currentPacket);
+                _lastProcessedInputTickPerClient[clientId] = currentPacket.Tick;
                 
                 var playerInputs = currentPacket.PlayerInputs.AsSpan();
                 for (var inputIndex = 0; inputIndex < playerInputs.Length; inputIndex++)
@@ -181,7 +216,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                     playerState.Spaceship.AimDirection = playerInput.AimDirection;
                     _playersMouseDataService.SetPlayerMouseData(playerId, playerInput.IsUsingMouseAim, playerInput.MouseWorldPosition);
-                    UpdatePlayerDirection(playerInput, playerState);
+                    UpdatePlayerDirection(processedTick, clientId, playerInput, playerState);
 
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, isTalentAInputPressed);
                     _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, isTalentBInputPressed);
@@ -354,11 +389,15 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _tryShootLockedOnTargetsCommand.SetCasterPlayerId(playerId).SetProcessedTick(processedTick).Execute();
         }
 
-        private void UpdatePlayerDirection(MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
+        private void UpdatePlayerDirection(int processedTick, long clientId, MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
         {
-            if (playerState.Spaceship.TalentsState.TryGetCurrentSelectedTalent(out var selectedTalent) && selectedTalent.IsCurrentlyAiming
-                || selectedTalent is {TalentType: TalentType.Umbrella, IsCurrentlyActive: true} || selectedTalent is {TalentType: TalentType.Rock, IsCurrentlyActive: true}
-                || selectedTalent is {TalentType: TalentType.Frozen, IsCurrentlyActive: true})
+            if (IsPlayerSteeringWithMouse(playerInputData))
+            {
+                UpdatePlayerDirectionFromMoveDestinationPoint(processedTick, clientId, playerInputData, playerState);
+                return;
+            }
+
+            if (playerState.Spaceship.TalentsState.IsSelectedTalentBlockingRotation())
             {
                 return;
             }
@@ -369,6 +408,34 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                  playerInputData.IsMoveRightInputPressed.ToInt()) * rotationDelta;
             var rotatedVector = playerState.Spaceship.Transform.Direction.Rotate(rotationAngle);
             playerState.Spaceship.Transform.Direction = rotatedVector;
+        }
+
+        private bool IsPlayerSteeringWithMouse(MatchLocalPlayerInputDataC2S playerInputData)
+        {
+            var isPlayerOnKeyboard = playerInputData.IsUsingMouseAim;
+
+            return _sharedGamePlayConfig.ShouldMoveWithMouse && isPlayerOnKeyboard;
+        }
+
+        private void UpdatePlayerDirectionFromMoveDestinationPoint(int processedTick, long clientId, MatchLocalPlayerInputDataC2S playerInputData, PlayerStateS2C playerState)
+        {
+            var playerId = playerState.Id;
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.MoveToPointInput, playerInputData.IsMoveToPointInputPressed);
+
+            var isRetargetingDestinationPoint = _simulationInputService.IsInputPressed(playerId, PlayerInputType.MoveToPointInput);
+            if (isRetargetingDestinationPoint)
+            {
+                var wasDestinationPointClickedThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.MoveToPointInput);
+                _trySetPlayerMoveDestinationPointCommand
+                    .SetPlayerId(playerId)
+                    .SetDestinationPoint(playerInputData.MouseWorldPosition)
+                    .SetClientId(clientId)
+                    .SetProcessedTick(processedTick)
+                    .ShouldShowIndicator(wasDestinationPointClickedThisTick)
+                    .Execute();
+            }
+
+            _rotatePlayerTowardsMoveDestinationPointCommand.SetPlayerId(playerId).Execute();
         }
         
         private CapacityDict<long, MatchPlayersInputPacketC2S> PopEarliestInputsOfEachClient()

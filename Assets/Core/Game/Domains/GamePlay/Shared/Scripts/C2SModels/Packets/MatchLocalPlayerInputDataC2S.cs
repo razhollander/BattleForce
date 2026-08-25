@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
         public bool IsTalentCInputPressed;
         public bool IsPowerUpInputPressed;
         public bool IsBarrelDashInputPressed;
+        public bool IsMoveToPointInputPressed;
         public Vector2 AimDirection;
         public bool IsUsingMouseAim;
         public Vector2 MouseWorldPosition;
@@ -32,7 +33,8 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
                 (IsTalentCInputPressed    ? 1 << 5 : 0) |
                 (IsPowerUpInputPressed    ? 1 << 6 : 0) |
                 (IsUsingMouseAim          ? 1 << 7 : 0) |
-                (IsBarrelDashInputPressed ? 1 << 8 : 0)
+                (IsBarrelDashInputPressed ? 1 << 8 : 0) |
+                (IsMoveToPointInputPressed ? 1 << 9 : 0)
             );
 
             writer.Put(inputBits);
@@ -58,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Shared.C2SModels.Packets
             IsPowerUpInputPressed    = (inputBits & (1 << 6)) != 0;
             IsUsingMouseAim          = (inputBits & (1 << 7)) != 0;
             IsBarrelDashInputPressed = (inputBits & (1 << 8)) != 0;
+            IsMoveToPointInputPressed = (inputBits & (1 << 9)) != 0;
 
             AimDirection = reader.GetVector2FromAngle16();
             MouseWorldPosition = IsUsingMouseAim ? reader.GetVector2Quantized() : Vector2.Zero;

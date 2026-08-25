@@ -60,6 +60,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
         public FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C> ActivateHeadbuttChargingNetEvents;
         public FixedUnorderedList<PerformHeadbuttDashNetEventS2C> PerformHeadbuttDashNetEvents;
         public FixedUnorderedList<PerformBarrelDashNetEventS2C> PerformBarrelDashNetEvents;
+        public FixedUnorderedList<PlayerSetMoveDestinationPointNetEventS2C> PlayerSetMoveDestinationPointNetEvents;
         public FixedUnorderedList<HeadbuttHitEnemyNetEventS2C> HeadbuttHitEnemyNetEvents;
         public FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C> DeactivateHeadbuttTalentNetEvents;
         public FixedUnorderedList<CreateMagneticPullFieldNetEventS2C> CreateMagneticPullFieldNetEvents;
@@ -164,6 +165,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             ActivateHeadbuttChargingNetEvents = new FixedUnorderedList<ActivateHeadbuttChargingNetEventS2C>(maxCap.ActivateHeadbuttChargingNetEvents);
             PerformHeadbuttDashNetEvents = new FixedUnorderedList<PerformHeadbuttDashNetEventS2C>(maxCap.PerformHeadbuttDashNetEvents);
             PerformBarrelDashNetEvents = new FixedUnorderedList<PerformBarrelDashNetEventS2C>(maxCap.PerformBarrelDashNetEvents);
+            PlayerSetMoveDestinationPointNetEvents = new FixedUnorderedList<PlayerSetMoveDestinationPointNetEventS2C>(maxCap.PlayerSetMoveDestinationPointNetEvents);
             HeadbuttHitEnemyNetEvents = new FixedUnorderedList<HeadbuttHitEnemyNetEventS2C>(maxCap.HeadbuttHitEnemyNetEvents);
             DeactivateHeadbuttTalentNetEvents = new FixedUnorderedList<DeactivateHeadbuttTalentNetEventS2C>(maxCap.DeactivateHeadbuttTalentNetEvents);
             LayChickenEggNetEvents = new FixedUnorderedList<LayChickenEggNetEventS2C>(maxCap.LayChickenEggNetEvents);
@@ -293,6 +295,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if ((eventMask2 & (1UL << 12)) != 0) SerializedPlayerPassedScoreGateNetEvents(writer);
             if ((eventMask2 & (1UL << 13)) != 0) SerializedGateTrapClosingNetEvents(writer);
             if ((eventMask2 & (1UL << 14)) != 0) SerializedPerformBarrelDashNetEvents(writer);
+            if ((eventMask2 & (1UL << 15)) != 0) SerializedPlayerSetMoveDestinationPointNetEvents(writer);
         }
 
         private ulong CalculateEventMask2()
@@ -313,6 +316,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             if (PlayerPassedScoreGateNetEvents.Count > 0) eventMask2 |= 1UL << 12;
             if (GateTrapClosingNetEvents.Count > 0) eventMask2 |= 1UL << 13;
             if (PerformBarrelDashNetEvents.Count > 0) eventMask2 |= 1UL << 14;
+            if (PlayerSetMoveDestinationPointNetEvents.Count > 0) eventMask2 |= 1UL << 15;
             return eventMask2;
         }
 
@@ -643,6 +647,8 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
 
             if ((eventMask2 & (1UL << 14)) != 0) DeserializedPerformBarrelDashNetEvents(reader);
             else PerformBarrelDashNetEvents.Clear();
+            if ((eventMask2 & (1UL << 15)) != 0) DeserializedPlayerSetMoveDestinationPointNetEvents(reader);
+            else PlayerSetMoveDestinationPointNetEvents.Clear();
         }
 
         private void SerializedKOProjectHitPlayerNetEvents(NetDataWriter writer)
@@ -1751,6 +1757,24 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels
             for (int i = 0; i < count; i++)
             {
                 ref var netEvent = ref PerformBarrelDashNetEvents.AddAndGet();
+                netEvent.Deserialize(reader);
+            }
+        }
+
+        private void SerializedPlayerSetMoveDestinationPointNetEvents(NetDataWriter writer)
+        {
+            writer.Put((byte)PlayerSetMoveDestinationPointNetEvents.Count);
+            foreach (var netEvent in PlayerSetMoveDestinationPointNetEvents.AsSpan())
+                netEvent.Serialize(writer);
+        }
+
+        private void DeserializedPlayerSetMoveDestinationPointNetEvents(NetDataReader reader)
+        {
+            PlayerSetMoveDestinationPointNetEvents.Clear();
+            var count = reader.GetByte();
+            for (int i = 0; i < count; i++)
+            {
+                ref var netEvent = ref PlayerSetMoveDestinationPointNetEvents.AddAndGet();
                 netEvent.Deserialize(reader);
             }
         }

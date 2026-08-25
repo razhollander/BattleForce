@@ -8,6 +8,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
         TalentCInput = 3,
         Shoot = 4,
         PowerUpInput = 5,
-        BarrelDashInput = 6
+        BarrelDashInput = 6,
+        MoveToPointInput = 7
     }
 }

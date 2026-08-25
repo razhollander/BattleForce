@@ -78,7 +78,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.Inputs
                 {PlayerInputType.TalentCInput, new TickInputState()},
                 {PlayerInputType.Shoot, new TickInputState()},
                 {PlayerInputType.PowerUpInput, new TickInputState()},
-                {PlayerInputType.BarrelDashInput, new TickInputState()}
+                {PlayerInputType.BarrelDashInput, new TickInputState()},
+                {PlayerInputType.MoveToPointInput, new TickInputState()}
             };
         }
 
