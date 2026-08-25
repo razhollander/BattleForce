@@ -39,7 +39,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly CapacityDict<long, MatchMakingPlayersInputPacketC2S> _earliestInputsPerClient;
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _playerInputPacketsPool;
         private readonly ConcurrentPool<FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsListsPool;
-        private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
+        private readonly CapacityDict<long, int> _cachedHeighestProcessedTickPerClient;
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _earliestInputPacketsPool;
 
         public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager,
@@ -50,7 +50,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _updateSubscriptionService = updateSubscriptionService;
             _clientsNetworkDataService = clientsNetworkDataService;
             _commandFactory = commandFactory;
-            _cachedProcessPlayersInputsResult = new ProcessPlayersInputsResult(networkConfig.MaxCap.ConcurrentPlayers);
+            _cachedHeighestProcessedTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputPerClient = new CapacityDict<long, MatchMakingPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
             _lastProcessedInputTickPerClient = new CapacityDict<long, int>(networkConfig.MaxCap.ConcurrentPlayers);
             _earliestInputsPerClient = new CapacityDict<long, MatchMakingPlayersInputPacketC2S>(networkConfig.MaxCap.ConcurrentPlayers);
@@ -76,18 +76,18 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _updateSubscriptionService.UnregisterGuiUpdatable(this);
         }
         
-        public ProcessPlayersInputsResult ProcessInputs(int processedTick)
+        public CapacityDict<long, int> ProcessInputs(int processedTick)
         {
-            DiscardInputPacketsAlreadySuperseded();
+            DiscardInputPacketsAlreadyProcessed();
             LeaveLatestPacketsForBuffer(_networkConfig.ServerPlayerInputPacketsBuffer);
-            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
+            var heighestProcessedTickPerClient = GetHeighestProcessedTickFromServerPerClient();
             ProcessEarliestInputsPacketPerClient(processedTick);
-            return _cachedProcessPlayersInputsResult;
+            return heighestProcessedTickPerClient;
         }
 
         // Applying a packet the server already moved past walks every held button back down and then up again on the next
         // packet, which reads as a fresh press. The jitter buffer still runs deliberately behind.
-        private void DiscardInputPacketsAlreadySuperseded()
+        private void DiscardInputPacketsAlreadyProcessed()
         {
             foreach (var kvp in _inputsPerClient)
             {
@@ -104,8 +104,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         {
             for (var i = inputsOfClient.Count - 1; i >= 0; i--)
             {
-                var isPacketAlreadySuperseded = inputsOfClient[i].Tick <= lastProcessedInputTick;
-                if (isPacketAlreadySuperseded)
+                var isPacketAlreadyProcessed = inputsOfClient[i].Tick <= lastProcessedInputTick;
+                if (isPacketAlreadyProcessed)
                 {
                     inputsOfClient.RemoveAt(i);
                 }
@@ -171,14 +171,14 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         }        
         private CapacityDict<long, int> GetHeighestProcessedTickFromServerPerClient()
         {
-            _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient.Clear();
+            _cachedHeighestProcessedTickPerClient.Clear();
             
             foreach (var kvp in _heighestProcessedTickPerClient)
             {
-                _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient.TryAdd(kvp.Key, kvp.Value);
+                _cachedHeighestProcessedTickPerClient.TryAdd(kvp.Key, kvp.Value);
             }
 
-            return _cachedProcessPlayersInputsResult.HeighestProcessedTickPerClient;
+            return _cachedHeighestProcessedTickPerClient;
         }
 
         private int GetIndexOfEarliestInput(FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S> inputs)
@@ -292,13 +292,4 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         }
     }
     
-    public class ProcessPlayersInputsResult
-    {
-        public CapacityDict<long, int> HeighestProcessedTickPerClient;
-
-        public ProcessPlayersInputsResult(int maxConcurrentPlayers)
-        {
-            HeighestProcessedTickPerClient = new CapacityDict<long, int>(maxConcurrentPlayers);
-        }
-    }
 }

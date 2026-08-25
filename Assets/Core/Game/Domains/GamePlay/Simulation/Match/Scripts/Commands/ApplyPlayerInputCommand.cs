@@ -79,16 +79,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var playerId = _playerInputData.PlayerId;
             var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
 
-            UpdatePlayerShoot(playerState);
+            RecordPlayerInput(playerId);
+            TryShootLockedOnTargets(playerId);
             playerState.Spaceship.AimDirection = _playerInputData.AimDirection;
             _playersMouseDataService.SetPlayerMouseData(playerId, _playerInputData.IsUsingMouseAim, _playerInputData.MouseWorldPosition);
             UpdatePlayerDirection(playerState);
-
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, _playerInputData.IsTalentAInputPressed);
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, _playerInputData.IsTalentBInputPressed);
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, _playerInputData.IsTalentCInputPressed);
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.PowerUpInput, _playerInputData.IsPowerUpInputPressed);
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.BarrelDashInput, _playerInputData.IsBarrelDashInputPressed);
 
             _applyPlayerTalentsInputCommand
                 .SetPlayerId(playerId)
@@ -101,11 +96,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             ProcessPlayerBarrelDashInput(playerId);
         }
 
-        private void UpdatePlayerShoot(PlayerStateS2C playerState)
+        private void RecordPlayerInput(ushort playerId)
         {
-            var playerId = playerState.Id;
             _simulationInputService.SetPlayerInput(playerId, PlayerInputType.Shoot, _playerInputData.IsShootInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.MoveToPointInput, _playerInputData.IsMoveToPointInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentAInput, _playerInputData.IsTalentAInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentBInput, _playerInputData.IsTalentBInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.TalentCInput, _playerInputData.IsTalentCInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.PowerUpInput, _playerInputData.IsPowerUpInputPressed);
+            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.BarrelDashInput, _playerInputData.IsBarrelDashInputPressed);
+        }
 
+        private void TryShootLockedOnTargets(ushort playerId)
+        {
             var wasShootInputDownThisTick = _simulationInputService.WasInputDownThisTick(playerId, PlayerInputType.Shoot);
             if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !wasShootInputDownThisTick)
             {
@@ -146,8 +149,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         private void UpdatePlayerDirectionFromMoveDestinationPoint(PlayerStateS2C playerState)
         {
             var playerId = playerState.Id;
-            _simulationInputService.SetPlayerInput(playerId, PlayerInputType.MoveToPointInput, _playerInputData.IsMoveToPointInputPressed);
-
             var isRetargetingDestinationPoint = _simulationInputService.IsInputPressed(playerId, PlayerInputType.MoveToPointInput);
             if (isRetargetingDestinationPoint)
             {
