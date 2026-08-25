@@ -15,6 +15,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
         private IGameInputActionsController _gameInputActionsController;
         private IWorldCameraController _worldCameraController;
         private ILocalPlayersDataService _localPlayersDataService;
+        private SharedGamePlayConfig _sharedGamePlayConfig;
         
         private Vector2 _playerDirection;
         private UnityEngine.Vector2 _playerPosition;
@@ -43,11 +44,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
              _gameInputActionsController = _diContainer.Resolve<IGameInputActionsController>();
              _worldCameraController = _diContainer.Resolve<IWorldCameraController>();
              _localPlayersDataService = _diContainer.Resolve<ILocalPlayersDataService>();
+             _sharedGamePlayConfig = _diContainer.Resolve<SharedGamePlayConfig>();
         }
 
         public Result Execute()
         {
-            var isShootInputPressed = _gameInputActionsController.IsPlayerShootInputPressed(_playerId);
+            var isShootInputPressed = CalculateShootInput();
             var isTalentAInputPressed = _gameInputActionsController.IsPlayerTalentAInputPressed(_playerId);
             var isTalentBInputPressed = _gameInputActionsController.IsPlayerTalentBInputPressed(_playerId);
             var isTalentCInputPressed = _gameInputActionsController.IsPlayerTalentCInputPressed(_playerId);
@@ -55,9 +57,30 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             var isMoveForawrdInputPressed = _gameInputActionsController.IsPlayerMoveForwardInputPressed(_playerId);
             var isBarrelDashInputPressed = _gameInputActionsController.IsPlayerBarrelDashInputPressed(_playerId);
 
+            var isMoveToPointInputPressed = IsSteeringWithMouse() && _gameInputActionsController.IsPlayerMoveToPointInputPressed(_playerId);
+
             CalculateRightAndLeftInputs(_playerDirection, out var isMoveRightInputPressed, out var isMoveLeftInputPressed);
             var aimDirection = CalculateAimDirection(out var mouseWorldPosition, out var isUsingMouseAim);
-            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isPowerUpInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, isBarrelDashInputPressed, aimDirection, mouseWorldPosition, isUsingMouseAim);
+            return new Result(isShootInputPressed, isTalentAInputPressed, isTalentBInputPressed, isTalentCInputPressed, isPowerUpInputPressed, isMoveLeftInputPressed, isMoveRightInputPressed, isMoveForawrdInputPressed, isBarrelDashInputPressed, isMoveToPointInputPressed, aimDirection, mouseWorldPosition, isUsingMouseAim);
+        }
+
+        private bool CalculateShootInput()
+        {
+            return IsSteeringWithMouse()
+                ? _gameInputActionsController.IsPlayerShootWithMouseInputPressed(_playerId)
+                : _gameInputActionsController.IsPlayerShootInputPressed(_playerId);
+        }
+
+        private bool IsSteeringWithMouse()
+        {
+            var isPlayerOnKeyboard = !IsPlayerOnGamepad();
+
+            return _sharedGamePlayConfig.ShouldMoveWithMouse && isPlayerOnKeyboard;
+        }
+
+        private bool IsPlayerOnGamepad()
+        {
+            return _localPlayersDataService.GetInputDeviceForPlayer(_playerId) is Gamepad;
         }
 
         private void CalculateRightAndLeftInputs(Vector2 playerDirection, out bool isMoveRightInputPressed, out bool isMoveLeftInputPressed)
@@ -78,8 +101,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
 
         private Vector2 CalculateAimDirection(out Vector2 mouseWorldPosition, out bool isUsingMouseAim)
         {
-            var device = _localPlayersDataService.GetInputDeviceForPlayer(_playerId);
-            var isGamepad = device is Gamepad;
+            var isGamepad = IsPlayerOnGamepad();
             isUsingMouseAim = !isGamepad;
             var mousePos = Input.mousePosition;
             var mouseWorldPos = _worldCameraController.ScreenToWorldPoint(mousePos).ToVector2XY();
@@ -101,12 +123,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
             public bool IsMoveRightInputPressed;
             public bool IsMoveForawrdInputPressed;
             public bool IsBarrelDashInputPressed;
+            public bool IsMoveToPointInputPressed;
             public Vector2 AimDirection;
             public Vector2 MouseWorldPosition;
             public bool IsUsingMouseAim;
 
             public Result(bool isShootInputPressed, bool isTalentAInputPressed, bool isTalentBInputPressed, bool isTalentCInputPressed, bool isPowerUpInputPressed, bool isMoveLeftInputPressed,
-                bool isMoveRightInputPressed, bool isMoveForawrdInputPressed, bool isBarrelDashInputPressed, Vector2 aimDirection, Vector2 mouseWorldPosition, bool isUsingMouseAim)
+                bool isMoveRightInputPressed, bool isMoveForawrdInputPressed, bool isBarrelDashInputPressed, bool isMoveToPointInputPressed, Vector2 aimDirection, Vector2 mouseWorldPosition, bool isUsingMouseAim)
 
             {
                 IsTalentAInputPressed = isTalentAInputPressed;
@@ -118,6 +141,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.Commands.Inputs
                 IsMoveRightInputPressed = isMoveRightInputPressed;
                 IsMoveForawrdInputPressed = isMoveForawrdInputPressed;
                 IsBarrelDashInputPressed = isBarrelDashInputPressed;
+                IsMoveToPointInputPressed = isMoveToPointInputPressed;
                 AimDirection = aimDirection;
                 MouseWorldPosition = mouseWorldPosition;
                 IsUsingMouseAim = isUsingMouseAim;

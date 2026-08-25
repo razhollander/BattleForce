@@ -120,7 +120,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Talent"",
+                    ""name"": ""ShootWithMouse"",
                     ""type"": ""Button"",
                     ""id"": ""c6d73784-4036-4e45-b758-f3c279a22949"",
                     ""expectedControlType"": """",
@@ -129,7 +129,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SwitchTalent"",
+                    ""name"": ""MoveToPoint"",
                     ""type"": ""Button"",
                     ""id"": ""d7e84895-5147-5f56-c869-04d380b33050"",
                     ""expectedControlType"": """",
@@ -262,7 +262,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Talent"",
+                    ""action"": ""ShootWithMouse"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -273,7 +273,7 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""SwitchTalent"",
+                    ""action"": ""MoveToPoint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -296,17 +296,6 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MoveForward"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b28aa33c-2922-45ee-8114-c8bc85efdbaf"",
-                    ""path"": ""<DualShockGamepad>/rightTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Talent"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1029,8 +1018,8 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_GamePlay_Shoot = m_GamePlay.FindAction("Shoot", throwIfNotFound: true);
         m_GamePlay_MoveLeft = m_GamePlay.FindAction("MoveLeft", throwIfNotFound: true);
         m_GamePlay_MoveRight = m_GamePlay.FindAction("MoveRight", throwIfNotFound: true);
-        m_GamePlay_Talent = m_GamePlay.FindAction("Talent", throwIfNotFound: true);
-        m_GamePlay_SwitchTalent = m_GamePlay.FindAction("SwitchTalent", throwIfNotFound: true);
+        m_GamePlay_ShootWithMouse = m_GamePlay.FindAction("ShootWithMouse", throwIfNotFound: true);
+        m_GamePlay_MoveToPoint = m_GamePlay.FindAction("MoveToPoint", throwIfNotFound: true);
         m_GamePlay_MoveForward = m_GamePlay.FindAction("MoveForward", throwIfNotFound: true);
         m_GamePlay_Aim = m_GamePlay.FindAction("Aim", throwIfNotFound: true);
         m_GamePlay_MoveDirection = m_GamePlay.FindAction("MoveDirection", throwIfNotFound: true);
@@ -1135,8 +1124,8 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_Shoot;
     private readonly InputAction m_GamePlay_MoveLeft;
     private readonly InputAction m_GamePlay_MoveRight;
-    private readonly InputAction m_GamePlay_Talent;
-    private readonly InputAction m_GamePlay_SwitchTalent;
+    private readonly InputAction m_GamePlay_ShootWithMouse;
+    private readonly InputAction m_GamePlay_MoveToPoint;
     private readonly InputAction m_GamePlay_MoveForward;
     private readonly InputAction m_GamePlay_Aim;
     private readonly InputAction m_GamePlay_MoveDirection;
@@ -1169,13 +1158,13 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @MoveRight => m_Wrapper.m_GamePlay_MoveRight;
         /// <summary>
-        /// Provides access to the underlying input action "GamePlay/Talent".
+        /// Provides access to the underlying input action "GamePlay/ShootWithMouse".
         /// </summary>
-        public InputAction @Talent => m_Wrapper.m_GamePlay_Talent;
+        public InputAction @ShootWithMouse => m_Wrapper.m_GamePlay_ShootWithMouse;
         /// <summary>
-        /// Provides access to the underlying input action "GamePlay/SwitchTalent".
+        /// Provides access to the underlying input action "GamePlay/MoveToPoint".
         /// </summary>
-        public InputAction @SwitchTalent => m_Wrapper.m_GamePlay_SwitchTalent;
+        public InputAction @MoveToPoint => m_Wrapper.m_GamePlay_MoveToPoint;
         /// <summary>
         /// Provides access to the underlying input action "GamePlay/MoveForward".
         /// </summary>
@@ -1243,12 +1232,12 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @MoveRight.started += instance.OnMoveRight;
             @MoveRight.performed += instance.OnMoveRight;
             @MoveRight.canceled += instance.OnMoveRight;
-            @Talent.started += instance.OnTalent;
-            @Talent.performed += instance.OnTalent;
-            @Talent.canceled += instance.OnTalent;
-            @SwitchTalent.started += instance.OnSwitchTalent;
-            @SwitchTalent.performed += instance.OnSwitchTalent;
-            @SwitchTalent.canceled += instance.OnSwitchTalent;
+            @ShootWithMouse.started += instance.OnShootWithMouse;
+            @ShootWithMouse.performed += instance.OnShootWithMouse;
+            @ShootWithMouse.canceled += instance.OnShootWithMouse;
+            @MoveToPoint.started += instance.OnMoveToPoint;
+            @MoveToPoint.performed += instance.OnMoveToPoint;
+            @MoveToPoint.canceled += instance.OnMoveToPoint;
             @MoveForward.started += instance.OnMoveForward;
             @MoveForward.performed += instance.OnMoveForward;
             @MoveForward.canceled += instance.OnMoveForward;
@@ -1293,12 +1282,12 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             @MoveRight.started -= instance.OnMoveRight;
             @MoveRight.performed -= instance.OnMoveRight;
             @MoveRight.canceled -= instance.OnMoveRight;
-            @Talent.started -= instance.OnTalent;
-            @Talent.performed -= instance.OnTalent;
-            @Talent.canceled -= instance.OnTalent;
-            @SwitchTalent.started -= instance.OnSwitchTalent;
-            @SwitchTalent.performed -= instance.OnSwitchTalent;
-            @SwitchTalent.canceled -= instance.OnSwitchTalent;
+            @ShootWithMouse.started -= instance.OnShootWithMouse;
+            @ShootWithMouse.performed -= instance.OnShootWithMouse;
+            @ShootWithMouse.canceled -= instance.OnShootWithMouse;
+            @MoveToPoint.started -= instance.OnMoveToPoint;
+            @MoveToPoint.performed -= instance.OnMoveToPoint;
+            @MoveToPoint.canceled -= instance.OnMoveToPoint;
             @MoveForward.started -= instance.OnMoveForward;
             @MoveForward.performed -= instance.OnMoveForward;
             @MoveForward.canceled -= instance.OnMoveForward;
@@ -1645,19 +1634,19 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMoveRight(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Talent" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "ShootWithMouse" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTalent(InputAction.CallbackContext context);
+        void OnShootWithMouse(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "SwitchTalent" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoveToPoint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSwitchTalent(InputAction.CallbackContext context);
+        void OnMoveToPoint(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "MoveForward" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

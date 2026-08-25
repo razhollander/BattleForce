@@ -42,6 +42,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Scripts.ContextInstaller
             Container.Bind<ISimulationInputService>().To<SimulationInputService>().AsSingle();
             Container.Bind<IRandomPlayersInputService>().To<RandomPlayersInputService>().AsSingle();
             Container.Bind<IPlayersMouseDataService>().To<PlayersMouseDataService>().AsSingle();
+            Container.Bind<IPlayersMoveDestinationPointService>().To<PlayersMoveDestinationPointService>().AsSingle();
             Container.Bind<IClientsNetworkDataService>().To<ClientsNetworkDataService>().AsSingle();
         }
     }

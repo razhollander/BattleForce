@@ -109,13 +109,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                 _networkManager.PollEvents();
                 var stepDeltaTime = _networkConfig.DeltaTime;
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
-                var processPlayersInputsResult = ProcessPackets(currentTick);
+                var heighestProcessedTickPerClient = ProcessPackets(currentTick);
                 _stepPhysiscsSimulationCommand.SetDeltaTime(stepDeltaTime).SetTick(currentTick).Execute();
                 _updatePlayersLockOnWallStateCommand.SetTick(currentTick).Execute();
                 _handleIfAnyPlayerChangedTeamFloorCommand.SetTick(currentTick).Execute();
                 _handleIfStartMatchEligiblityChangedCommand.SetTick(currentTick).Execute();
                 MoveToMatchStateIfCountdownEnded();
-                RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
+                RemoveOlderThanTickEventsPerClient(heighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
             }
@@ -150,7 +150,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             _simulationStateMachine.ChangeToMatch(matchEnterData);
         }
 
-        private ProcessPlayersInputsResult ProcessPackets(int processedTick)
+        private CapacityDict<long, int> ProcessPackets(int processedTick)
         {
             _playerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
             return _playerInputsPacketsHandler.ProcessInputs(processedTick);

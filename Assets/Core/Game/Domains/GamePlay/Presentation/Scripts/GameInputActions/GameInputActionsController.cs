@@ -51,13 +51,27 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
 
                 if (device != null)
                 {
-                    inputActions.devices = new UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputDevice>(new[] {device});
+                    inputActions.devices = new UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputDevice>(GetPairedDevices(device));
                 }
 
                 inputActions.Enable();
                 //inputActions.GamePlay.MoveRight.performed += OnShootInput;
                 _gameInputActionsByPlayer[playerId] = inputActions;
             }
+        }
+
+        // A laptop trackpad reaches us as the same Mouse device, so pairing it covers trackpad clicks too.
+        private static InputDevice[] GetPairedDevices(InputDevice device)
+        {
+            var isPlayerOnKeyboard = device is Keyboard;
+            var hasConnectedMouse = Mouse.current != null;
+            var doesPlayerAlsoClickWithMouse = isPlayerOnKeyboard && hasConnectedMouse;
+            if (doesPlayerAlsoClickWithMouse)
+            {
+                return new InputDevice[] {device, Mouse.current};
+            }
+
+            return new[] {device};
         }
 
         public void EnableInputs()
@@ -225,6 +239,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
             }
 
             return actions.GamePlay.BarrelDash.IsPressed();
+        }
+
+        public bool IsPlayerShootWithMouseInputPressed(ushort playerId)
+        {
+            if (!TryGetPlayerInputActions(playerId, out var actions))
+            {
+                return false;
+            }
+
+            return actions.GamePlay.ShootWithMouse.IsPressed();
+        }
+
+        public bool IsPlayerMoveToPointInputPressed(ushort playerId)
+        {
+            if (!TryGetPlayerInputActions(playerId, out var actions))
+            {
+                return false;
+            }
+
+            return actions.GamePlay.MoveToPoint.IsPressed();
         }
 
         public async Awaitable WaitForAnyKeyPressed(CancellationTokenSource cancellationTokenSource, bool canPressOverGui = false)

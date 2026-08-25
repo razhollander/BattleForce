@@ -23,6 +23,7 @@ using Core.Game.Domains.GamePlay.Presentation.Match.Features.Soul.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.FrigidBlock.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.ScoreGate.Scripts.Mvc;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.HeadbuttHitEffect.Scripts;
+using Core.Game.Domains.GamePlay.Presentation.Match.Features.MoveDestinationPointIndicator.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.MagneticPullEffect.Scripts;
 using Core.Game.Domains.GamePlay.Presentation.Match.Features.Nuke.Scripts;
@@ -76,6 +77,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
         private IScoreGainedEffectController _scoreGainedEffectController;
         private IPlayerTeleportEffectController _playerTeleportEffectController;
         private IHeadbuttHitEffectController _headbuttHitEffectController;
+        private IMoveDestinationPointIndicatorController _moveDestinationPointIndicatorController;
         private IEnvironmentTeleportGateControllers _environmentTeleportGateControllers;
         private IEnvironmentFieldBarrierControllers _environmentFieldBarrierControllers;
         private ISwapFieldControllers _swapFieldControllers;
@@ -130,6 +132,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _scoreGainedEffectController = _diContainer.Resolve<IScoreGainedEffectController>();
             _playerTeleportEffectController = _diContainer.Resolve<IPlayerTeleportEffectController>();
             _headbuttHitEffectController = _diContainer.Resolve<IHeadbuttHitEffectController>();
+            _moveDestinationPointIndicatorController = _diContainer.Resolve<IMoveDestinationPointIndicatorController>();
             _environmentTeleportGateControllers = _diContainer.Resolve<IEnvironmentTeleportGateControllers>();
             _environmentFieldBarrierControllers = _diContainer.Resolve<IEnvironmentFieldBarrierControllers>();
             _swapFieldControllers = _diContainer.Resolve<ISwapFieldControllers>();
@@ -183,6 +186,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.EntryPo
             _environmentSpikeControllers.InitEntryPoint();
             _playerTeleportEffectController.InitEntryPoint();
             _headbuttHitEffectController.InitEntryPoint();
+            _moveDestinationPointIndicatorController.InitEntryPoint();
             _environmentTeleportGateControllers.InitEntryPoint();
             _backgroundParallaxController.InitEntryPoint();
             _lockOnTargetEffectController.InitEntryPoint();

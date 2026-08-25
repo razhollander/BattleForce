@@ -130,7 +130,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
 
                 _stepTimersCommand.SetStepDeltaTime(stepDeltaTime).Execute();
                 _stepAllPlayersTalentsCooldownsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
-                var processPlayersInputsResult = ProcessPackets(currentTick, stepDeltaTime);
+                var heighestProcessedTickPerClient = ProcessPackets(currentTick, stepDeltaTime);
                 _playersPowerUpsManager.OnTick(currentTick);
                 _stepAllPlayersTalentsCommand.SetStepTick(currentTick).SetStepDeltaTime(stepDeltaTime).Execute();
                 _trySpawnPowerUpBallsCommand.SetProcessedTick(currentTick).Execute();
@@ -149,7 +149,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _tryDamagePlayersTouchingSpikesCommand.SetProcessedTick(currentTick).Execute();
                 _trySendPlayersLockOnTargetChangedCommand.SetProcessedTick(currentTick).Execute();
                 _overrideableNetEventsService.RegisterAllOverridableNetEvents();
-                RemoveOlderThanTickEventsPerClient(processPlayersInputsResult.HeighestProcessedTickPerClient);
+                RemoveOlderThanTickEventsPerClient(heighestProcessedTickPerClient);
                 SendCurrentTickStateToAllClients(currentTick);
                 SendStartMatchToNotAcknowledgedClients(currentTick);
                 _headLessQuitterController.QuitIfTimeOut();
@@ -222,7 +222,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
             _networkManager.SendPacketToClientSerialized(clientId, PacketTypeS2C.StartMatch, _cachedStartMatchPacket, deliveryMethod);
         }
 
-        private ProcessPlayersInputsResult ProcessPackets(int processedTick, float deltaTime)
+        private CapacityDict<long, int> ProcessPackets(int processedTick, float deltaTime)
         {
             _matchPlayerJoinPacketsHandler.ProcessPlayersJoined(processedTick);
             return _playerInputsPacketsHandler.ProcessInputs(processedTick, deltaTime);
@@ -302,6 +302,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.NetworkManager.Tic
                 _fullTickPacket.ActivateHeadbuttChargingNetEvents = _netEventsDataService.ActivateHeadbuttChargingNetEventsPerClient[clientId];
                 _fullTickPacket.PerformHeadbuttDashNetEvents = _netEventsDataService.PerformHeadbuttDashNetEventsPerClient[clientId];
                 _fullTickPacket.PerformBarrelDashNetEvents = _netEventsDataService.PerformBarrelDashNetEventsPerClient[clientId];
+                _fullTickPacket.PlayerSetMoveDestinationPointNetEvents = _netEventsDataService.PlayerSetMoveDestinationPointNetEventsPerClient[clientId];
                 _fullTickPacket.HeadbuttHitEnemyNetEvents = _netEventsDataService.HeadbuttHitEnemyNetEventsPerClient[clientId];
                 _fullTickPacket.DeactivateHeadbuttTalentNetEvents = _netEventsDataService.DeactivateHeadbuttTalentNetEventsPerClient[clientId];
                 _fullTickPacket.CreateMagneticPullFieldNetEvents = _netEventsDataService.CreateMagneticPullFieldNetEventsPerClient[clientId];

@@ -24,5 +24,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Scripts.GameInputActions
         bool IsPlayerTalentCInputPressed(ushort playerId);
         bool IsPlayerPowerUpInputPressed(ushort playerId);
         bool IsPlayerBarrelDashInputPressed(ushort playerId);
+        bool IsPlayerShootWithMouseInputPressed(ushort playerId);
+        bool IsPlayerMoveToPointInputPressed(ushort playerId);
     }
 }
