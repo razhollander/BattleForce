@@ -2,7 +2,7 @@ using Core.Game.Domains.GamePlay.Simulation.Scripts.Services.GamePlayConfig;
 using Core.Game.Domains.GamePlay.Shared.C2SModels;
 using Core.Game.Domains.GamePlay.Shared.C2SModels.Packets;
 using Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking;
-using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOnWall;
+using Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.Commands;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.MatchMakingModel.MatchMakingModel;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.NetworkManager;
 using Core.Game.Domains.GamePlay.Simulation.Scripts.Physics;
@@ -25,16 +25,12 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         public PacketTypeC2S PacketType => PacketTypeC2S.MatchMakingPlayersInput;
 
         private readonly IServerNetworkManager _networkManager;
-        private readonly IMatchMakingDataService _matchDataService;
-        private readonly ISimulationGamePlayConfigService _gamePlayConfigService;
         private readonly NetworkConfig _networkConfig;
 
-        private readonly INetEventsDataService _netEventsDataService;
-        private readonly IPhysicsSimulator _physicsSimulator;
         private readonly IUpdateSubscriptionService _updateSubscriptionService;
         private readonly IClientsNetworkDataService _clientsNetworkDataService;
         private readonly ICommandFactory _commandFactory;
-        private TryShootLockedOnWallCommand _tryShootLockedOnWallCommand;
+        private ApplyMatchMakingPlayerInputCommand _applyMatchMakingPlayerInputCommand;
 
         private readonly CapacityDict<long, FixedClassUnorderedList<MatchMakingPlayersInputPacketC2S>> _inputsPerClient;
         private readonly CapacityDict<long, int> _heighestProcessedTickPerClient;
@@ -46,15 +42,11 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         private readonly ProcessPlayersInputsResult _cachedProcessPlayersInputsResult;
         private readonly ConcurrentPool<MatchMakingPlayersInputPacketC2S> _earliestInputPacketsPool;
 
-        public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager, IMatchMakingDataService matchDataService,
-            ISimulationGamePlayConfigService gamePlayConfigService, NetworkConfig networkConfig, INetEventsDataService netEventsDataService, IPhysicsSimulator physicsSimulator, IUpdateSubscriptionService updateSubscriptionService, IClientsNetworkDataService clientsNetworkDataService, ICommandFactory commandFactory)
+        public MatchMakingPlayerInputsPacketsHandler(IServerNetworkManager networkManager,
+            NetworkConfig networkConfig, IUpdateSubscriptionService updateSubscriptionService, IClientsNetworkDataService clientsNetworkDataService, ICommandFactory commandFactory)
         {
             _networkManager = networkManager;
-            _matchDataService = matchDataService;
-            _gamePlayConfigService = gamePlayConfigService;
             _networkConfig = networkConfig;
-            _netEventsDataService = netEventsDataService;
-            _physicsSimulator = physicsSimulator;
             _updateSubscriptionService = updateSubscriptionService;
             _clientsNetworkDataService = clientsNetworkDataService;
             _commandFactory = commandFactory;
@@ -75,7 +67,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
         {
             _networkManager.RegisterPacketsObserver(this);
             _updateSubscriptionService.RegisterGuiUpdatable(this);
-            _tryShootLockedOnWallCommand = _commandFactory.CreateCommandVoid<TryShootLockedOnWallCommand>();
+            _applyMatchMakingPlayerInputCommand = _commandFactory.CreateCommandVoid<ApplyMatchMakingPlayerInputCommand>();
         }
 
         public void InitExitPoint()
@@ -169,15 +161,10 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
                         continue;
                     }
 
-                    var playerState = _matchDataService.SimulationState.GetPlayerById(playerId);
-                    if (playerState == null)
-                    {
-                        LogService.LogTopic($"Didn't find player state for player {playerId}!", LogTopicType.ServerNetwork);
-                        continue;
-                    }
-
-                    UpdatePlayerDirection(playerInput, playerState);
-                    UpdatePlayerShoot(processedTick, playerInput.IsShootInputPressed, playerState);
+                    _applyMatchMakingPlayerInputCommand
+                        .SetPlayerInputData(playerInput)
+                        .SetProcessedTick(processedTick)
+                        .Execute();
                 }
             }
 
@@ -213,39 +200,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.NetworkManag
             return indexOfMin;
         }
 
-        private void UpdatePlayerShoot(int processedTick, bool isShootInputPressed, MatchMakingPlayerStateS2C playerModel)
-        {
-            //var shootState = playerModel.Spaceship.Shoot;
-            //var shouldShoot = isShootInputPressed && shootState.CooldownSecondsLeft == shootState.MaxCooldown;
-
-            if (!_gamePlayConfigService.GamePlayConfig.IsAutoShoot && !isShootInputPressed)
-            {
-                return;
-            }
-
-            // shootState.CooldownSecondsLeft -= _networkConfig.DeltaTime;
-            // playerModel.Spaceship.Shoot = shootState;
-            _tryShootLockedOnWallCommand.SetCasterPlayerId(playerModel.Id).SetTick(processedTick).Execute();
-        }
-
-        private void UpdatePlayerDirection(MatchMakingLocalPlayerInputDataC2S playerInputData, MatchMakingPlayerStateS2C playerModel)
-        {
-            var rotationDelta = _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.RotationSpeed * _networkConfig.DeltaTime;
-            var rotationAngle =
-                (playerInputData.IsMoveLeftInputPressed.ToInt() -
-                 playerInputData.IsMoveRightInputPressed.ToInt()) * rotationDelta;
-            var rotatedVector = playerModel.Spaceship.Transform.Direction.Rotate(rotationAngle);
-            playerModel.Spaceship.Transform.Direction = rotatedVector;
-            
-            if (playerInputData.IsMoveForwardInputPressed)
-            {
-                playerModel.Spaceship.Transform.Velocity = playerModel.Spaceship.Transform.Direction * _gamePlayConfigService.GamePlayConfig.PlayerSpaceship.TargetMovementSpeed;
-            }
-            else
-            {
-                playerModel.Spaceship.Transform.Velocity = System.Numerics.Vector2.Zero;
-            }
-        }
         
         private CapacityDict<long, MatchMakingPlayersInputPacketC2S> PopEarliestInputsOfEachClient()
         {
