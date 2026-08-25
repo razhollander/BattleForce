@@ -77,8 +77,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
             var wasPlayerTurnedByAnythingElse = playerSpaceship.Transform.Direction != destinationPointData.DirectionAfterLastRotation;
             var isPlayerStandingOnDestinationPoint = playerSpaceship.Transform.Position.IsAlmostEqual(destinationPointData.DestinationPoint);
 
-            return !playerSpaceship.IsAlive
-                   || playerSpaceship.TalentsState.IsSelectedTalentBlockingRotation()
+            return playerSpaceship.TalentsState.IsSelectedTalentBlockingRotation()
                    || wasPlayerTurnedByAnythingElse
                    || isPlayerStandingOnDestinationPoint;
         }

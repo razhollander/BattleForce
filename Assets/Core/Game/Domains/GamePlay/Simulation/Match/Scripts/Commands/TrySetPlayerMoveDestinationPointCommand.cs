@@ -58,8 +58,8 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.Commands
         public void Execute()
         {
             var playerSpaceship = _matchDataService.SimulationState.GetPlayerById(_playerId).Spaceship;
-            var canPlayerBeGivenDestinationPoint = playerSpaceship.IsAlive && !playerSpaceship.TalentsState.IsSelectedTalentBlockingRotation();
-            if (!canPlayerBeGivenDestinationPoint)
+            var isRotationBlockedByTalent = playerSpaceship.TalentsState.IsSelectedTalentBlockingRotation();
+            if (isRotationBlockedByTalent)
             {
                 return;
             }
