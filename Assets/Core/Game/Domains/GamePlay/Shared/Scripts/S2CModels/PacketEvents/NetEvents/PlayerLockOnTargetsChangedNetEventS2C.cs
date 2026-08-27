@@ -30,6 +30,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
                 writer.Put((byte)target.TargetId);
                 writer.Put(target.IsLockOnTargetShootable);
                 writer.Put((byte)target.TargetType);
+                writer.Put(target.RetentionEndTick);
             }
         }
 
@@ -45,6 +46,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels.PacketEvents.NetEvents
                 target.TargetId = reader.GetByte();
                 target.IsLockOnTargetShootable = reader.GetBool();
                 target.TargetType = (LockOnTargetType)reader.GetByte();
+                target.RetentionEndTick = reader.GetInt();
             }
         }
 

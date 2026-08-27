@@ -28,6 +28,7 @@ public class SharedGamePlayConfig : ScriptableObject
     public float SoulGhostSize = 1f;
     public float MagneticPullFieldRadius = 10f;
     public float LockOnTargetDurationInSeconds = 1.5f;
+    public float LockOnTargetRetentionDurationInSeconds = 3f;
     public float HeadbuttMaxChargeDurationSeconds = 2f;
     public float MoleHoleShakeDurationSeconds = 0.6f; // the mole stays hidden and unhittable while its hole shakes
     public byte GoldenMoleDamagePerHit = 1; // lives a golden mole loses per hit, also the amount shown on its damage indicator

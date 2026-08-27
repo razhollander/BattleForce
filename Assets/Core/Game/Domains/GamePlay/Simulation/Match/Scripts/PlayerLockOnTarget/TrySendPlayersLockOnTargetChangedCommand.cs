@@ -21,6 +21,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         private ISimulationGamePlayConfigService _gamePlayConfigService;
         private INetEventsDataService _netEventsDataService;
         private ILockOnTargetTimerService _lockOnTargetTimerService;
+        private ILockOnTargetRetentionService _lockOnTargetRetentionService;
 
         private FixedUnorderedList<ObjectLockedOnTargetS2C> _cachedLockedOnObjects;
         private readonly PhysicsBodyType[] _cachedBodyTypesRayCastCanHit =
@@ -42,6 +43,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _netEventsDataService = _diContainer.Resolve<INetEventsDataService>();
             _lockOnTargetTimerService = _diContainer.Resolve<ILockOnTargetTimerService>();
             _stageDataService = _diContainer.Resolve<IStageDataService>();
+            _lockOnTargetRetentionService = _diContainer.Resolve<ILockOnTargetRetentionService>();
             var networkConfig = _diContainer.Resolve<NetworkConfig>();
             _cachedLockedOnObjects = new FixedUnorderedList<ObjectLockedOnTargetS2C>(networkConfig.MaxCap.ConcurrentLockOnTargets);
         }
@@ -77,6 +79,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                     }
 
                     FindTargetedPowerUpBallsOfCaster(rayOriginPosition, playerState, _cachedLockedOnObjects);
+                    _lockOnTargetRetentionService.AddRetainedTargets(playerState, _cachedLockedOnObjects, _processedTick);
                 }
 
                 _cachedLockedOnObjects.Sort();
@@ -223,6 +226,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             targetedObject.TargetId = targetId;
             targetedObject.IsLockOnTargetShootable = _lockOnTargetTimerService.IsTargetShootable(casterId, targetId, targetType);
             targetedObject.TargetType = targetType;
+            targetedObject.RetentionEndTick = ObjectLockedOnTargetS2C.NO_RETENTION_END_TICK;
         }
     }
 }

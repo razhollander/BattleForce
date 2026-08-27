@@ -47,6 +47,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
                 targetedEnemy.TargetId = reader.GetByte();
                 targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
                 targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
+                targetedEnemy.RetentionEndTick = ObjectLockedOnTargetS2C.NO_RETENTION_END_TICK;
             }
         }
 

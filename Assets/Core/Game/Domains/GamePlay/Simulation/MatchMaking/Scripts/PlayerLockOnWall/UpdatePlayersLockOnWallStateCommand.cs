@@ -59,6 +59,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.MatchMaking.Scripts.PlayerLockOn
                     target.TargetId = _sharedGamePlayConfig.MinEntityId;
                     target.IsLockOnTargetShootable = _lockOnWallTimerService.IsWallShootableByPlayer(playerState.Id);
                     target.TargetType = LockOnTargetType.StartMatchWall;
+                    target.RetentionEndTick = ObjectLockedOnTargetS2C.NO_RETENTION_END_TICK;
                 }
 
                 var targetedEnemyIds = playerState.Spaceship.ObjectsLockedOnTarget;

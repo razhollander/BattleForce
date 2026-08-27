@@ -36,6 +36,7 @@ MonoBehaviour:
   SoulGhostSize: 1
   MagneticPullFieldRadius: 10
   LockOnTargetDurationInSeconds: 0.65
+  LockOnTargetRetentionDurationInSeconds: 1.5
   HeadbuttMaxChargeDurationSeconds: 2
   MoleHoleShakeDurationSeconds: 0.6
   GoldenMoleDamagePerHit: 1

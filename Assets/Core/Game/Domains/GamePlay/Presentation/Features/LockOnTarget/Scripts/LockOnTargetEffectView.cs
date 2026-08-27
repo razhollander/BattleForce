@@ -11,6 +11,10 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
     {
         private const string LOCK_ON_TARGET_ANIMATION_NAME = "LockOnTarget";
         private const string LOCK_ON_TARGET_SHOOTABLE_ANIMATION_NAME = "LockOnTargetShootable";
+        private const float RETENTION_BAR_EMPTY_HALF_ARC_DEGREES = 180f;
+        private const float RETENTION_BAR_FULL_HALF_ARC_DEGREES = 0f;
+
+        private static readonly int HALF_ARC_SHADER_PROPERTY = Shader.PropertyToID("_HalfArc");
 
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private LineRenderer _lineRenderer;
@@ -21,17 +25,23 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         [SerializeField] private Sprite _lockOnTargetSprite;
         [SerializeField] private Color _lineColorLockOnTarget = Color.white;
         [SerializeField] private Color _lineColorShootable = Color.white;
+        [SerializeField] private Color _lineColorRetention = new Color(1f, 0.61960787f, 0.23921569f, 1f);
+        [SerializeField] private GameObject _retentionRadialProgressBar;
+        [SerializeField] private SpriteRenderer _retentionRadialProgressBarSpriteRenderer;
 
         private CancellationTokenSource _currentAnimationCancellationTokenSource;
+        private Material _retentionRadialProgressBarMaterial;
 
         public Action Despawn { get; set; }
 
         public void OnCreated()
         {
+            _retentionRadialProgressBarMaterial = _retentionRadialProgressBarSpriteRenderer.material;
         }
 
         public void OnSpawned()
         {
+            HideRetentionEffect();
             gameObject.SetActive(true);
         }
 
@@ -67,7 +77,26 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         public void OnDespawned()
         {
             _currentAnimationCancellationTokenSource?.Cancel();
+            HideRetentionEffect();
             gameObject.SetActive(false);
+        }
+
+        public void ShowRetentionEffect(float retentionProgress)
+        {
+            _retentionRadialProgressBar.TrySetActive(true);
+            var halfArcDegrees = Mathf.Lerp(RETENTION_BAR_EMPTY_HALF_ARC_DEGREES, RETENTION_BAR_FULL_HALF_ARC_DEGREES, retentionProgress);
+            _retentionRadialProgressBarMaterial.SetFloat(HALF_ARC_SHADER_PROPERTY, halfArcDegrees);
+
+            var lineWidth = _hitLineWidth * retentionProgress;
+            _lineRenderer.startWidth = lineWidth;
+            _lineRenderer.endWidth = lineWidth;
+            _lineRenderer.startColor = _lineColorRetention;
+            _lineRenderer.endColor = _lineColorRetention;
+        }
+
+        public void HideRetentionEffect()
+        {
+            _retentionRadialProgressBar.TrySetActive(false);
         }
 
         public void Setup(float lockOnTargetDurationInSeconds)

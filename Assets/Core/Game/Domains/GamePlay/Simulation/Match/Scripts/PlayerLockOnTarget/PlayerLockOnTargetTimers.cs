@@ -24,7 +24,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
 
             foreach (var targetKey in _targetTimers.Keys)
             {
-                if (!ContainsTarget(targetedIds, targetKey))
+                if (!targetedIds.ContainsTarget(targetKey))
                 {
                     _cachedTargetsToRemoveBuffer.Add(targetKey);
                 }
@@ -52,19 +52,6 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         public bool IsTargetShootable(LockOnTargetKey targetKey, float durationLimit)
         {
             return _targetTimers.TryGetValue(targetKey, out var timer) && timer >= durationLimit;
-        }
-
-        private static bool ContainsTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targetedIds, LockOnTargetKey targetKey)
-        {
-            for (int i = 0; i < targetedIds.Count; i++)
-            {
-                if (targetedIds[i].GetKey().Equals(targetKey))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public void ResetTimer(LockOnTargetKey targetKey)
