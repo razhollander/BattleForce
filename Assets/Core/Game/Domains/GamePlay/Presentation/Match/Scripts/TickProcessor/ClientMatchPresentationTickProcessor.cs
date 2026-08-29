@@ -110,7 +110,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
         private readonly HandleActivateShuffleNetEventsCommand _handleActivateShuffleNetEventsCommand;
         private readonly HandleStartPowerUpGrantingPhaseNetEventsCommand _handleStartPowerUpGrantingPhaseNetEventsCommand;
         private readonly HandleEndPowerUpGrantingPhaseNetEventsCommand _handleEndPowerUpGrantingPhaseNetEventsCommand;
-        private readonly UpdateLockOnTargetsTransformsCommand _updateLockOnTargetsTransformsCommand;
+        private readonly UpdateLockOnTargetEffectsCommand _updateLockOnTargetEffectsCommand;
         private readonly UpdatePreperationPhaseCountdownCommand _updatePreperationPhaseCountdownCommand;
         private readonly UpdateMatchTimerCountdownCommand _updateMatchTimerCountdownCommand;
         private readonly HandleMoleSpawnedNetEventsCommand _handleMoleSpawnedNetEventsCommand;
@@ -212,7 +212,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateShuffleNetEventsCommand = commandFactory.CreateCommandVoid<HandleActivateShuffleNetEventsCommand>();
             _handleStartPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleStartPowerUpGrantingPhaseNetEventsCommand>();
             _handleEndPowerUpGrantingPhaseNetEventsCommand = commandFactory.CreateCommandVoid<HandleEndPowerUpGrantingPhaseNetEventsCommand>();
-            _updateLockOnTargetsTransformsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetsTransformsCommand>();
+            _updateLockOnTargetEffectsCommand = commandFactory.CreateCommandVoid<UpdateLockOnTargetEffectsCommand>();
             _updatePreperationPhaseCountdownCommand = commandFactory.CreateCommandVoid<UpdatePreperationPhaseCountdownCommand>();
             _updateMatchTimerCountdownCommand = commandFactory.CreateCommandVoid<UpdateMatchTimerCountdownCommand>();
             _handleMoleSpawnedNetEventsCommand = commandFactory.CreateCommandVoid<HandleMoleSpawnedNetEventsCommand>();
@@ -331,7 +331,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.TickProcessor
             _handleActivateShuffleNetEventsCommand.Execute();
             _handleStartPowerUpGrantingPhaseNetEventsCommand.Execute();
             _handleEndPowerUpGrantingPhaseNetEventsCommand.Execute();
-            _updateLockOnTargetsTransformsCommand.Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
+            _updateLockOnTargetEffectsCommand.SetTick(lastProcessedTickFromServer).Execute(); // must be after _handlePlayerLockOnTargetsChangedNetEventsCommand.Execute() & _playerControllers.UpdatePlayersTickDeltas();
             _fullTickPacketsHandler.ClearUnprocessedPacketsByView();
             _networkDiagnosticsService.OnFrameRendered(Time.unscaledDeltaTime);
         }

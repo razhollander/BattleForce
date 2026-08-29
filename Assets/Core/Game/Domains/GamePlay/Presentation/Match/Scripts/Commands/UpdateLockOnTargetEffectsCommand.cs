@@ -10,13 +10,21 @@ using UnityEngine;
 
 namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 {
-    public class UpdateLockOnTargetsTransformsCommand : BaseCommand, ICommandVoid
+    public class UpdateLockOnTargetEffectsCommand : BaseCommand, ICommandVoid
     {
         private ILockOnTargetEffectController _lockOnTargetEffectController;
         private IMatchPlayerControllers _playerControllers;
         private IPowerUpBallControllers _powerUpBallControllers;
         private IMoleControllers _moleControllers;
         private IMatchDataService _matchDataService;
+
+        private int _tick;
+
+        public UpdateLockOnTargetEffectsCommand SetTick(int tick)
+        {
+            _tick = tick;
+            return this;
+        }
 
         public override void ResolveDependencies()
         {
@@ -35,6 +43,8 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
                 foreach (var targetedObject in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
+                    _lockOnTargetEffectController.UpdateTargetRetentionProgressOfPlayer(playerModel.PlayerId, targetedObject, _tick);
+
                     if (!TryGetTargetPosition(targetedObject, out var targetPosition))
                     {
                         continue;

@@ -61,6 +61,16 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             casterActiveEffects.UpdateTargetsPositionOnPlayer(targetKey, startPoint, endPoint);
         }
 
+        public void UpdateTargetRetentionProgressOfPlayer(ushort casterPlayerId, ObjectLockedOnTargetS2C target, int currentTick)
+        {
+            if (!_targetEffectControllerPerPlayerId.TryGetValue(casterPlayerId, out var casterActiveEffects))
+            {
+                return;
+            }
+
+            casterActiveEffects.UpdateTargetRetentionProgress(target, currentTick);
+        }
+
         public void DestroyAll()
         {
             foreach (var targetEffectController in _targetEffectControllerPerPlayerId.Values)

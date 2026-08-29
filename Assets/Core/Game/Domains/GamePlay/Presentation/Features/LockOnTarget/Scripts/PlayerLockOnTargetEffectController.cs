@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core.Game.Domains.GamePlay.Shared.S2CModels;
+using Core.Game.Domains.GamePlay.Shared.Scripts.Utils;
 using Core.Scripts.Network;
 using Core.Scripts.Utils;
 using Core.Scripts.Utils.CustomCollections;
@@ -12,6 +13,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
     public class PlayerLockOnTargetEffectController
     {
         private readonly SharedGamePlayConfig _sharedGamePlayConfig;
+        private readonly NetworkConfig _networkConfig;
         private readonly IStateMachineService _stateMachineService;
         private readonly LockOnTargetEffectPool _effectsPool;
 
@@ -24,6 +26,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         {
             _casterPlayerId = casterPlayerId;
             _sharedGamePlayConfig = sharedGamePlayConfig;
+            _networkConfig = networkConfig;
             _stateMachineService = stateMachineService;
             _effectsPool = effectsPool;
             _activeEffectsPerTarget = new Dictionary<LockOnTargetKey, LockOnTargetEffectView>(networkConfig.MaxCap.ConcurrentPlayers - 1);
@@ -59,7 +62,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             _cachedTargetsToRemove.Clear();
             foreach (var targetKey in _activeEffectsPerTarget.Keys)
             {
-                if (!DoesListContainTarget(playerIdsLockedOnTarget, targetKey))
+                if (!playerIdsLockedOnTarget.ContainsTarget(targetKey))
                 {
                     _cachedTargetsToRemove.Add(targetKey);
                 }
@@ -70,19 +73,6 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
                 _activeEffectsPerTarget[targetKey].Despawn();
                 _activeEffectsPerTarget.Remove(targetKey);
             }
-        }
-
-        private bool DoesListContainTarget(FixedUnorderedList<ObjectLockedOnTargetS2C> targets, LockOnTargetKey targetKey)
-        {
-            foreach (var target in targets.AsSpan())
-            {
-                if (target.GetKey().Equals(targetKey))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void PlayAnimationForState(LockOnTargetEffectView view, bool isShootable)
@@ -96,6 +86,24 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
             {
                 view.PlayLockOnTargetAnimation(cancellationToken).Forget();
             }
+        }
+
+        public void UpdateTargetRetentionProgress(ObjectLockedOnTargetS2C target, int currentTick)
+        {
+            if (!_activeEffectsPerTarget.TryGetValue(target.GetKey(), out var activeEffect))
+            {
+                return;
+            }
+
+            if (!target.IsLockOnTargetRetained)
+            {
+                activeEffect.HideRetentionEffect();
+                return;
+            }
+
+            var retentionSecondsLeft = TickUtils.GetSecondsLeftUntilTick(currentTick, target.RetentionEndTick, _networkConfig.DeltaTime);
+            var retentionProgress = Mathf.Clamp01(retentionSecondsLeft / _sharedGamePlayConfig.LockOnTargetRetentionDurationInSeconds);
+            activeEffect.ShowRetentionEffect(retentionProgress);
         }
 
         public void UpdateTargetsPositionOnPlayer(LockOnTargetKey targetKey, Vector2 startPoint, Vector2 endPoint)

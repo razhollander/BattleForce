@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsCurrentlyInGrantingPowerUpPhase;
         public readonly FixedUnorderedList<ObjectLockedOnTargetS2C> LockOnTargetObjects;
 
-        public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.Count > 0;
+        public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.HasAnyNonRetainedTarget();
 
         public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {
@@ -86,6 +86,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 writer.Put((byte)lockOnTargetObject.TargetId);
                 writer.Put(lockOnTargetObject.IsLockOnTargetShootable);
                 writer.Put((byte)lockOnTargetObject.TargetType);
+                writer.Put(lockOnTargetObject.RetentionEndTick);
             }
         }
 
@@ -113,6 +114,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
                 targetedEnemy.TargetId = reader.GetByte();
                 targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
                 targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
+                targetedEnemy.RetentionEndTick = reader.GetInt();
             }
         }
 

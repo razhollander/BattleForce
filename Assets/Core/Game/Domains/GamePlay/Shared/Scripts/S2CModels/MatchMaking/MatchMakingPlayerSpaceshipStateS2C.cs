@@ -27,10 +27,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             writer.Put((byte)ObjectsLockedOnTarget.Count);
             for (int i = 0; i < ObjectsLockedOnTarget.Count; i++)
             {
-                var targetedEnemy = ObjectsLockedOnTarget[i];
-                writer.Put((byte)targetedEnemy.TargetId);
-                writer.Put(targetedEnemy.IsLockOnTargetShootable);
-                writer.Put((byte)targetedEnemy.TargetType);
+                ObjectsLockedOnTarget.GetByIndex(i).Serialize(writer);
             }
         }
 
@@ -43,10 +40,7 @@ namespace Core.Game.Domains.GamePlay.Shared.Scripts.S2CModels.MatchMaking
             ObjectsLockedOnTarget.Clear();
             for (int i = 0; i < targetedEnemyIdsAmount; i++)
             {
-                ref var targetedEnemy = ref ObjectsLockedOnTarget.AddAndGet();
-                targetedEnemy.TargetId = reader.GetByte();
-                targetedEnemy.IsLockOnTargetShootable = reader.GetBool();
-                targetedEnemy.TargetType = (LockOnTargetType)reader.GetByte();
+                ObjectsLockedOnTarget.AddAndGet().Deserialize(reader);
             }
         }
 

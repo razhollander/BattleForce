@@ -174,6 +174,14 @@ Must follow strict MVC. No break rule.
 * **Type every remaining field to its real range, never to `int` by default.** Counts, scores, healths and ids that fit in 0-255 are `byte`; up to 65,535 is `ushort`. `Serialize`/`Deserialize` use the matching width (`writer.Put(value)` / `reader.GetUShort()`), and the caller casts at the `Add*NetEvent` call site so the whole signature chain stays narrow.
 * **Not sure a value fits the narrower type? Ask Raz, do not pick the safe wide one.** The ceiling is a design decision (a score cap, a max entity count), not something to guess from.
 
+#### **A serialisable type owns its own wire format**
+
+* **A struct that travels inside another serialisable type implements `INetSerializable` itself.** The containing `Serialize`/`Deserialize` loop is then one call per element - `list.GetByIndex(i).Serialize(writer)` / `list.AddAndGet().Deserialize(reader)` - and the format of that struct exists in exactly one file.
+* **Hand-inlining an element's fields inside its container writes the same wire format twice.** The two copies stay consistent with each other only until the next field is added, and nothing fails loudly when they stop - both sides of the drifted copy still agree, so the field simply never arrives on that path.
+* **A deserializer that assigns a default or a sentinel to a field instead of reading it is a drifted copy, not a design.** The field is on the wire everywhere else; that path just never got updated.
+* **Adding a field to a serialisable struct must be a one-file change.** If a second `Serialize` needs the same field appended, move the format onto the type first, then add the field once.
+* **Serialize elements in place, never through a local copy.** A `var element = list[i]` copies the struct, and a `ref var` filled field by field is a half-built value until the last line - both are just extra chances to forget a field.
+
 #### **Net event naming**
 
 * **Name a net event for who did what, subject first, in active voice:** `PlayerPassedScoreGateNetEventS2C`, not `ScoreGatePassedNetEventS2C`. The actor leads, the thing it acted on follows.
@@ -202,9 +210,23 @@ Must follow strict MVC. No break rule.
 * **Cleaning comments never changes behaviour or public API.** Extracted methods are `private`, serialized field names stay untouched so prefab references survive, and callers are left alone.
 
 
+#### **Name a query for the fact it checks, not for the conclusion its caller draws**
+
+* **A boolean method is named after what it verifies, using only the data its own class owns.** A class holding timers can answer `IsTargetTimerEnded`; it cannot answer `IsTargetShootable` - shootability is the caller's interpretation of that fact, and the next caller will draw a different conclusion from the same answer. Name it for the fact and both callers read correctly.
+* **The conclusion belongs at the call site, in a local named for what it means there.** That is also what keeps the query reusable - a query named after one caller's decision is a query nobody else can call without lying.
+* **An existence check over a collection reads `HasAny...`.** `HasNonRetainedTarget` reads as a statement about *the* target; `HasAnyNonRetainedTarget` cannot be misread as being about one particular element.
+* **A method on a `*Controllers` or collection class that acts on a single element says so in its name** (`...OfPlayer`, `...OfCaster`), matching its siblings, so it is never read as acting on all of them.
+
+#### **One concept, one name along the whole call chain**
+
+* **The same value keeps the same name in the interface, the implementation and every private helper it is passed to.** A list that is `outputTargetedObjects` in the public method and `validTargetedObjects` in the helper it calls forces the reader to re-establish, at every hop, that these are the same list.
+* **Name a parameter for what the data is, not for the role it plays at one call site.** `targetsInConeSight` over `output...` or `valid...`: role names go stale the moment the method both reads and appends to the list, and "valid" never says which validity.
+* **A parameter rename carries into the `I...` declaration in the same change**, so the interface and the implementation never disagree about what the argument is.
+
 ### **3\. PROGRAMMING RULES**
 
 * **Booleans:** Extract any logic into local `var` or properties. Do not calculate or check a condition with '=='/'>''<' inside the `if()` statement.  
+  * **This covers method calls too, not only operators.** `if (targets.ContainsTarget(key))` becomes `var isTargetStillInConeSight = targets.ContainsTarget(key);` whenever the method's own name does not state what a `true` means *here* - the local carries the meaning the call cannot.  
 * **Branch on the flag that actually distinguishes the cases, never on two numbers that happen to coincide.** A comparison like `remainingLives > damagePerHit` can look correct only because one entity type's life count happens to equal the damage constant - tune either number, or add a third case, and the coincidence breaks silently. Check the explicit flag (`IsGolden`) first, and only compare the numbers once inside the branch where they are actually meaningful.  
 * **If Statements:** Braces `{}` required unless it is a simple early return. Prefer early returns over nesting. Put expected logic in `if`, edge cases in `else`.  
 * **Constants:** No magic numbers. Ever.  
