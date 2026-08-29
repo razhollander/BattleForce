@@ -25,7 +25,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
         public bool IsCurrentlyInGrantingPowerUpPhase;
         public readonly FixedUnorderedList<ObjectLockedOnTargetS2C> LockOnTargetObjects;
 
-        public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.HasNonRetainedTarget();
+        public bool IsPlayerLockOnTargetSightShown => LockOnTargetObjects.HasAnyNonRetainedTarget();
 
         public PlayerSpaceshipStateS2C(int maxTalents, int maxEnemiesAmount)
         {

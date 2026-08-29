@@ -43,7 +43,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands
 
                 foreach (var targetedObject in playerModel.Spaceship.LockOnTargetObjects.AsSpan())
                 {
-                    _lockOnTargetEffectController.UpdateTargetRetentionProgress(playerModel.PlayerId, targetedObject, _tick);
+                    _lockOnTargetEffectController.UpdateTargetRetentionProgressOfPlayer(playerModel.PlayerId, targetedObject, _tick);
 
                     if (!TryGetTargetPosition(targetedObject, out var targetPosition))
                     {

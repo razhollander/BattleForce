@@ -28,7 +28,7 @@ namespace Core.Game.Domains.GamePlay.Presentation.Match.Scripts.Commands.NetEven
 
             foreach (var netEvent in _cachedPresentationEventsService.PlayerLockOnTargetsChangedNetEvents)
             {
-                var isLockOnTargetSightShown = netEvent.LockedOnTargetObjects.HasNonRetainedTarget();
+                var isLockOnTargetSightShown = netEvent.LockedOnTargetObjects.HasAnyNonRetainedTarget();
                 _matchPlayerControllers.SetPlayerIsLockOnTargetSightShown(netEvent.PlayerId, isLockOnTargetSightShown);
                 _lockOnTargetEffectController.RefreshTargetEffectsOfCaster(netEvent.PlayerId, netEvent.LockedOnTargetObjects);
             }

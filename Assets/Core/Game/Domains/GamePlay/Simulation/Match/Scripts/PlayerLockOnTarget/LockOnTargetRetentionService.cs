@@ -22,19 +22,19 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             _networkConfig = networkConfig;
         }
 
-        public void AddRetainedTargets(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> outputTargetedObjects, int processedTick)
+        public void AddRetainedTargets(PlayerStateS2C casterPlayerState, FixedUnorderedList<ObjectLockedOnTargetS2C> targetsInConeSight, int processedTick)
         {
             var previouslyTargetedObjects = casterPlayerState.Spaceship.LockOnTargetObjects;
 
             for (int i = 0; i < previouslyTargetedObjects.Count; i++)
             {
                 var previouslyTargetedObject = previouslyTargetedObjects[i];
-                if (!TryGetRetentionEndTick(casterPlayerState.Id, previouslyTargetedObject, outputTargetedObjects, processedTick, out var retentionEndTick))
+                if (!TryGetRetentionEndTick(casterPlayerState.Id, previouslyTargetedObject, targetsInConeSight, processedTick, out var retentionEndTick))
                 {
                     continue;
                 }
 
-                ref var retainedTarget = ref outputTargetedObjects.AddAndGet();
+                ref var retainedTarget = ref targetsInConeSight.AddAndGet();
                 retainedTarget.TargetId = previouslyTargetedObject.TargetId;
                 retainedTarget.TargetType = previouslyTargetedObject.TargetType;
                 retainedTarget.IsLockOnTargetShootable = true;
@@ -43,12 +43,13 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
         }
 
         private bool TryGetRetentionEndTick(ushort casterId, ObjectLockedOnTargetS2C previouslyTargetedObject,
-            FixedUnorderedList<ObjectLockedOnTargetS2C> validTargetedObjects, int processedTick, out int retentionEndTick)
+            FixedUnorderedList<ObjectLockedOnTargetS2C> targetsInConeSight, int processedTick, out int retentionEndTick)
         {
             retentionEndTick = ObjectLockedOnTargetS2C.NO_RETENTION_END_TICK;
             var targetKey = previouslyTargetedObject.GetKey();
-
-            if (validTargetedObjects.ContainsTarget(targetKey))
+            
+            var isTargetStillInConeSight = targetsInConeSight.ContainsTarget(targetKey);
+            if (isTargetStillInConeSight)
             {
                 return false;
             }

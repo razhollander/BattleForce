@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
             }
         }
 
-        public bool IsTargetShootable(LockOnTargetKey targetKey, float durationLimit)
+        public bool IsTargetTimerEnded(LockOnTargetKey targetKey, float durationLimit)
         {
             return _targetTimers.TryGetValue(targetKey, out var timer) && timer >= durationLimit;
         }

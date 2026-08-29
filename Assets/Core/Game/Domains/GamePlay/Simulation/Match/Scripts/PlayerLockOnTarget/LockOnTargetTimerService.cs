@@ -49,7 +49,7 @@ namespace Core.Game.Domains.GamePlay.Simulation.Match.Scripts.PlayerLockOnTarget
                 return false;
             }
 
-            return playerTimer.IsTargetShootable(new LockOnTargetKey(targetId, targetType), _sharedGamePlayConfig.LockOnTargetDurationInSeconds);
+            return playerTimer.IsTargetTimerEnded(new LockOnTargetKey(targetId, targetType), _sharedGamePlayConfig.LockOnTargetDurationInSeconds);
         }
 
         public void ResetTimer(ushort casterId, ushort targetId, LockOnTargetType targetType)

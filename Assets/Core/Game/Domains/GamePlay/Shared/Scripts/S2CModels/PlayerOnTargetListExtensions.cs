@@ -17,7 +17,7 @@ namespace Core.Game.Domains.GamePlay.Shared.S2CModels
             return false;
         }
 
-        public static bool HasNonRetainedTarget(this FixedUnorderedList<ObjectLockedOnTargetS2C> targets)
+        public static bool HasAnyNonRetainedTarget(this FixedUnorderedList<ObjectLockedOnTargetS2C> targets)
         {
             for (int i = 0; i < targets.Count; i++)
             {
