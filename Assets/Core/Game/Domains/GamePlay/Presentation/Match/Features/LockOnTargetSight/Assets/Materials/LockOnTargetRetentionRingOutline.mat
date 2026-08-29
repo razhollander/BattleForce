@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LockOnTargetRetentionRing
+  m_Name: LockOnTargetRetentionRingOutline
   m_Shader: {fileID: -6465566751694194690, guid: 0d29a75bbf6354fc48524ee4f03539b1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -72,11 +72,11 @@ Material:
     - _HalfArc: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Radius: 0.468
-    - _Thickness: 0.1
+    - _Radius: 0.483
+    - _Thickness: 0.13
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 0.22352941, g: 0.83137256, b: 0.3254902, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

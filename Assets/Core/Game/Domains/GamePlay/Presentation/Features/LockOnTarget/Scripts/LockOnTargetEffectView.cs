@@ -13,8 +13,12 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         private const string LOCK_ON_TARGET_SHOOTABLE_ANIMATION_NAME = "LockOnTargetShootable";
         private const float RETENTION_BAR_EMPTY_HALF_ARC_DEGREES = 180f;
         private const float RETENTION_BAR_FULL_HALF_ARC_DEGREES = 0f;
+        private const float RETENTION_BAR_FIXED_EDGE_ANGLE_DEGREES = 90f;
+        private const float RETENTION_BAR_OUTLINE_ARC_OVERHANG_DEGREES = 4f;
+        private const float FULL_CIRCLE_DEGREES = 360f;
 
         private static readonly int HALF_ARC_SHADER_PROPERTY = Shader.PropertyToID("_HalfArc");
+        private static readonly int ANGLE_SHADER_PROPERTY = Shader.PropertyToID("_Angle");
 
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private LineRenderer _lineRenderer;
@@ -28,15 +32,18 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         [SerializeField] private Color _lineColorRetention = new Color(1f, 0.61960787f, 0.23921569f, 1f);
         [SerializeField] private GameObject _retentionRadialProgressBar;
         [SerializeField] private SpriteRenderer _retentionRadialProgressBarSpriteRenderer;
+        [SerializeField] private SpriteRenderer _retentionRadialProgressBarOutlineSpriteRenderer;
 
         private CancellationTokenSource _currentAnimationCancellationTokenSource;
         private Material _retentionRadialProgressBarMaterial;
+        private Material _retentionRadialProgressBarOutlineMaterial;
 
         public Action Despawn { get; set; }
 
         public void OnCreated()
         {
             _retentionRadialProgressBarMaterial = _retentionRadialProgressBarSpriteRenderer.material;
+            _retentionRadialProgressBarOutlineMaterial = _retentionRadialProgressBarOutlineSpriteRenderer.material;
         }
 
         public void OnSpawned()
@@ -85,7 +92,13 @@ namespace Core.Game.Domains.GamePlay.Presentation.Features.LockOnTarget
         {
             _retentionRadialProgressBar.TrySetActive(true);
             var halfArcDegrees = Mathf.Lerp(RETENTION_BAR_EMPTY_HALF_ARC_DEGREES, RETENTION_BAR_FULL_HALF_ARC_DEGREES, retentionProgress);
+            var centerAngleDegrees = Mathf.Repeat(RETENTION_BAR_FIXED_EDGE_ANGLE_DEGREES - halfArcDegrees, FULL_CIRCLE_DEGREES);
             _retentionRadialProgressBarMaterial.SetFloat(HALF_ARC_SHADER_PROPERTY, halfArcDegrees);
+            _retentionRadialProgressBarMaterial.SetFloat(ANGLE_SHADER_PROPERTY, centerAngleDegrees);
+
+            var outlineHalfArcDegrees = halfArcDegrees - RETENTION_BAR_OUTLINE_ARC_OVERHANG_DEGREES * retentionProgress;
+            _retentionRadialProgressBarOutlineMaterial.SetFloat(HALF_ARC_SHADER_PROPERTY, outlineHalfArcDegrees);
+            _retentionRadialProgressBarOutlineMaterial.SetFloat(ANGLE_SHADER_PROPERTY, centerAngleDegrees);
 
             var lineWidth = _hitLineWidth * retentionProgress;
             _lineRenderer.startWidth = lineWidth;
